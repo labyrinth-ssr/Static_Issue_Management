@@ -1,34 +1,33 @@
 package org.example;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+//import net.sf.json.JSONArray;
+//import net.sf.json.JSONObject;
+
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import org.example.Utils.HTTPUtil;
 
-import java.io.FileFilter;
+import java.util.List;
 
 public class SonarResult {
 
-    public static void getSonarResut(){
+    public static List<Issues> getSonarIssues() {
         String result = HTTPUtil.sendGet("http://127.0.0.1:9000/api/issues/search?componentKeys=cim&additionalFields=_all&s=FILE_LINE&resolved=false");
-        JSONObject sonarData = JSONObject.fromObject(result);
+        JSONObject sonarData = JSONObject.parseObject(result);
         JSONArray issueRawData = sonarData.getJSONArray("issues");
-        for (int j = 0; j < issueRawData.size(); j++) {
-            JSONObject sonarIssue = issueRawData.getJSONObject(j);
-            //解析location
-            System.out.println(sonarIssue);
-        }
+        return JSON.parseArray(String.valueOf(issueRawData), Issues.class);
+    }
 
+    public static List<Rules> getSonartype(){
         String result1 = HTTPUtil.sendGet("http://127.0.0.1:9000/api/qualityprofiles/search?language=java");
-        JSONObject sonarConfig = JSONObject.fromObject(result1);
+        JSONObject sonarConfig = JSONObject.parseObject(result1);
         JSONObject profile = (JSONObject) sonarConfig.getJSONArray("profiles").get(0);
         String key = profile.getString("key");
         System.out.println(key);
 
         String result2 = HTTPUtil.sendGet("http://127.0.0.1:9000/api/rules/search?qprofile=" + key + "&activation=true");
-        JSONArray sonarRules = JSONObject.fromObject(result2).getJSONArray("rules");
-        for(int i = 0; i < sonarRules.size(); i++){
-            JSONObject jsonObject = (JSONObject) sonarRules.get(i);
-            System.out.println(jsonObject);
-        }
+        JSONArray sonarRules = JSONObject.parseObject(result2).getJSONArray("rules");
+        return JSON.parseArray(String.valueOf(sonarRules), Rules.class);
     }
 }
