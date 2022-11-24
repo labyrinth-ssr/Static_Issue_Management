@@ -1,6 +1,5 @@
 package org.example;
 
-import net.sf.json.JSONObject;
 import org.example.Utils.HTTPUtil;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
