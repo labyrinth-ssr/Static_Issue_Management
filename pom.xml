@@ -42,6 +42,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/issue-1.0.0-jar-with-dependencies.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.sonar</groupId>
+            <artifactId>sonar-plugin-api</artifactId>
+            <version>5.1</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

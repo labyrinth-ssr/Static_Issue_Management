@@ -19,14 +19,12 @@ public class SonarResult {
         List<SonarIssues> sonarIssueEntities = JSON.parseArray(String.valueOf(issueRawData), SonarIssues.class);
         for(int i = 0; i < sonarIssueEntities.size(); i++){
             JSONObject jsonObject = ((JSONObject)issueRawData.get(i));
-            System.out.println(jsonObject.toString());
             SonarIssues sonarIssueEntity = sonarIssueEntities.get(i);
             JSONArray flows = jsonObject.getJSONArray("flows");
             List<SonarLocation> sonarLocations = new ArrayList<>();
             SonarLocation sonarLocation;
             if(flows != null && flows.size() > 0) {
                 for (Object o : flows) {
-                    System.out.println(o.toString());
                     sonarLocation = JSON.parseObject(String.valueOf(((JSONObject)((JSONObject) o).getJSONArray("locations").get(0)).getJSONObject("textRange")), SonarLocation.class);
                     sonarLocations.add(sonarLocation);
                 }
