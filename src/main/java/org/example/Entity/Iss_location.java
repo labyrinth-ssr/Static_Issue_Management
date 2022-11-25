@@ -1,7 +1,12 @@
 package org.example.Entity;
 
+import SonarConfig.SonarIssues;
+import SonarConfig.SonarLocation;
+
+import java.util.List;
+
 public class Iss_location {
-    Integer inst_id;
+    String inst_id;
     String class_;
     String method;
     Integer start_line;
@@ -10,14 +15,14 @@ public class Iss_location {
     Integer end_col;
     Integer line_offset;
     String code;
-    int file_id;
+    String file_path;
 
-    public Integer getInst_id() {
+    public String getInst_id() {
         return inst_id;
     }
 
-    public void setFile_id(int file_id) {
-        this.file_id = file_id;
+    public void setFile_path(String file_path) {
+        this.file_path = file_path;
     }
 
     public String getClass_() {
@@ -84,11 +89,32 @@ public class Iss_location {
         this.code = code;
     }
 
-    public int getFile_id() {
-        return file_id;
+    public String getFile_path() {
+        return file_path;
     }
 
-    public void setInst_id(Integer inst_id) {
+    public void setInst_id(String inst_id) {
         this.inst_id = inst_id;
     }
+
+    public static void setLocation (List<SonarIssues> sonarIssues,List<Iss_location>res){
+        for (SonarIssues sonarIssues1:sonarIssues) {
+            for (SonarLocation location:sonarIssues1.getLocation()) {
+                Iss_location iss_location = new Iss_location();
+                iss_location.setCode("");
+                iss_location.setClass_("");
+                iss_location.setStart_line(Integer.parseInt(location.getStartLine()));
+                iss_location.setEnd_line(Integer.parseInt(location.getEndLine()));
+                iss_location.setStart_col(Integer.parseInt(location.getStartOffset()));
+                iss_location.setEnd_col(Integer.parseInt(location.getEndOffset()));
+                iss_location.setFile_path(sonarIssues1.getFilePath());
+                iss_location.setInst_id(sonarIssues1.getId());
+                iss_location.setMethod("");
+                res.add(iss_location);
+
+            }
+
+            }
+
+        }
 }

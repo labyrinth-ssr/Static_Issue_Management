@@ -69,7 +69,7 @@ public class Iss_instance {
         this.description = description;
     }
 
-    public void setInstance(List<SonarIssues> sonarIssues, Commit commit,List<Iss_instance> res){
+    public static void setInstance(List<SonarIssues> sonarIssues, Commit commit,List<Iss_instance> res){
             for (SonarIssues sonarIssues1:sonarIssues) {
                 Iss_instance iss_instance=new Iss_instance();
                 iss_instance.commit_hash=commit.getCommit_hash();

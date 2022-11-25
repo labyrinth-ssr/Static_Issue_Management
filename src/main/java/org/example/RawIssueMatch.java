@@ -13,13 +13,14 @@ import cn.edu.fudan.issue.entity.dbo.RawIssue;
 import cn.edu.fudan.issue.util.AnalyzerUtil;
 import cn.edu.fudan.issue.util.AstParserUtil;
 import org.example.Entity.Iss_instance;
+import org.example.Entity.Iss_match;
 
 public class RawIssueMatch {
 
     private static final String baseRepoPath = System.getProperty("user.dir");
     private static final String SEPARATOR = System.getProperty("file.separator");
 
-    public static void match(List<SonarIssues> issInstanceListPre, List<SonarIssues> issInstanceListCur,String commitHashPre,String commitHashCur)throws IOException{
+    public static void match(List<Iss_match> iss_matchList,List<SonarIssues> issInstanceListPre, List<SonarIssues> issInstanceListCur, String commitHashPre, String commitHashCur)throws IOException{
         List<RawIssue> preRawIssueList = new ArrayList<>();
 
         for (SonarIssues instance:issInstanceListPre) {
@@ -93,13 +94,17 @@ public class RawIssueMatch {
         AnalyzerUtil.addExtraAttributeInRawIssues(curRawIssueList, baseRepoPath);
         RawIssueMatcher.match(preRawIssueList, curRawIssueList, AstParserUtil.getMethodsAndFieldsInFile(baseRepoPath + SEPARATOR + "src/main/resources/testFile/commit2/test.java"));
 
-
-        for (RawIssue preRawIssue:preRawIssueList) {
-            System.out.println("preRawIssue1:matches " + preRawIssue.getMappedRawIssue().getUuid());
-        }
         for (RawIssue curRawIssue:curRawIssueList) {
-            System.out.println("preRawIssue1:matches " + curRawIssue.getMappedRawIssue().getUuid());
+            System.out.println("curRawIssue1:matches " + curRawIssue.getMappedRawIssue().getUuid());
+            Iss_match iss_match = new Iss_match();
+            iss_match.setInst_id(curRawIssue.getUuid());
+            iss_match.setParent_inst_id(curRawIssue.getMappedRawIssue().getUuid());
+            iss_match.setCommit_hash(curRawIssue.getCommitId());
+            iss_match.setParent_commit_hash(curRawIssue.getMappedRawIssue().getCommitId());
+            iss_match.setStatus("new");
+            iss_matchList.add(iss_match);
         }
+
     }
 
     public static void main(String[] args) throws IOException {

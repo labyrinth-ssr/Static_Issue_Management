@@ -69,5 +69,23 @@ public class Iss_file {
         this.file_name=temp[temp.length-1];
 
     }
+    //        List<Iss_file> issfileList = new ArrayList<>();
+//        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        File file = new File(pj_path);		//获取其file对象
+//        File[] fs = file.listFiles();
+//        for(File f:fs)
+//        {
+//            if(f.isFile())
+//            {
+//                String f1 = f.toString().replace("\\","/");
+//                Iss_file fti = new Iss_file();
+//                fti.setFile_path(f1);
+//                String[] temp2 = f1.split("/");
+//                fti.setFile_name(temp2[temp2.length-1]);
+//                fti.setlast_modified_time();
+//                fti.setRepo_path(pj_path);
+//                issfileList.add(fti);
+//            }
+//        }
 }
 
