@@ -13,8 +13,6 @@ public class SqlMapping {
     private Field[] fields;
     private String tableName;
     SqlConnect connection;
-
-
     public SqlMapping(SqlConnect connection) {
         this.connection = connection;
     }
@@ -57,11 +55,27 @@ public class SqlMapping {
         return list;
     }
 
+    private String hump2Underline(String str){
+        StringBuilder underLine = new StringBuilder();
+        String lowerString = str.toLowerCase();
+        for(int i = 0; i < str.length(); i++){
+            char a = str.charAt(i);
+            if(i == 0) underLine.append(lowerString.charAt(0));
+            else if(Character.isUpperCase(a)){
+                underLine.append("_").append(lowerString.charAt(i));
+            }
+            else{
+                underLine.append(a);
+            }
+        }
+        return underLine.toString();
+    }
+
     private String getInsertSQL() {
         StringBuilder sql = new StringBuilder();
         sql.append("insert ignore into ").append("`").append(tableName).append("`").append(" (");
         for (int i = 0; i < fields.length; i++) {
-            sql.append("`").append(fields[i].getName()).append("`");
+            sql.append("`").append(hump2Underline(fields[i].getName())).append("`");
             if (i < fields.length - 1) sql.append(",");
         }
         sql.append(") ").append(" values(");
@@ -119,26 +133,26 @@ public class SqlMapping {
         int kk = 0;
         for(List<?> l : list) {
             for (int i = 1; i <= l.size(); i++)
-                ps.setObject(i, l.get(i-1));
+                ps.setObject(i, l.get(i-1) instanceof ArrayList ? ((ArrayList<?>) l.get(i-1)).toString() : l.get(i-1));
             ps.addBatch();
             if(batchNum++ == 500){
                 int[] ns = ps.executeBatch();
-                for(int i = 0; i<ns.length; i++){
-                    if(ns[i] <= 0){
-                        //System.out.println(String.valueOf(++kk)+": "+list.get(i).toString());
-
-                    }
-                }
+//                for(int i = 0; i<ns.length; i++){
+//                    if(ns[i] <= 0){
+//                        //System.out.println(String.valueOf(++kk)+": "+list.get(i).toString());
+//
+//                    }
+//                }
                 batchNum = 0;
                 ps.clearParameters();
             }
         }
         int[] ns = ps.executeBatch();
-        for(int i = 0; i<ns.length; i++){
-            if(ns[i] <= 0){
-                //System.out.println(String.valueOf(++kk)+": "+list.get(i).toString());
-            }
-        }
+//        for(int i = 0; i<ns.length; i++){
+//            if(ns[i] <= 0){
+//                //System.out.println(String.valueOf(++kk)+": "+list.get(i).toString());
+//            }
+//        }
         return true;
     }
 
