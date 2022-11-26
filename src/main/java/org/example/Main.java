@@ -6,7 +6,7 @@ import org.example.Utils.SqlMapping;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        SqlConnect mysqlConnect = new SqlConnect(System.getProperty("user.dir") + "/conf.properties");
+        SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.execSqlReadFileContent("sql_create.sql");
 
         mysqlConnect.useDataBase("sonar");

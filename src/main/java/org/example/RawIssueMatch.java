@@ -22,7 +22,8 @@ public class RawIssueMatch {
 
     private static final String baseRepoPath = System.getProperty("user.dir");
 
-    private static final String baseRepoPath1 = "C:\\Users\\31324\\Desktop\\ss-backend\\lab2_back-end";
+    //private static final String baseRepoPath1 = "C:\\Users\\31324\\Desktop\\ss-backend\\lab2_back-end";
+    private static final String baseRepoPath1 = Constant.RepoPath;
 
     private static final String SEPARATOR = System.getProperty("file.separator");
 

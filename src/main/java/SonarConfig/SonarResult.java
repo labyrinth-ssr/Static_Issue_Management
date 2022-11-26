@@ -58,7 +58,7 @@ public class SonarResult {
             if(sonarIssueEntity.getLocation().size() > 0) locationBugLines = sonarIssueEntity.getLocation().stream().map(SonarLocation::getUuid).sorted().collect(Collectors.toList());
             StringBuilder locationStringBuilder = new StringBuilder();
             if(locationBugLines!=null) locationBugLines.forEach(location -> locationStringBuilder.append(location).append("_"));
-            String stringBuilder = locationStringBuilder + sonarIssueEntity .getType() + sonarIssueEntity.getFilePath();
+            String stringBuilder = locationStringBuilder + sonarIssueEntity .getType() + sonarIssueEntity.getFilePath() + System.currentTimeMillis();
             return UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
     }
 }

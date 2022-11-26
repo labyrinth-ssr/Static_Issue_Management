@@ -22,11 +22,10 @@ public class JGitTest {
     //获取版本信息和issue。
     public static void main(String[] args) throws Exception {
 
-//        使用自己库时把我这个注释掉，不要删
-//        String pj_path = "E:\\Blood\\secondyear_spring\\se\\work\\lab2_back-end";
-        String pj_path = "C:\\Users\\31324\\Desktop\\ss-backend\\lab2_back-end";
+        String pj_path = Constant.RepoPath;
 
-        SqlConnect mysqlConnect = new SqlConnect(System.getProperty("user.dir") + "/conf.properties");
+        SqlConnect mysqlConnect = new SqlConnect();
+        mysqlConnect.execSqlReadFileContent("crebas2.sql");
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 

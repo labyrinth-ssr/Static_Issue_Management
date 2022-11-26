@@ -1,5 +1,6 @@
 package org.example.Utils;
 
+import org.example.Constant;
 import org.example.Main;
 
 import java.io.*;
@@ -21,44 +22,30 @@ public class SqlConnect {
 
     public static Connection connection;
 
-    public SqlConnect(String configFile) {
+    public SqlConnect() {
         try {
-            Properties properties = new Properties();
-            File file = new File(configFile);
-            FileInputStream fis = new FileInputStream(file);
-            properties.load(fis);
-            fis.close();
-            JDBC_URL = properties.getProperty("jdbc_url");
-            JDBC_USER = properties.getProperty("jdbc_user");
-            JDBC_PASSWORD = properties.getProperty("jdbc_password");
+            JDBC_URL = Constant.jdbc_url;
+            JDBC_USER = Constant.jdbc_user;
+            JDBC_PASSWORD = Constant.jdbc_password;
 
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
-        } catch (SQLException | ClassNotFoundException | FileNotFoundException e){
+        } catch (SQLException | ClassNotFoundException e){
             e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    public SqlConnect(String configFile, String database) {
+    public SqlConnect(String database) {
         try {
-            Properties properties = new Properties();
-            File file = new File(configFile);
-            FileInputStream fis = new FileInputStream(file);
-            properties.load(fis);
-            fis.close();
-            JDBC_URL = properties.getProperty("jdbc_url");
-            JDBC_USER = properties.getProperty("jdbc_user");
-            JDBC_PASSWORD = properties.getProperty("jdbc_password");
+            JDBC_URL = Constant.jdbc_url;
+            JDBC_USER = Constant.jdbc_user;
+            JDBC_PASSWORD = Constant.jdbc_password;
 
             Class.forName("com.mysql.cj.jdbc.Driver");
             String DATABASE_URL = JDBC_URL + "/" + database;
             connection = DriverManager.getConnection(DATABASE_URL, JDBC_USER, JDBC_PASSWORD);
         } catch (SQLException | ClassNotFoundException e){
             e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
