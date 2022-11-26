@@ -3,6 +3,7 @@ package org.example.Entity;
 import SonarConfig.SonarIssues;
 import SonarConfig.SonarLocation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Iss_location {
@@ -97,7 +98,7 @@ public class Iss_location {
         this.inst_id = inst_id;
     }
 
-    public static void setLocation (List<SonarIssues> sonarIssues,List<Iss_location>res){
+    public static void setLocation (List<Iss_location>res,List<SonarIssues> sonarIssues){
         for (SonarIssues sonarIssues1:sonarIssues) {
             for (SonarLocation location:sonarIssues1.getLocation()) {
                 Iss_location iss_location = new Iss_location();

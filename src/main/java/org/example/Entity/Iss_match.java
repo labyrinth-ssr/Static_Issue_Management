@@ -1,11 +1,21 @@
 package org.example.Entity;
 
+import java.util.List;
+
 public class Iss_match {
     String inst_id;
     String parent_inst_id;
+    int case_id;
     String commit_hash;
     String parent_commit_hash;
-    String status;
+
+    public int getCase_id() {
+        return case_id;
+    }
+
+    public void setCase_id(int case_id) {
+        this.case_id = case_id;
+    }
 
     public String getInst_id() {
         return inst_id;
@@ -39,12 +49,14 @@ public class Iss_match {
         this.parent_commit_hash = parent_commit_hash;
     }
 
-    public String getStatus() {
-        return status;
-    }
+    public static int instIdLookUpCaseId(List<Iss_match>iss_matchList,String inst_id){
+        for (Iss_match iss_match:iss_matchList) {
+            if (iss_match.inst_id==inst_id){
+                return iss_match.case_id;
+            }
 
-    public void setStatus(String status) {
-        this.status = status;
+        }
+        return -1;
     }
 }
 

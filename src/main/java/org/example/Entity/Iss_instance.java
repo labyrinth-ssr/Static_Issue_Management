@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Iss_instance {
-    int id;
+    String inst_id;
     String type_id;
     String commit_hash;
     String commit_time;
@@ -14,12 +14,12 @@ public class Iss_instance {
     String file_path;
     String description;
 
-    public int getId() {
-        return id;
+    public void setInst_id(String inst_id) {
+        this.inst_id = inst_id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getInst_id() {
+        return inst_id;
     }
 
     public String getType_id() {
@@ -70,10 +70,10 @@ public class Iss_instance {
         this.description = description;
     }
 
-    public static List<Iss_instance> setInstance(List<SonarIssues> sonarIssues, Commit commit){
-        List<Iss_instance> res = new ArrayList<>();
+    public static void setInstance(List<Iss_instance> res,List<SonarIssues> sonarIssues, Commit commit){
             for (SonarIssues sonarIssues1:sonarIssues) {
                 Iss_instance iss_instance=new Iss_instance();
+                iss_instance.inst_id = sonarIssues1.getId();
                 iss_instance.commit_hash=commit.getCommit_hash();
                 iss_instance.commit_time=commit.getCommit_time();
                 iss_instance.committer=commit.getCommitter();
@@ -82,6 +82,5 @@ public class Iss_instance {
                 iss_instance.type_id=sonarIssues1.getTypeId();
                 res.add(iss_instance);
             }
-        return res;
     }
 };

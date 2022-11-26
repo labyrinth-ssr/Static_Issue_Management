@@ -9,10 +9,8 @@ public class Iss_case {
     Integer case_id;
     String type_id;
     String commit_hash_new;
-    String commiter_new;
-    String time_new;
+    String committer_new;
     String commit_hash_last;
-    String filepath_last;
     String commit_hash_disappear;
     String committer_disappear;
     String time_disappear;
@@ -44,20 +42,12 @@ public class Iss_case {
         this.commit_hash_new = commit_hash_new;
     }
 
-    public String getCommiter_new() {
-        return commiter_new;
+    public String getCommitter_new() {
+        return committer_new;
     }
 
-    public void setCommiter_new(String commiter_new) {
-        this.commiter_new = commiter_new;
-    }
-
-    public String getTime_new() {
-        return time_new;
-    }
-
-    public void setTime_new(String time_new) {
-        this.time_new = time_new;
+    public void setCommitter_new(String committer_new) {
+        this.committer_new = committer_new;
     }
 
     public String getCommit_hash_last() {
@@ -66,14 +56,6 @@ public class Iss_case {
 
     public void setCommit_hash_last(String commit_hash_last) {
         this.commit_hash_last = commit_hash_last;
-    }
-
-    public String getFilepath_last() {
-        return filepath_last;
-    }
-
-    public void setFilepath_last(String filepath_last) {
-        this.filepath_last = filepath_last;
     }
 
     public String getCommit_hash_disappear() {
@@ -122,6 +104,16 @@ public class Iss_case {
 
     public void setCase_status(String case_status) {
         this.case_status = case_status;
+    }
+
+    public static Iss_case look_up_case(List<Iss_case> iss_caseList,int case_id){
+        for (Iss_case iss_case:iss_caseList) {
+            if (case_id == iss_case.case_id){
+                return iss_case;
+            }
+
+        }
+        return null;
     }
 
 //    public static List<Iss_case> setIss_case(List<Iss_match>matchList, List<SonarIssues>sonarIssuesList){
