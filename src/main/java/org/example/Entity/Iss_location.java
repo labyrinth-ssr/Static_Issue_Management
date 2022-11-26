@@ -107,14 +107,11 @@ public class Iss_location {
                 iss_location.setEnd_line(Integer.parseInt(location.getEndLine()));
                 iss_location.setStart_col(Integer.parseInt(location.getStartOffset()));
                 iss_location.setEnd_col(Integer.parseInt(location.getEndOffset()));
-                iss_location.setFile_path(sonarIssues1.getFilePath());
+                iss_location.setFile_path(sonarIssues1.getFilePath().split(":")[1]);
                 iss_location.setInst_id(sonarIssues1.getId());
                 iss_location.setMethod("");
                 res.add(iss_location);
-
             }
-
             }
-
         }
 }

@@ -98,6 +98,7 @@ public class JgitUtil {
     }
 
     public static List<Iss_file> gitFileList(Git git,String repo_name){
+
         List<Iss_file> ret=new ArrayList<>();
         try {
             Repository repo = git.getRepository();
@@ -109,8 +110,9 @@ public class JgitUtil {
 
             ObjectId treeId = revCommit.getTree().getId();
 
-            try (TreeWalk treeWalk = new TreeWalk(git.getRepository())) {
+            try (TreeWalk treeWalk = new TreeWalk(repo)) {
                 treeWalk.reset(treeId);
+                treeWalk.setRecursive(true);
                 while (treeWalk.next()) {
                     Iss_file iss_file = new Iss_file();
                     iss_file.setFile_path(treeWalk.getPathString());

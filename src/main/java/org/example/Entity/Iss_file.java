@@ -65,7 +65,7 @@ public class Iss_file {
 
     public void path_to_name(){
 
-        String[] temp = file_path.split("\\\\");
+        String[] temp = file_path.split("/");
         this.file_name=temp[temp.length-1];
 
     }

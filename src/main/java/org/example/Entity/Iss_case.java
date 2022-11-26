@@ -1,8 +1,13 @@
 package org.example.Entity;
 
+import SonarConfig.SonarIssues;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Iss_case {
     Integer case_id;
-    Integer type_id;
+    String type_id;
     String commit_hash_new;
     String commiter_new;
     String time_new;
@@ -23,11 +28,11 @@ public class Iss_case {
         this.case_id = case_id;
     }
 
-    public Integer getType_id() {
+    public String getType_id() {
         return type_id;
     }
 
-    public void setType_id(Integer type_id) {
+    public void setType_id(String type_id) {
         this.type_id = type_id;
     }
 
@@ -118,6 +123,16 @@ public class Iss_case {
     public void setCase_status(String case_status) {
         this.case_status = case_status;
     }
+
+//    public static List<Iss_case> setIss_case(List<Iss_match>matchList, List<SonarIssues>sonarIssuesList){
+//        List<Iss_case> iss_caseList = new ArrayList<>();
+//        for (Iss_match iss_match:matchList) {
+//            Iss_case iss_case = new Iss_case();
+//            iss_case.setCase_status(iss_case.getCase_status());
+//            iss_case.setType_id(iss_match.getInst_id());
+//
+//        }
+//    }
 }
 
 

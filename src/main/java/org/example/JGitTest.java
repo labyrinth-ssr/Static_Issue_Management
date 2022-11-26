@@ -15,25 +15,25 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class JGitTest {
     //获取版本信息和issue。
     public static void main(String[] args) throws Exception {
-        SqlConnect mysqlConnect = new SqlConnect(System.getProperty("user.dir") + "/conf.properties");
-        mysqlConnect.useDataBase("sonarissue");
-        SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
+
 //        使用自己库时把我这个注释掉，不要删
 //        String pj_path = "E:\\Blood\\secondyear_spring\\se\\work\\lab2_back-end";
         String pj_path = "C:\\Users\\31324\\Desktop\\ss-backend\\lab2_back-end";
 
-        List<Repository> repositoryList=new ArrayList<>();
-        Repository repository=new Repository();
-        repository.setPath(pj_path);
-        repository.pathToName();
-        repositoryList.add(repository);
-        boolean a = sqlMapping.save(repositoryList);
+        SqlConnect mysqlConnect = new SqlConnect(System.getProperty("user.dir") + "/conf.properties");
+        mysqlConnect.useDataBase("sonarissue");
+        SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
+        Repository repository=new Repository();
+        repository.setPath(pj_path.replace("\\","/"));
+        repository.pathToName();
+        boolean a = sqlMapping.save(Collections.singletonList(repository));
 
         Git git = JgitUtil.openRpo(pj_path);
 
@@ -45,7 +45,6 @@ public class JGitTest {
         System.out.println("cur" + curCommit.getCommit_hash());
 
         List<Commit> commitList1 = new ArrayList<>();
-        List<Iss_instance> issInstanceList = new ArrayList<>();
         List<SonarIssues> sonarIssuesPre = new ArrayList<>();
         List<Iss_match> iss_matchList = new ArrayList<>();
         List<Iss_location> iss_locations = new ArrayList<>();
@@ -62,19 +61,26 @@ public class JGitTest {
             System.out.println(commit);
             commitList1.add(commit);
 
-            Iss_instance.setInstance(sonarIssues,commit,issInstanceList);
+            List<Iss_instance> issInstanceList = Iss_instance.setInstance(sonarIssues,commit);
             Iss_location.setLocation(sonarIssues,iss_locations);
 
             if (i>0){
                 RawIssueMatch.match(iss_matchList,sonarIssuesPre,sonarIssues,commitList.get(i-1).getCommit_hash(),commitList.get(i).getCommit_hash());
             }
+
             sonarIssuesPre = new ArrayList<> (sonarIssues);
+
+            boolean h = sqlMapping.save(sonarIssues);
+            boolean d =sqlMapping.save(issInstanceList);
+            boolean f = sqlMapping.save(iss_matchList);
+            boolean g = sqlMapping.save(iss_locations);
+
         }
 
         boolean c =sqlMapping.save(commitList1);
-        boolean d =sqlMapping.save(issInstanceList);
-        boolean f = sqlMapping.save(iss_matchList);
-        boolean g = sqlMapping.save(iss_locations);
+
+
+
 
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
 

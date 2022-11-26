@@ -2,6 +2,7 @@ package org.example.Entity;
 
 import SonarConfig.SonarIssues;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Iss_instance {
@@ -69,7 +70,8 @@ public class Iss_instance {
         this.description = description;
     }
 
-    public static void setInstance(List<SonarIssues> sonarIssues, Commit commit,List<Iss_instance> res){
+    public static List<Iss_instance> setInstance(List<SonarIssues> sonarIssues, Commit commit){
+        List<Iss_instance> res = new ArrayList<>();
             for (SonarIssues sonarIssues1:sonarIssues) {
                 Iss_instance iss_instance=new Iss_instance();
                 iss_instance.commit_hash=commit.getCommit_hash();
@@ -80,5 +82,6 @@ public class Iss_instance {
                 iss_instance.type_id=sonarIssues1.getTypeId();
                 res.add(iss_instance);
             }
+        return res;
     }
 };

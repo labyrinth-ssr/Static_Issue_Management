@@ -81,11 +81,9 @@ create table iss_case
    committer_new        varchar(40) not null,
    time_new             varchar(50) not null,
    commit_hash_last     varchar(40) not null,
-   file_path_last       varchar(255) not null,
    commit_hash_disappear varchar(40) not null,
    committer_disappear  varchar(40) not null,
-   time_disappear       varchar(50) not null,
-   create_time          varchar(50) not null,
+   time_disappear       varchar(50),
    update_time          varchar(50) not null,
    case_status          varchar(20) not null,
    primary key (case_id)
@@ -104,7 +102,6 @@ create table iss_case
 /*==============================================================*/
 create table iss_instance
 (
-   id                   int unsigned not null auto_increment,
    inst_id              varchar(36) not null,
    type_id              varchar(20) not null,
    commit_hash          varchar(40) not null,
@@ -112,7 +109,7 @@ create table iss_instance
    committer            varchar(40) not null,
    file_path            varchar(255) not null,
    description          varchar(255) not null,
-   primary key (id)
+   primary key (inst_id)
 );
 
 /*==============================================================*/
@@ -177,8 +174,8 @@ alter table iss_file add constraint FK_file_from_repo foreign key (repo_path)
 alter table iss_instance add constraint FK_commit foreign key (commit_hash)
      references commit (commit_hash) on delete restrict on update restrict;
 
--- alter table iss_location add constraint FK_instance_locate foreign key (inst_id)
---       references iss_instance (inst_id) on delete restrict on update restrict;
+ alter table iss_location add constraint FK_instance_locate foreign key (inst_id)
+       references iss_instance (inst_id) on delete restrict on update restrict;
 
 alter table iss_location add constraint FK_location_from_file foreign key (file_path)
       references iss_file (file_path) on delete restrict on update restrict;
@@ -186,9 +183,9 @@ alter table iss_location add constraint FK_location_from_file foreign key (file_
 -- alter table iss_match add constraint FK_case_match foreign key (case_id)
 --       references iss_case (case_id) on delete restrict on update restrict;
 
--- alter table iss_match add constraint FK_instance_match foreign key (inst_id)
---       references iss_instance (inst_id) on delete restrict on update restrict;
+ alter table iss_match add constraint FK_instance_match foreign key (inst_id)
+       references iss_instance (inst_id) on delete restrict on update restrict;
 
--- alter table iss_match add constraint FK_instance_match2 foreign key (parent_inst_id)
---      references iss_instance (inst_id) on delete restrict on update restrict;
+ alter table iss_match add constraint FK_instance_match2 foreign key (parent_inst_id)
+      references iss_instance (inst_id) on delete restrict on update restrict;
 

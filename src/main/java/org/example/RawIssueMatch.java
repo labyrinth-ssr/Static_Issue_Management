@@ -12,6 +12,8 @@ import cn.edu.fudan.issue.entity.dbo.Location;
 import cn.edu.fudan.issue.entity.dbo.RawIssue;
 import cn.edu.fudan.issue.util.AnalyzerUtil;
 import cn.edu.fudan.issue.util.AstParserUtil;
+import org.example.Entity.Commit;
+import org.example.Entity.Iss_case;
 import org.example.Entity.Iss_instance;
 import org.example.Entity.Iss_match;
 
@@ -20,7 +22,7 @@ public class RawIssueMatch {
     private static final String baseRepoPath = System.getProperty("user.dir");
     private static final String SEPARATOR = System.getProperty("file.separator");
 
-    public static void match(List<Iss_match> iss_matchList,List<SonarIssues> issInstanceListPre, List<SonarIssues> issInstanceListCur, String commitHashPre, String commitHashCur)throws IOException{
+    public static void match(List<Iss_case>iss_caseList, List<Iss_match> iss_matchList, List<SonarIssues> issInstanceListPre, List<SonarIssues> issInstanceListCur, Commit preCommit,Commit curCommit,)throws IOException{
         List<RawIssue> preRawIssueList = new ArrayList<>();
 
         for (SonarIssues instance:issInstanceListPre) {
@@ -29,7 +31,7 @@ public class RawIssueMatch {
             preRawIssue1.setType(instance.getType());
             preRawIssue1.setFileName(instance.getFilePath());
             preRawIssue1.setDetail(instance.getMessage());
-            preRawIssue1.setCommitId(commitHashPre);
+            preRawIssue1.setCommitId(preCommit.getCommit_hash());
                 List<Location> locationList = new ArrayList<>();
                 for (SonarLocation location:instance.getLocation()) {
                     Location preLocation1 = new Location();
@@ -65,7 +67,7 @@ public class RawIssueMatch {
             curRawIssue1.setType(instance.getType());
             curRawIssue1.setFileName(instance.getFilePath());
             curRawIssue1.setDetail(instance.getMessage());
-            curRawIssue1.setCommitId(commitHashCur);
+            curRawIssue1.setCommitId(curCommit.getCommit_hash());
                 List<Location> locationList = new ArrayList<>();
                 for (SonarLocation location : instance.getLocation()) {
                     Location curLocation1 = new Location();
@@ -103,6 +105,13 @@ public class RawIssueMatch {
             iss_match.setParent_commit_hash(curRawIssue.getMappedRawIssue().getCommitId());
             iss_match.setStatus("new");
             iss_matchList.add(iss_match);
+
+            Iss_case iss_case=new Iss_case();
+            iss_case.setType_id(curRawIssue.getType());
+            iss_case.setCommit_hash_new(curRawIssue.getCommitId());
+            iss_case.setCommit_hash_last(curRawIssue.getMappedRawIssue().getCommitId());
+            iss_case.setCommiter_new(curCommit.getCommitter());
+            iss_case.setCommit_hash_last(preCommit.getCommit_hash());
         }
 
     }
