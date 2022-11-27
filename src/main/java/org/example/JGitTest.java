@@ -25,7 +25,7 @@ public class JGitTest {
         String pj_path = Constant.RepoPath;
 
         SqlConnect mysqlConnect = new SqlConnect();
-        mysqlConnect.execSqlReadFileContent("crebas2.sql");
+//        mysqlConnect.execSqlReadFileContent("crebas2.sql");
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
@@ -51,7 +51,7 @@ public class JGitTest {
         List<Iss_instance> issInstanceList = new ArrayList<>();
         List<Iss_location> iss_locations = new ArrayList<>();
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 1; i >=0; i--) {
 
             Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
 
@@ -67,20 +67,21 @@ public class JGitTest {
             Iss_instance.setInstance(issInstanceList,sonarIssues,commit);
             Iss_location.setLocation(iss_locations,sonarIssues);
 
-            if (i==0) {
-                RawIssueMatch.firstMatch(iss_matchList,iss_caseList,sonarIssues,commitList.get(0));
+            if (i==1) {
+                RawIssueMatch.firstMatch(iss_matchList,iss_caseList,sonarIssues,commitList.get(1));
             }else {
-                RawIssueMatch.match(iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList.get(i-1),commitList.get(i));
+                RawIssueMatch.match(iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList.get(i+1),commitList.get(i));
             }
 
             sonarIssuesPre = new ArrayList<> (sonarIssues);
 
-            boolean c =sqlMapping.save(commitList1);
-            boolean d =sqlMapping.save(issInstanceList);
-            boolean f = sqlMapping.save(iss_matchList);
-            boolean g = sqlMapping.save(iss_locations);
-            boolean j =sqlMapping.save(iss_caseList);
+
         }
+        boolean c =sqlMapping.save(commitList1);
+        boolean d =sqlMapping.save(issInstanceList);
+        boolean j =sqlMapping.save(iss_caseList);
+        boolean f = sqlMapping.save(iss_matchList);
+        boolean g = sqlMapping.save(iss_locations);
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
     }
 
