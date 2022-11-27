@@ -27,6 +27,8 @@ public class JGitTest {
         String pj_path = "C:\\Users\\31324\\Desktop\\ss-backend\\lab2_back-end";
 
         SqlConnect mysqlConnect = new SqlConnect(System.getProperty("user.dir") + "/conf.properties");
+        mysqlConnect.execSqlReadFileContent("crebas2.sql");
+
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
