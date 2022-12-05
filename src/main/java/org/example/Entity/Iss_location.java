@@ -1,9 +1,8 @@
 package org.example.Entity;
 
-import SonarConfig.SonarIssues;
-import SonarConfig.SonarLocation;
+import org.example.SonarConfig.SonarIssues;
+import org.example.SonarConfig.SonarLocation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Iss_location {

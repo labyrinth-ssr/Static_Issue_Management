@@ -23,6 +23,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * 实现Jgit操作
+ */
 public class JgitUtil {
     public static Git openRpo(String dir){
         Git git = null;

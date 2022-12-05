@@ -1,4 +1,4 @@
-package SonarConfig;
+package org.example.SonarConfig;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;

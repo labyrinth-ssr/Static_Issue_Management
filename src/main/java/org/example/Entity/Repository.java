@@ -26,4 +26,12 @@ public class Repository {
         String[] temp = path.split("\\\\");
         this.repo_name=temp[temp.length-1];
     }
+
+    @Override
+    public String toString() {
+        return "Repository{" +
+                "repo_name='" + repo_name + '\'' +
+                ", path='" + path + '\'' +
+                '}';
+    }
 }

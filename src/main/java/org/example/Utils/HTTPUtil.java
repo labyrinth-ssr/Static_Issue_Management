@@ -15,6 +15,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 实现HTTP操作，主要用于SonarQube数据获取
+ * */
 public class HTTPUtil {
 
     /**

@@ -1,8 +1,5 @@
 package org.example.Entity;
 
-import SonarConfig.SonarIssues;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class Iss_case {
