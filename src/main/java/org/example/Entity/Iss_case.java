@@ -3,6 +3,7 @@ package org.example.Entity;
 import SonarConfig.SonarIssues;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Iss_case {
@@ -13,9 +14,9 @@ public class Iss_case {
     String commit_hash_last;
     String commit_hash_disappear;
     String committer_disappear;
-    String time_disappear;
-    String create_time;
-    String update_time;
+    Date time_disappear;
+    Date create_time;
+    Date update_time;
     String case_status;
 
     public Integer getCase_id() {
@@ -74,27 +75,27 @@ public class Iss_case {
         this.commit_hash_disappear = commit_hash_disappear;
     }
 
-    public String getTime_disappear() {
+    public Date getTime_disappear() {
         return time_disappear;
     }
 
-    public void setTime_disappear(String time_disappear) {
+    public void setTime_disappear(Date time_disappear) {
         this.time_disappear = time_disappear;
     }
 
-    public String getCreate_time() {
+    public Date getCreate_time() {
         return create_time;
     }
 
-    public void setCreate_time(String create_time) {
+    public void setCreate_time(Date create_time) {
         this.create_time = create_time;
     }
 
-    public String getUpdate_time() {
+    public Date getUpdate_time() {
         return update_time;
     }
 
-    public void setUpdate_time(String update_time) {
+    public void setUpdate_time(Date update_time) {
         this.update_time = update_time;
     }
 

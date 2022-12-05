@@ -12,7 +12,7 @@ import java.util.Date;
 public class Iss_file {
     String file_name;
     String file_path;
-    String created_time;
+    Date created_time;
 
     String repo_path;
 
@@ -41,27 +41,27 @@ public class Iss_file {
         this.file_path = file_path;
     }
 
-    public String getCreated_time() {
+    public Date getCreated_time() {
         return created_time;
     }
 
-    public void setCreated_time(String created_time) {
+    public void setCreated_time(Date created_time) {
         this.created_time = created_time;
     }
 
-    public void setlast_modified_time() {
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Path path = Paths.get(file_path);
-        BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
-        BasicFileAttributes attr;
-        try {
-            attr = basicview.readAttributes();
-            this.created_time = df.format(new Date(attr.lastModifiedTime().toMillis())); ;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    public void setlast_modified_time() {
+//
+//        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        Path path = Paths.get(file_path);
+//        BasicFileAttributeView basicview = Files.getFileAttributeView(path, BasicFileAttributeView.class, LinkOption.NOFOLLOW_LINKS);
+//        BasicFileAttributes attr;
+//        try {
+//            attr = basicview.readAttributes();
+//            this.created_time = df.format(new Date(attr.lastModifiedTime().toMillis())); ;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void path_to_name(){
 
