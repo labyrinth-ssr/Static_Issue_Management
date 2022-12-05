@@ -2,6 +2,7 @@ package org.example.Entity;
 
 import org.example.SonarConfig.SonarIssues;
 import org.example.SonarConfig.SonarLocation;
+import cn.edu.fudan.issue.util.AstParserUtil;
 
 import java.util.List;
 
@@ -102,6 +103,7 @@ public class Iss_location {
             for (SonarLocation location:sonarIssues1.getLocation()) {
                 Iss_location iss_location = new Iss_location();
                 iss_location.setCode("");
+//                AstParserUtil.getAllClassNamesInFile()
                 iss_location.setClass_("");
                 iss_location.setStart_line(Integer.parseInt(location.getStartLine()));
                 iss_location.setEnd_line(Integer.parseInt(location.getEndLine()));

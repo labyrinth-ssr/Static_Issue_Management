@@ -21,6 +21,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -67,9 +68,9 @@ public class JgitUtil {
         final Instant commitInstant = Instant.ofEpochSecond(c.getCommitTime());
         final ZoneId zoneId = c.getAuthorIdent().getTimeZone().toZoneId();
         final ZonedDateTime authorDateTime = ZonedDateTime.ofInstant(commitInstant, zoneId);
-        final String gitDateTimeFormatString = "yyyy MM dd HH:mm:ss Z";
-        final String formattedDate = authorDateTime.format(DateTimeFormatter.ofPattern(gitDateTimeFormatString));
-        commit.setCommit_time(formattedDate);
+//        final String gitDateTimeFormatString = "yyyy MM dd HH:mm:ss Z";
+//        final String formattedDate = authorDateTime.format(DateTimeFormatter.ofPattern(gitDateTimeFormatString));
+        commit.setCommit_time(Date.from(authorDateTime.toInstant()));
         commit.setCommit_msg(c.getShortMessage());
         if(c.getParentCount() > 0) commit.setParent_commit_hash(c.getParent(0).getName());
         return  commit;
@@ -110,8 +111,6 @@ public class JgitUtil {
             ObjectId objectId = repo.resolve(Constants.HEAD);
             RevCommit revCommit = revWalk.parseCommit(objectId);
 
-            revCommit.getCommitTime();
-
             ObjectId treeId = revCommit.getTree().getId();
 
             try (TreeWalk treeWalk = new TreeWalk(repo)) {
@@ -122,7 +121,7 @@ public class JgitUtil {
                     iss_file.setFile_path(treeWalk.getPathString());
                     iss_file.path_to_name();
                     iss_file.setRepo_path(repo_name);
-                    iss_file.setCreated_time(String.valueOf(revCommit.getCommitTime()));
+                    iss_file.setCreated_time(RevCommit2Commit(revCommit).getCommit_time());
                     ret.add(iss_file);
                 }
                 return ret;

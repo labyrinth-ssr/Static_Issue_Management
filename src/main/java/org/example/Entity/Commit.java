@@ -1,9 +1,11 @@
 package org.example.Entity;
 
+import java.util.Date;
+
 public class Commit implements Cloneable{
     String commit_hash;
     String committer;
-    String commit_time;
+    Date commit_time;
     String commit_msg;
     String committer_email;
     String parent_commit_hash;
@@ -32,11 +34,11 @@ public class Commit implements Cloneable{
         this.committer = committer;
     }
 
-    public String getCommit_time() {
+    public Date getCommit_time() {
         return commit_time;
     }
 
-    public void setCommit_time(String commit_time) {
+    public void setCommit_time(Date commit_time) {
         this.commit_time = commit_time;
     }
 

@@ -39,11 +39,11 @@ create table commit
    commit_hash          varchar(40) not null,
    repo_path            varchar(255) not null,
    committer            varchar(40) not null,
-   commit_time          varchar(50) not null,
+   commit_time          datetime not null,
    commit_msg           varchar(255),
    committer_email      varchar(255),
    parent_commit_hash   varchar(40),
-   primary key (commit_hash)
+   primary key (commit_hash,repo_path)
 );
 
 -- create unique index commit_from_file_FK on commit
@@ -66,7 +66,7 @@ create table iss_file
    file_name            varchar(40) not null,
    repo_path            varchar(255) not null,
    file_path            varchar(255) not null,
-   created_time             varchar(50) not null,
+   created_time         datetime not null,
    primary key (file_path)
 );
 
@@ -82,9 +82,9 @@ create table iss_case
    commit_hash_last     varchar(40) not null,
    commit_hash_disappear varchar(40) not null,
    committer_disappear  varchar(40) not null,
-   time_disappear       varchar(50),
-   update_time          varchar(50) not null,
-   create_time          varchar(50) not null,
+   time_disappear       datetime,
+   update_time          datetime not null,
+   create_time          datetime not null,
    case_status          varchar(20) not null,
    primary key (case_id)
 );
@@ -105,7 +105,7 @@ create table iss_instance
    inst_id              varchar(36) not null,
    type_id              varchar(20) not null,
    commit_hash          varchar(40) not null,
-   commit_time          varchar(50) not null,
+   commit_time          datetime not null,
    committer            varchar(40) not null,
    file_path            varchar(255) not null,
    description          varchar(255) not null,

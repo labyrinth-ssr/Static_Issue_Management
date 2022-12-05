@@ -2,13 +2,15 @@ package org.example.Entity;
 
 import org.example.SonarConfig.SonarIssues;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Iss_instance {
     String inst_id;
     String type_id;
     String commit_hash;
-    String commit_time;
+    Date commit_time;
     String committer;
     String file_path;
     String description;
@@ -37,11 +39,11 @@ public class Iss_instance {
         this.commit_hash = commit_hash;
     }
 
-    public String getCommit_time() {
+    public Date getCommit_time() {
         return commit_time;
     }
 
-    public void setCommit_time(String commit_time) {
+    public void setCommit_time(Date commit_time) {
         this.commit_time = commit_time;
     }
 
