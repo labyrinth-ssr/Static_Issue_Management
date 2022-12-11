@@ -10,10 +10,10 @@ public class Iss_instance {
     String inst_id;
     String type_id;
     String commit_hash;
-    Date commit_time;
-    String committer;
-    String file_path;
-    String description;
+//    Date commit_time;
+//    String committer;
+//    String file_path;
+//    String description;
 
     public void setInst_id(String inst_id) {
         this.inst_id = inst_id;
@@ -39,48 +39,48 @@ public class Iss_instance {
         this.commit_hash = commit_hash;
     }
 
-    public Date getCommit_time() {
-        return commit_time;
-    }
-
-    public void setCommit_time(Date commit_time) {
-        this.commit_time = commit_time;
-    }
-
-    public String getCommitter() {
-        return committer;
-    }
-
-    public void setCommitter(String committer) {
-        this.committer = committer;
-    }
-
-    public String getFile_path() {
-        return file_path;
-    }
-
-    public void setFile_path(String file_path) {
-        this.file_path = file_path;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+//    public Date getCommit_time() {
+//        return commit_time;
+//    }
+//
+//    public void setCommit_time(Date commit_time) {
+//        this.commit_time = commit_time;
+//    }
+//
+//    public String getCommitter() {
+//        return committer;
+//    }
+//
+//    public void setCommitter(String committer) {
+//        this.committer = committer;
+//    }
+//
+//    public String getFile_path() {
+//        return file_path;
+//    }
+//
+//    public void setFile_path(String file_path) {
+//        this.file_path = file_path;
+//    }
+//
+//    public String getDescription() {
+//        return description;
+//    }
+//
+//    public void setDescription(String description) {
+//        this.description = description;
+//    }
 
     public static void setInstance(List<Iss_instance> res,List<SonarIssues> sonarIssues, Commit commit){
             for (SonarIssues sonarIssues1:sonarIssues) {
                 Iss_instance iss_instance=new Iss_instance();
                 iss_instance.inst_id = sonarIssues1.getId();
                 iss_instance.commit_hash=commit.getCommit_hash();
-                iss_instance.commit_time=commit.getCommit_time();
-                iss_instance.committer=commit.getCommitter();
-                iss_instance.file_path=sonarIssues1.getFilePath();
-                iss_instance.description=sonarIssues1.getMessage();
-                iss_instance.type_id=sonarIssues1.getType();
+//                iss_instance.commit_time=commit.getCommit_time();
+//                iss_instance.committer=commit.getCommitter();
+//                iss_instance.file_path=sonarIssues1.getFilePath();
+//                iss_instance.description=sonarIssues1.getMessage();
+                iss_instance.type_id=sonarIssues1.getTypeId() ;
                 res.add(iss_instance);
             }
     }

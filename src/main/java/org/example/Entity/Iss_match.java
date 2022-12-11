@@ -6,8 +6,8 @@ public class Iss_match {
     String inst_id;
     String parent_inst_id;
     String case_id;
-    String commit_hash;
-    String parent_commit_hash;
+//    String commit_hash;
+//    String parent_commit_hash;
 
     public String getCase_id() {
         return case_id;
@@ -33,21 +33,21 @@ public class Iss_match {
         this.parent_inst_id = parent_inst_id;
     }
 
-    public String getCommit_hash() {
-        return commit_hash;
-    }
-
-    public void setCommit_hash(String commit_hash) {
-        this.commit_hash = commit_hash;
-    }
-
-    public String getParent_commit_hash() {
-        return parent_commit_hash;
-    }
-
-    public void setParent_commit_hash(String parent_commit_hash) {
-        this.parent_commit_hash = parent_commit_hash;
-    }
+//    public String getCommit_hash() {
+//        return commit_hash;
+//    }
+//
+//    public void setCommit_hash(String commit_hash) {
+//        this.commit_hash = commit_hash;
+//    }
+//
+//    public String getParent_commit_hash() {
+//        return parent_commit_hash;
+//    }
+//
+//    public void setParent_commit_hash(String parent_commit_hash) {
+//        this.parent_commit_hash = parent_commit_hash;
+//    }
 
     public static String instIdLookUpCaseId(List<Iss_match>iss_matchList,String inst_id){
         for (Iss_match iss_match:iss_matchList) {

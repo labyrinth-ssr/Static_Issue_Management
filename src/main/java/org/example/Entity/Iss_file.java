@@ -13,7 +13,6 @@ public class Iss_file {
     String file_name;
     String file_path;
     Date created_time;
-
     String repo_path;
 
     public String getRepo_path() {

@@ -6,9 +6,11 @@ import cn.edu.fudan.issue.util.AstParserUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Iss_location {
-    String inst_id;
+    String location_id;
+//    String inst_id;
     String class_;
     String method;
     Integer start_line;
@@ -19,9 +21,17 @@ public class Iss_location {
     String code;
     String file_path;
 
-    public String getInst_id() {
-        return inst_id;
+    public String getLocation_id() {
+        return location_id;
     }
+
+    public void setLocation_id(String location_id) {
+        this.location_id = location_id;
+    }
+
+//    public String getInst_id() {
+//        return inst_id;
+//    }
 
     public void setFile_path(String file_path) {
         this.file_path = file_path;
@@ -95,8 +105,13 @@ public class Iss_location {
         return file_path;
     }
 
-    public void setInst_id(String inst_id) {
-        this.inst_id = inst_id;
+//    public void setInst_id(String inst_id) {
+//        this.inst_id = inst_id;
+//    }
+
+    public static String getUuidFromLocation(Iss_location location){
+        String stringBuilder =location.getFile_path()+location.getStart_line()+location.getEnd_line()+location.getStart_col()+location.getEnd_col();
+        return UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
     }
 
     public static void setLocation (List<Iss_location>res,List<SonarIssues> sonarIssues){
@@ -111,8 +126,9 @@ public class Iss_location {
                 iss_location.setStart_col(Integer.parseInt(location.getStartOffset()));
                 iss_location.setEnd_col(Integer.parseInt(location.getEndOffset()));
                 iss_location.setFile_path(sonarIssues1.getFilePath().split(":")[1]);
-                iss_location.setInst_id(sonarIssues1.getId());
+//                iss_location.setInst_id(sonarIssues1.getId());
                 iss_location.setMethod("");
+                iss_location.setLocation_id(getUuidFromLocation(iss_location));
                 res.add(iss_location);
             }
             }
