@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 public class Iss_case {
     String case_id;
+//    String type_;
     String type_id;
-    String message;
     String commit_hash_new;
     String committer_new;
     String commit_hash_last;
@@ -20,13 +20,13 @@ public class Iss_case {
     Date update_time;
     String case_status;
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
+//    public String getType_() {
+//        return type_;
+//    }
+//
+//    public void setType_(String type_) {
+//        this.type_ = type_;
+//    }
 
     public String getCase_id() {
         return case_id;
@@ -127,7 +127,7 @@ public class Iss_case {
     }
 
     public static String getUuidFromIssueCase(Iss_case iss_case,int i){
-        String stringBuilder =iss_case.getCommit_hash_new()+iss_case.getCommit_hash_last()+ System.currentTimeMillis() + String.valueOf(i);
+        String stringBuilder =iss_case.getCommit_hash_new()+iss_case.getCommit_hash_last()+ String.valueOf(i);
         return UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
     }
 

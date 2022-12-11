@@ -34,22 +34,22 @@ public class RawIssueMatch {
             Iss_case iss_case = new Iss_case();
             Iss_match iss_match = new Iss_match();
 
-            iss_case.setType_id(iss_instance.getType());
+            iss_case.setType_id(iss_instance.getTypeId());
             iss_case.setUpdate_time(curCommit.getCommit_time());
             iss_case.setCase_status("new");
             iss_case.setCommit_hash_new(curCommit.getCommit_hash());
             iss_case.setCommit_hash_last(curCommit.getCommit_hash());
             iss_case.setCommitter_new(curCommit.getCommitter());
             iss_case.setCreate_time(curCommit.getCommit_time());
-            iss_case.setMessage(iss_instance.getMessage());
+//            iss_case.setMessage(iss_instance.getMessage());
             String case_id = Iss_case.getUuidFromIssueCase(iss_case,++case_id_num);
             iss_case.setCase_id(case_id);
 
             iss_match.setParent_inst_id("");
-            iss_match.setParent_commit_hash("");
+//            iss_match.setParent_commit_hash("");
             iss_match.setCase_id(case_id);
             iss_match.setInst_id(iss_instance.getId());
-            iss_match.setCommit_hash(curCommit.getCommit_hash());
+//            iss_match.setCommit_hash(curCommit.getCommit_hash());
 
             iss_matchList.add(iss_match);
             iss_caseList.add(iss_case);
@@ -58,7 +58,7 @@ public class RawIssueMatch {
             //直接将inst_id设成rawIssue的uuid
             preRawIssue1.setUuid(String.valueOf(iss_instance.getId()));
             //rawIssue 中的type设为SonarIssue中的typeId
-            preRawIssue1.setType(iss_instance.getType());
+            preRawIssue1.setType(iss_instance.getTypeId());
             preRawIssue1.setDetail(iss_instance.getMessage());
             preRawIssue1.setCommitId(curCommit.getCommit_hash());
             preRawIssue1.setFileName(iss_instance.getFilePath().split(":")[1].replace("/","\\"));
@@ -91,13 +91,20 @@ public class RawIssueMatch {
 
         AnalyzerUtil.addExtraAttributeInRawIssues(preRawIssueList, baseRepoPath1);
 
-                for (RawIssue i: preRawIssueList) {
+        for (RawIssue i: preRawIssueList) {
             for (Location location: i.getLocations()) {
-                if (preRawIssueList.indexOf(i)==-1) continue;
-                Iss_location iss_location = iss_locationList.get(preRawIssueList.indexOf(i));
+//                if (preRawIssueList.indexOf(i)==-1) continue;
+                Iss_location iss_location = new Iss_location();
                 iss_location.setMethod(location.getAnchorName());
                 iss_location.setClass_(location.getClassName());
                 iss_location.setCode(location.getCode());
+                iss_location.setFile_path(i.getFileName());
+                iss_location.setStart_line(location.getStartLine());
+                iss_location.setEnd_line(location.getEndLine());
+                iss_location.setStart_col(location.getStartToken());
+                iss_location.setEnd_col(location.getEndToken());
+                iss_location.setLocation_id(Iss_location.getUuidFromLocation(iss_location));
+                iss_locationList.add(iss_location);
             }
         }
     }
@@ -110,7 +117,7 @@ public class RawIssueMatch {
             //直接将inst_id设成rawIssue的uuid
             preRawIssue1.setUuid(String.valueOf(instance.getId()));
             //rawIssue 中的type设为SonarIssue中的typeId
-            preRawIssue1.setType(instance.getType());
+            preRawIssue1.setType(instance.getTypeId());
             preRawIssue1.setDetail(instance.getMessage());
             preRawIssue1.setCommitId(preCommit.getCommit_hash());
             preRawIssue1.setFileName(instance.getFilePath().split(":")[1].replace("/","\\"));
@@ -157,7 +164,7 @@ public class RawIssueMatch {
             RawIssue curRawIssue1 = new RawIssue();
 
             curRawIssue1.setUuid(String.valueOf(instance.getId()));
-            curRawIssue1.setType(instance.getType());
+            curRawIssue1.setType(instance.getTypeId());
             curRawIssue1.setFileName(instance.getFilePath().split(":")[1].replace("/","\\"));
             curRawIssue1.setDetail(instance.getMessage());
             curRawIssue1.setCommitId(curCommit.getCommit_hash());
@@ -191,10 +198,18 @@ public class RawIssueMatch {
         for (RawIssue i: curRawIssueList) {
             for (Location location: i.getLocations()) {
                 if (curRawIssueList.indexOf(i)==-1) continue;
-                Iss_location iss_location = iss_locationList.get(curRawIssueList.indexOf(i));
+                Iss_location iss_location = new Iss_location();
                 iss_location.setMethod(location.getAnchorName());
                 iss_location.setClass_(location.getClassName());
                 iss_location.setCode(location.getCode());
+                iss_location.setFile_path(i.getFileName());
+                iss_location.setStart_line(location.getStartLine());
+                iss_location.setEnd_line(location.getEndLine());
+                iss_location.setStart_col(location.getStartToken());
+                iss_location.setEnd_col(location.getEndToken());
+                iss_location.setLocation_id(Iss_location.getUuidFromLocation(iss_location));
+
+                iss_locationList.add(iss_location);
             }
         }
 
@@ -204,14 +219,14 @@ public class RawIssueMatch {
 
             Iss_match iss_match = new Iss_match();
             iss_match.setInst_id(curRawIssue.getUuid());
-            iss_match.setCommit_hash(curRawIssue.getCommitId());
+//            iss_match.setCommit_hash(curRawIssue.getCommitId());
 
 
             if (curRawIssue.getMappedRawIssue() == null){
                 Iss_case iss_case = new Iss_case();
                 iss_case.setType_id(curRawIssue.getType());
                 iss_case.setUpdate_time(curCommit.getCommit_time());
-                iss_case.setMessage(curRawIssue.getDetail());
+//                iss_case.setMessage(curRawIssue.getDetail());
                 iss_case.setCase_status("new");
                 iss_case.setCommit_hash_new(curRawIssue.getCommitId());
                 iss_case.setCommitter_new(curCommit.getCommitter());
@@ -222,7 +237,7 @@ public class RawIssueMatch {
                 iss_case.setCase_id(case_id);
                 //允许没有parent的match，用于和case保持一致
                 iss_match.setParent_inst_id("");
-                iss_match.setParent_commit_hash("");
+//                iss_match.setParent_commit_hash("");
                 iss_match.setCase_id(case_id);
 
                 iss_caseList.add(iss_case);
@@ -233,7 +248,7 @@ public class RawIssueMatch {
                 Iss_case iss_case = Iss_case.look_up_case(iss_caseList,Iss_match.instIdLookUpCaseId(iss_matchList,curRawIssue.getMappedRawIssue().getUuid()));
 
                 iss_match.setParent_inst_id(curRawIssue.getMappedRawIssue().getUuid());
-                iss_match.setParent_commit_hash(curRawIssue.getMappedRawIssue().getCommitId());
+//                iss_match.setParent_commit_hash(curRawIssue.getMappedRawIssue().getCommitId());
                 iss_case.setCommit_hash_last(curRawIssue.getCommitId());
                 iss_case.setCase_status("remain");
                 //在match中设置case_id，发现匹配时，在match list中搜索其parentMappedIssue对应的case_id

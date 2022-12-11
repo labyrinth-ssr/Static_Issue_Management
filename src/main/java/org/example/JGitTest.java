@@ -36,7 +36,6 @@ public class JGitTest {
         Git git = JgitUtil.openRpo(pj_path);
 
         List<Iss_file> iss_files = JgitUtil.gitFileList(git, repository.getPath());
-        boolean b = sqlMapping.save(iss_files);
 
         List<Commit> commitList = JgitUtil.gitLog(git);
         Commit curCommit = JgitUtil.gitCurLog(git);
@@ -49,8 +48,10 @@ public class JGitTest {
         List<Iss_case> iss_caseList = new ArrayList<>();
         List<Iss_instance> issInstanceList = new ArrayList<>();
         List<Iss_location> iss_locations = new ArrayList<>();
+        List<Instance_location> instance_locationList = new ArrayList<>();
+        List<SonarRules> sonarRulesList = new ArrayList<>();
 
-        for (int i = 1; i >=0; i--) {
+        for (int i = commitList.size()/2; i >=commitList.size()/2-5; i--) {
 
             Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
 
@@ -64,23 +65,28 @@ public class JGitTest {
             commitList1.add(commit);
 
             Iss_instance.setInstance(issInstanceList,sonarIssues,commit);
-            Iss_location.setLocation(iss_locations,sonarIssues);
+            Instance_location.setInstanceLocation(sonarIssues,instance_locationList);
+            SonarRules.setSonarRules(sonarRulesList,sonarIssues);
+//            Iss_location.setLocation(iss_locations,sonarIssues);
 
             if (i==1) {
                 RawIssueMatch.firstMatch(iss_locations,iss_matchList,iss_caseList,sonarIssues,commitList.get(1));
             }else {
                 RawIssueMatch.match(iss_locations,iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList.get(i+1),commitList.get(i));
             }
-
             sonarIssuesPre = new ArrayList<> (sonarIssues);
 
-
+            boolean b = sqlMapping.save(iss_files);
+            boolean g = sqlMapping.save(iss_locations);
+            boolean d =sqlMapping.save(issInstanceList);
+            boolean h = sqlMapping.save(instance_locationList);
+            boolean j =sqlMapping.save(iss_caseList);
+            boolean f = sqlMapping.save(iss_matchList);
+            boolean k = sqlMapping.save(sonarRulesList);
         }
+
         boolean c =sqlMapping.save(commitList1);
-        boolean d =sqlMapping.save(issInstanceList);
-        boolean j =sqlMapping.save(iss_caseList);
-        boolean f = sqlMapping.save(iss_matchList);
-        boolean g = sqlMapping.save(iss_locations);
+
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
     }
 

@@ -3,8 +3,11 @@ package org.example.Entity;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.UUID;
 
 public class Commit implements Cloneable{
+
+    String commit_id;
     String commit_hash;
     String repo_path;
     String committer;
@@ -12,6 +15,14 @@ public class Commit implements Cloneable{
     String commit_msg;
     String committer_email;
     String parent_commit_hash;
+
+    public String getCommit_id() {
+        return commit_id;
+    }
+
+    public void setCommit_id(String commit_id) {
+        this.commit_id = commit_id;
+    }
 
     public String getRepo_path() {
         return repo_path;
@@ -89,7 +100,13 @@ public class Commit implements Cloneable{
         return (Commit)super.clone();
     }
 
+    public static String getUuidFromCommit(Commit commit){
+        String stringBuilder =commit.getCommit_hash()+commit.getRepo_path();
+        return UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
+    }
+
     public void setCommit(Commit commit,String repo_path){
+        this.setCommit_id(getUuidFromCommit(commit));
         this.commit_hash=commit.getCommit_hash();
         this.commit_msg=commit.getCommit_msg();
         this.committer=commit.getCommitter();
