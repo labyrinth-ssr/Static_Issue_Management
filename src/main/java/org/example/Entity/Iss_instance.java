@@ -80,7 +80,7 @@ public class Iss_instance {
                 iss_instance.committer=commit.getCommitter();
                 iss_instance.file_path=sonarIssues1.getFilePath();
                 iss_instance.description=sonarIssues1.getMessage();
-                iss_instance.type_id=sonarIssues1.getTypeId();
+                iss_instance.type_id=sonarIssues1.getType();
                 res.add(iss_instance);
             }
     }

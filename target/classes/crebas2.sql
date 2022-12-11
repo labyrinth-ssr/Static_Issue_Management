@@ -75,8 +75,9 @@ create table iss_file
 /*==============================================================*/
 create table iss_case
 (
-   case_id              int unsigned not null,
+   case_id              varchar(36) not null,
    type_id              varchar(20) not null,
+   message              varchar(255) not null,
    commit_hash_new      varchar(40) not null,
    committer_new        varchar(40) not null,
    commit_hash_last     varchar(40) not null,

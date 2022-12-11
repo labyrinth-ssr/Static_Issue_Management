@@ -1,14 +1,18 @@
 package org.example.Entity;
 
 import SonarConfig.SonarIssues;
+import SonarConfig.SonarLocation;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Iss_case {
-    Integer case_id;
+    String case_id;
     String type_id;
+    String message;
     String commit_hash_new;
     String committer_new;
     String commit_hash_last;
@@ -19,11 +23,19 @@ public class Iss_case {
     Date update_time;
     String case_status;
 
-    public Integer getCase_id() {
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getCase_id() {
         return case_id;
     }
 
-    public void setCase_id(Integer case_id) {
+    public void setCase_id(String case_id) {
         this.case_id = case_id;
     }
 
@@ -107,7 +119,7 @@ public class Iss_case {
         this.case_status = case_status;
     }
 
-    public static Iss_case look_up_case(List<Iss_case> iss_caseList,int case_id){
+    public static Iss_case look_up_case(List<Iss_case> iss_caseList,String case_id){
         for (Iss_case iss_case:iss_caseList) {
             if (case_id == iss_case.case_id){
                 return iss_case;
@@ -115,6 +127,11 @@ public class Iss_case {
 
         }
         return null;
+    }
+
+    public static String getUuidFromIssueCase(Iss_case iss_case,int i){
+        String stringBuilder =iss_case.getCommit_hash_new()+iss_case.getCommit_hash_last()+ System.currentTimeMillis() + String.valueOf(i);
+        return UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
     }
 
 //    public static List<Iss_case> setIss_case(List<Iss_match>matchList, List<SonarIssues>sonarIssuesList){

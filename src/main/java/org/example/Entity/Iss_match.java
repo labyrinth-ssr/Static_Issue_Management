@@ -5,15 +5,15 @@ import java.util.List;
 public class Iss_match {
     String inst_id;
     String parent_inst_id;
-    int case_id;
+    String case_id;
     String commit_hash;
     String parent_commit_hash;
 
-    public int getCase_id() {
+    public String getCase_id() {
         return case_id;
     }
 
-    public void setCase_id(int case_id) {
+    public void setCase_id(String case_id) {
         this.case_id = case_id;
     }
 
@@ -49,14 +49,14 @@ public class Iss_match {
         this.parent_commit_hash = parent_commit_hash;
     }
 
-    public static int instIdLookUpCaseId(List<Iss_match>iss_matchList,String inst_id){
+    public static String instIdLookUpCaseId(List<Iss_match>iss_matchList,String inst_id){
         for (Iss_match iss_match:iss_matchList) {
             if (iss_match.inst_id==inst_id){
                 return iss_match.case_id;
             }
-
         }
-        return -1;
+        System.out.println("given case id not found case id");
+        return "";
     }
 }
 
