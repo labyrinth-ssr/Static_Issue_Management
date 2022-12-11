@@ -70,7 +70,7 @@ public class JgitUtil {
         final ZonedDateTime authorDateTime = ZonedDateTime.ofInstant(commitInstant, zoneId);
 //        final String gitDateTimeFormatString = "yyyy MM dd HH:mm:ss Z";
 //        final String formattedDate = authorDateTime.format(DateTimeFormatter.ofPattern(gitDateTimeFormatString));
-        commit.setCommit_time(Date.from(authorDateTime.toInstant()));
+        commit.setCommit_time_(Date.from(authorDateTime.toInstant()));
         commit.setCommit_msg(c.getShortMessage());
         if(c.getParentCount() > 0) commit.setParent_commit_hash(c.getParent(0).getName());
         return  commit;

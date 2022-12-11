@@ -29,9 +29,7 @@ public class Repository {
 
     @Override
     public String toString() {
-        return "Repository{" +
-                "repo_name='" + repo_name + '\'' +
-                ", path='" + path + '\'' +
-                '}';
+        return "repo_name='" + repo_name + '\'' +
+                ", path='" + path + '\'';
     }
 }

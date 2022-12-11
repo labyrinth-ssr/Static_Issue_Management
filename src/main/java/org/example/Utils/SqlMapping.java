@@ -167,17 +167,20 @@ public class SqlMapping {
         ResultSet rs = ps.executeQuery();
         Class<?> c = want.getClass();
         Method[] method = c.getMethods();
+        Field[] want_fields = c.getDeclaredFields();
         List<Object> result = new ArrayList<>();
         while (rs.next()) {
             Object o = c.getDeclaredConstructor().newInstance();
-            for (int j = 0; j < fields.length; j++) {
-                String m = "set" + fields[j].getName().toUpperCase().charAt(0)
-                        + fields[j].getName().substring(1);
+            for (int j = 0; j < want_fields.length; j++) {
+                String m = "set" + want_fields[j].getName().toUpperCase().charAt(0)
+                        + want_fields[j].getName().substring(1);
                 for (Method value : method) {
                     if (value.getName().endsWith(m)) {
                         try {
+                            //System.out.println("method: "+m);
                             value.invoke(o, rs.getObject(j + 1));
                         } catch (Exception e) {
+                            System.out.println("m: "+m);
                             System.out.println(rs.getObject(j + 1).getClass().toString());
                             e.printStackTrace();
                         }
@@ -212,19 +215,20 @@ public class SqlMapping {
         }
         ResultSet rs = ps.executeQuery();
         Class<?> c = (want == null ? obj.getClass() : want.getClass());
+        Field[] want_fields = c.getDeclaredFields();
         Method[] method = c.getMethods();
         List<Object> result = new ArrayList<>();
         while (rs.next()) {
             Object o = c.getDeclaredConstructor().newInstance();
-            for (int j = 0; j < fields.length; j++) {
-                String m = "set" + fields[j].getName().toUpperCase().charAt(0)
-                        + fields[j].getName().substring(1);
+            for (int j = 0; j < want_fields.length; j++) {
+                String m = "set" + want_fields[j].getName().toUpperCase().charAt(0)
+                        + want_fields[j].getName().substring(1);
                 for (Method value : method) {
                     if (value.getName().endsWith(m)) {
                         try {
                             value.invoke(o, rs.getObject(j + 1));
                         } catch (Exception e) {
-                            System.out.println(rs.getObject(j + 1).getClass().toString());
+                            System.out.println(m + rs.getObject(j + 1).getClass().toString());
                             e.printStackTrace();
                         }
                     }

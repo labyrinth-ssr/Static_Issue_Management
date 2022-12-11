@@ -1,15 +1,17 @@
 package org.example.Entity;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class Commit implements Cloneable{
     String commit_hash;
+    String repo_path;
     String committer;
     Date commit_time;
     String commit_msg;
     String committer_email;
     String parent_commit_hash;
-    String repo_path;
 
     public String getRepo_path() {
         return repo_path;
@@ -38,7 +40,12 @@ public class Commit implements Cloneable{
         return commit_time;
     }
 
-    public void setCommit_time(Date commit_time) {
+    public void setCommit_time(LocalDateTime commit_time) {
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        this.commit_time = Date.from(commit_time.atZone(defaultZoneId).toInstant());
+    }
+
+    public void setCommit_time_(Date commit_time) {
         this.commit_time = commit_time;
     }
 
@@ -68,16 +75,13 @@ public class Commit implements Cloneable{
 
     @Override
     public String toString() {
-        return "Commit{" +
-                "commit_hash='" + commit_hash + '\'' +
-                ", committer='" + committer + '\'' +
+        return "commit_hash='" + commit_hash + '\'' +
                 ", commit_time='" + commit_time + '\'' +
                 ", commit_msg='" + commit_msg + '\'' +
+                ", committer='" + committer + '\'' +
                 ", committer_email='" + committer_email + '\'' +
                 ", parent_commit_hash='" + parent_commit_hash + '\'' +
-                ", repo_path='" + repo_path + '\'' +
-
-                "}\n";
+                ", repo_path='" + repo_path + '\'';
     }
 
     @Override

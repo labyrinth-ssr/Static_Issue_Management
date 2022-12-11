@@ -1,5 +1,7 @@
 package org.example.QueryUseEntity;
 
+import java.math.BigDecimal;
+
 public class DefectTypeEntity {
     String type_id;
     String description;
@@ -33,7 +35,18 @@ public class DefectTypeEntity {
         return average_exist_duration;
     }
 
-    public void setAverage_exist_duration(String average_exist_duration) {
-        this.average_exist_duration = average_exist_duration;
+    public void setAverage_exist_duration(BigDecimal average_exist_duration) {
+        long time_duration = average_exist_duration.longValue();
+        long diffSeconds = time_duration % 60;
+        long diffMinutes = time_duration / (60) % 60;
+        long diffHours = time_duration / (60 * 60) % 24;
+        long diffDays = time_duration / (24 * 60 * 60);
+        StringBuffer s = new StringBuffer();
+        if(diffDays > 0) {
+            s.append(diffDays).append("天");
+            s.append(diffHours).append("时");
+        }else if(diffHours > 0) s.append(diffHours).append("时");
+        s.append(diffMinutes).append("分").append(diffSeconds).append("秒");
+        this.average_exist_duration = s.toString();
     }
 }
