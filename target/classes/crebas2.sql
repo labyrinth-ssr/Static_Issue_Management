@@ -84,7 +84,6 @@ create table iss_file
 create table iss_case
 (
    case_id              varchar(36) not null,
-   type_                varchar(20) not null,
    type_id              varchar(20) not null,
    commit_hash_new      varchar(40) not null,
    committer_new        varchar(40) not null,
@@ -98,12 +97,12 @@ create table iss_case
    primary key (case_id)
 );
 
---create table type_message
---(
+-- create table type_message
+-- (
 --   type_id              varchar(20) not null,
 --   message              varchar(255) not null,
 --   primary key (type_id)
---);
+-- );
 
 /*==============================================================*/
 /* Index: case_match_FK                                         */
