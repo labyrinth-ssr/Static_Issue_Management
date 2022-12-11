@@ -67,9 +67,9 @@ public class JGitTest {
             Iss_location.setLocation(iss_locations,sonarIssues);
 
             if (i==1) {
-                RawIssueMatch.firstMatch(iss_matchList,iss_caseList,sonarIssues,commitList.get(1));
+                RawIssueMatch.firstMatch(iss_locations,iss_matchList,iss_caseList,sonarIssues,commitList.get(1));
             }else {
-                RawIssueMatch.match(iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList.get(i+1),commitList.get(i));
+                RawIssueMatch.match(iss_locations,iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList.get(i+1),commitList.get(i));
             }
 
             sonarIssuesPre = new ArrayList<> (sonarIssues);

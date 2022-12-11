@@ -91,7 +91,8 @@ public class SqlQuery {
         List<Map.Entry<String, ?>> list = new ArrayList<>();
         list.add(new SimpleEntry<>("iss_inst", inst_id));
         List<Iss_match> iss_matches = (List<Iss_match>) sqlMapping.select(new Iss_match(), null, list, null);
-        return iss_matches == null ? -1 : iss_matches.get(0).getCase_id();
+        //return iss_matches == null ? -1 : iss_matches.get(0).getCase_id();
+        return 0;
     }
 
 
@@ -117,6 +118,7 @@ public class SqlQuery {
                         "from iss_case join commit on iss_case.commit_hash_new = commit.cimmit_hash " +
                         "where commit.commit_hash = 'commit_hash' and 'begin_time' <= iss_case.create_time and 'end_time' >= iss_case.create_time and type_id = 'type_id' " +
                         "and duration > 'min_duration') t";
+        return null;
 
     }
 
