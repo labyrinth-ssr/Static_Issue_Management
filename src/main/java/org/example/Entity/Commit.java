@@ -86,12 +86,12 @@ public class Commit implements Cloneable{
 
     @Override
     public String toString() {
-        return "commit_hash='" + commit_hash + '\'' +
-                ", commit_time='" + commit_time + '\'' +
-                ", commit_msg='" + commit_msg + '\'' +
-                ", committer='" + committer + '\'' +
-                ", committer_email='" + committer_email + '\'' +
-                ", parent_commit_hash='" + parent_commit_hash + '\'' +
+        return "commit_hash='" + commit_hash + '\'' + '\n' +
+                "\tcommit_time='" + commit_time + '\'' +
+                ", commit_msg='" + commit_msg + '\'' + '\n'  +
+                "\tcommitter='" + committer + '\'' +
+                ", committer_email='" + committer_email + '\'' + '\n' +
+                "\tparent_commit_hash='" + parent_commit_hash + '\'' +
                 ", repo_path='" + repo_path + '\'';
     }
 

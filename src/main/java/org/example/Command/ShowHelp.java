@@ -21,13 +21,15 @@ public class ShowHelp {
     }
     public static void analysis(){
         System.out.println("" +
-                "     * 数据分析统计\n" +
+                "    * 数据分析统计\n" +
                 "     * 应使用命令：analysis\n" +
                 "     * 默认情况：所有时间内引入静态缺陷的数量、解决数量、解决率，按总量以及各个缺陷大类和具体类型统计\n" +
                 "     * -u [user_name](user) 指定开发人员，根据引入缺陷、解决他人引入缺陷、自己引入且尚未解决缺陷、自己引入且被他人解决缺陷的分类统计，平均存活时间（存活周期）统计。\n" +
                 "     * -t [time_begin--time_end](time) 指定时间段\n" +
-                "     * -md [duration](min duration) 指定最小存续时长，按时长从大到小排序\n" +
-                "     * -l (list) 显示详细列表");
+                "     * -c [commit_hash](commit) 指定版本\n" +
+                "     * -d [type_id](type_id) 指定缺陷类型\n" +
+                "     * -f [defect-type](defect) 指定缺陷大类\n" +
+                "     * -md [duration](min duration) 指定最小存续时长，按时长从大到小排序");
     }
     public static void devs(){}
     public static void repos(){}

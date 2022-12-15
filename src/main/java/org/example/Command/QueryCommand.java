@@ -10,6 +10,7 @@ import org.example.Utils.SqlQuery;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class QueryCommand {
@@ -107,10 +108,10 @@ public class QueryCommand {
      * -t [time_begin--time_end](time) 指定时间段
      * -c [commit_hash](commit) 指定版本
      * -d [type_id](type_id) 指定缺陷类型
+     * -f [defect-type](defect) 指定缺陷大类
      * -md [duration](min duration) 指定最小存续时长，按时长从大到小排序
-     * -l (list) 显示详细列表
      * */
-    public void ShowAnalysis(List<String> args){
+    public void ShowAnalysis(List<String> args) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String user = null;
         String begin_time = null;
         String end_time =null;
@@ -118,6 +119,7 @@ public class QueryCommand {
         boolean is_list = false;
         String commit_hash = null;
         String type_id = null;
+        String defect_type = null;
         for(String arg : args){
             arg = arg.trim();
             if(arg.equals("")) continue;
@@ -135,13 +137,29 @@ public class QueryCommand {
                 commit_hash = arg.substring(2).trim();
             }else if(arg.startsWith("-d")){
                 type_id = arg.substring(2).trim();
-            }else{
+            }else if(arg.startsWith("-f")) {
+                defect_type = arg.substring(2).trim();
+            }else {
                 ShowHelp.analysis();
+                return;
             }
         }
 
-        List<AnalysisEntity> analysisEntities = sqlQuery.getAnalysisEntities(commit_hash, type_id, begin_time, end_time, min_duration);
-
+        List<List<AnalysisEntity>> analysisEntities = sqlQuery.getAnalysisEntities(commit_hash, type_id, defect_type, begin_time, end_time, min_duration);
+        List<AnalysisEntity> totalEntity = analysisEntities.get(0);
+        List<AnalysisEntity> defectEntity = analysisEntities.get(1);
+        List<AnalysisEntity> typeEntity = analysisEntities.get(2);
+        if(isEmpty(defect_type) && isEmpty(type_id)) System.out.println(totalEntity.get(0).toString_total());
+        if(isEmpty(type_id)) {
+            if (defectEntity.size() > 0) System.out.println("\ndefect:");
+            for (AnalysisEntity ae : defectEntity) {
+                System.out.println(ae.toString_defect());
+            }
+        }
+        if(typeEntity.size() > 0) System.out.println("\ntype:");
+        for(AnalysisEntity ae : typeEntity) {
+            System.out.println(ae.toString_type());
+        }
     }
 
     /**
@@ -264,5 +282,7 @@ public class QueryCommand {
     public void ShowInfo(List<String> args){
 
     }
-
+    public static boolean isEmpty(String str){
+        return str == null || str.equals("");
+    }
 }

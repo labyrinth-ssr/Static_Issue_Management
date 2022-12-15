@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class DefectEntity {
     String exist_duration;
-    Long case_id;
+    String case_id;
     String inst_id;
     String file_path;
     Long start_line;
@@ -122,11 +122,11 @@ public class DefectEntity {
         this.exist_duration = s.toString();
     }
 
-    public Long getCase_id() {
+    public String getCase_id() {
         return case_id;
     }
 
-    public void setCase_id(Long case_id) {
+    public void setCase_id(String case_id) {
         this.case_id = case_id;
     }
 }

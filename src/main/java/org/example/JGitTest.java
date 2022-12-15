@@ -51,7 +51,8 @@ public class JGitTest {
         List<Instance_location> instance_locationList = new ArrayList<>();
         List<SonarRules> sonarRulesList = new ArrayList<>();
 
-        for (int i = commitList.size()/2; i >=commitList.size()/2-5; i--) {
+
+        for (int i = commitList.size()-2; i >=2; i--) {
 
             Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
 

@@ -163,6 +163,7 @@ public class SqlMapping {
 
     public List<?> select(Object want, String sql) throws SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         Connection conn = connection.getConnection();
+//        System.out.println("sql: "+sql);
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
         Class<?> c = want.getClass();
@@ -239,7 +240,11 @@ public class SqlMapping {
         }
         return result;
     }
-/*
+
+    public void execute(String sql) throws SQLException {
+        SqlConnect.sqlBatch(Collections.singletonList(sql));
+    }
+    /*
     public boolean update(Object obj) throws Exception {
         // 获取obj的属性的值
         List list = getFields(obj);

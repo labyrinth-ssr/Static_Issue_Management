@@ -54,19 +54,23 @@ public class SqlQuery {
 
     //! 此处有根据commit_id查找type_id需求
     public List<DefectTypeEntity> getDefectType(String commit_id) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql = "select iss_instance.type_id, description, avg(TIMESTAMPDIFF(SECOND,iss_case.create_time, commit_time)) average_exist_duration " +
-                "from iss_instance, iss_case " +
-                "where commit_hash = '" + commit_id +"' and case_id in (select case_id from iss_match where inst_id = iss_instance.inst_id) "+
-                "group by iss_instance.type_id " +
+        String sql = "select ii.type_id, sr.description, avg(TIMESTAMPDIFF(SECOND,iss_case.create_time, commit_time)) average_exist_duration " +
+                "from (iss_instance ii join sonarrules sr on ii.type_id = sr.id) join commit c on ii.commit_hash = `c`.commit_hash, iss_case " +
+                "where ii.commit_hash = '" + commit_id +"' and case_id in (select case_id from iss_match where inst_id = ii.inst_id) "+
+                "group by ii.type_id " +
                 "order by average_exist_duration desc";
 //        System.out.println("getDefectType_sql: "+sql);
         return (List<DefectTypeEntity>) sqlMapping.select(new DefectTypeEntity(), sql);
     }
 
     public List<DefectEntity> getDefectEntity(String commit_id, String type_id) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql = "select timestampdiff(SECOND, iss_case.create_time, commit_time) as exist_duration, iss_match.case_id, iss_instance.inst_id, iss_location.file_path, iss_location.start_line, iss_location.end_line, iss_location.start_col, iss_location.end_col, iss_location.class_,iss_location.method,iss_location.code " +
-                "from ((iss_instance left outer join iss_location on iss_instance.inst_id = iss_location.inst_id) LEFT OUTER JOIN iss_match on iss_instance.inst_id = iss_match.inst_id) LEFT OUTER JOIN iss_case on iss_match.case_id = iss_case.case_id " +
-                "where iss_instance.commit_hash = '"+commit_id +"' and iss_instance.type_id = '"+type_id+"' " +
+        String sql = "select timestampdiff(SECOND, ic.create_time, c.commit_time) as exist_duration, im.case_id, ii.inst_id, il.file_path, il.start_line, il.end_line, il.start_col, il.end_col, il.class_,il.method,il.code " +
+                "from iss_instance ii left outer join instance_location ilo on ii.inst_id = ilo.inst_id " +
+                "join iss_location il on ilo.location_id = il.location_id " +
+                "LEFT OUTER JOIN iss_match im on ii.inst_id = im.inst_id " +
+                "LEFT OUTER JOIN iss_case ic on im.case_id = ic.case_id " +
+                "LEFT JOIN commit c on c.commit_hash = ii.commit_hash " +
+                "where ii.commit_hash = '"+commit_id +"' and ii.type_id = '"+type_id+"' " +
                 "order by exist_duration desc;";
 //        System.out.println("getDefectEntity_sql: "+sql);
         return (List<DefectEntity>) sqlMapping.select(new DefectEntity(), sql);
@@ -111,15 +115,41 @@ public class SqlQuery {
     }
 
 
-    public List<AnalysisEntity> getAnalysisEntities(String commit_hash, String type_id, String begin_time, String end_time, String min_duration) {
-        String sql =
-                "select count(*) as total, (select count(*) from t where case_status = 'DONE') as done, done/total) " +
-                "from (select iss_case.case_id, type_id, case_status, timestampdiff(SECOND, now(),create_time) as duration " +
-                        "from iss_case join commit on iss_case.commit_hash_new = commit.cimmit_hash " +
-                        "where commit.commit_hash = 'commit_hash' and 'begin_time' <= iss_case.create_time and 'end_time' >= iss_case.create_time and type_id = 'type_id' " +
-                        "and duration > 'min_duration') t";
-        return null;
+    public List<List<AnalysisEntity>> getAnalysisEntities(String commit_hash, String type_id, String defect_type, String begin_time, String end_time, String min_duration) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        String drop_sql = "drop view if exists tt;";
+        sqlMapping.execute(drop_sql);
+        String view_sql =
+                "create view tt as " +
+                "(select ic.case_id, ic.type_id, sr.type, case_status, timestampdiff(SECOND, ic.create_time, now()) as duration " +
+                "from (iss_case ic join commit c on ic.commit_hash_new = c.commit_hash)" +
+                "join sonarrules sr on ic.type_id = sr.id ";
+        String sql_commit = isEmpty(commit_hash) ? "" : ("c.commit_hash = '" + commit_hash + "' && ");
+        String sql_begin_time = isEmpty(begin_time) ? "" : ("c.create_time >= '" + begin_time + "' && ");
+        String sql_end_time = isEmpty(end_time) ? "" : ("c.create_time <= '" + end_time + "' && ");
+        String sql_type = isEmpty(type_id) ? "" : ("ic.type_id = '" + type_id + "' && ");
+        String sql_defect = isEmpty(defect_type) ? "" : ("sr.type = '" + defect_type + "' && ");
+        String sql_min = isEmpty(min_duration) ? "" : ("ic.create_time, now()) >= '" + min_duration + "' && ");
+        if((sql_commit+sql_begin_time+sql_end_time+sql_type+sql_defect+sql_min).equals("")) view_sql = view_sql + ")";
+        else{
+            view_sql = view_sql + "where " + sql_commit + sql_begin_time + sql_end_time + sql_type + sql_defect + sql_min;
+            view_sql = view_sql.substring(0, view_sql.lastIndexOf("&&"));
+            view_sql = view_sql + ")";
+        }
+        sqlMapping.execute(view_sql);
+        String total_sql = "select count(*) as total, (select COUNT(*) from tt where case_status = 'CLOSE') as done,(select COUNT(*) from tt where case_status = 'CLOSE')/count(*) as percentage, null as type from tt;";
+        List<AnalysisEntity> totalEntity = (List<AnalysisEntity>) sqlMapping.select(new AnalysisEntity(), total_sql);
+        String defect_sql = "select count(*) as total, (select COUNT(*) from tt where case_status = 'CLOSE') as done,(select COUNT(*) from tt where case_status = 'CLOSE')/count(*) as percentage, type from tt group by type order by percentage asc, total desc;";
+        List<AnalysisEntity> defectEntity = (List<AnalysisEntity>) sqlMapping.select(new AnalysisEntity(), defect_sql);
+        String type_sql = "select count(*) as total, (select COUNT(*) from tt where case_status = 'CLOSE') as done,(select COUNT(*) from tt where case_status = 'CLOSE')/count(*) as percentage, type_id as type from tt group by type_id order by percentage asc, total desc;";
+        List<AnalysisEntity> typeEntity = (List<AnalysisEntity>) sqlMapping.select(new AnalysisEntity(), type_sql);
+        String view_destroy = "drop view tt";
+        sqlMapping.execute(view_destroy);
 
+        List<List<AnalysisEntity>> anaysis = new ArrayList<>();
+        anaysis.add(totalEntity);
+        anaysis.add(defectEntity);
+        anaysis.add(typeEntity);
+        return anaysis;
     }
 
     public static boolean isEmpty(String str){

@@ -20,7 +20,7 @@ public class Cmd {
         String str = null;
         List<String> my_args = null;
         while(true){
-            System.out.print("Defect me# ");
+            System.out.print("Defect# ");
             str = br.readLine();
             if(str.startsWith("defect")){
                 str = str.substring(6).trim();
@@ -34,6 +34,10 @@ public class Cmd {
                 queryCommand.ShowDevelopers();
             }else if(str.startsWith("quit")){
                 break;
+            }else if(str.startsWith("analysis")){
+                str = str.substring(8).trim();
+                my_args = List.of(str.split("(?= -)"));
+                queryCommand.ShowAnalysis(my_args);
             }
 
         }
