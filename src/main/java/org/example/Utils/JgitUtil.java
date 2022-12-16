@@ -12,14 +12,12 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.example.Entity.Commit;
-import org.example.Entity.Iss_file;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -98,37 +96,37 @@ public class JgitUtil {
         }
     }
 
-    public static List<Iss_file> gitFileList(Git git,String repo_name){
-
-        List<Iss_file> ret=new ArrayList<>();
-        try {
-            Repository repo = git.getRepository();
-            RevWalk revWalk = new RevWalk(repo);
-            ObjectId objectId = repo.resolve(Constants.HEAD);
-            RevCommit revCommit = revWalk.parseCommit(objectId);
-
-            ObjectId treeId = revCommit.getTree().getId();
-
-            try (TreeWalk treeWalk = new TreeWalk(repo)) {
-                treeWalk.reset(treeId);
-                treeWalk.setRecursive(true);
-                while (treeWalk.next()) {
-                    Iss_file iss_file = new Iss_file();
-                    iss_file.setFile_path(treeWalk.getPathString());
-                    iss_file.path_to_name();
-                    iss_file.setRepo_path(repo_name);
-                    iss_file.setCreated_time(RevCommit2Commit(revCommit).getCommit_time());
-                    ret.add(iss_file);
-                }
-                return ret;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
+//    public static List<Iss_file> gitFileList(Git git,String repo_name){
+//
+//        List<Iss_file> ret=new ArrayList<>();
+//        try {
+//            Repository repo = git.getRepository();
+//            RevWalk revWalk = new RevWalk(repo);
+//            ObjectId objectId = repo.resolve(Constants.HEAD);
+//            RevCommit revCommit = revWalk.parseCommit(objectId);
+//
+//            ObjectId treeId = revCommit.getTree().getId();
+//
+//            try (TreeWalk treeWalk = new TreeWalk(repo)) {
+//                treeWalk.reset(treeId);
+//                treeWalk.setRecursive(true);
+//                while (treeWalk.next()) {
+//                    Iss_file iss_file = new Iss_file();
+//                    iss_file.setFile_path(treeWalk.getPathString());
+//                    iss_file.path_to_name();
+//                    iss_file.setRepo_path(repo_name);
+//                    iss_file.setCreated_time(RevCommit2Commit(revCommit).getCommit_time());
+//                    ret.add(iss_file);
+//                }
+//                return ret;
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
 
 
 }

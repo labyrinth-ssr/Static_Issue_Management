@@ -14,15 +14,11 @@ drop table if exists commit;
 
 drop table if exists iss_file;
 
-/*drop index case_match_FK on iss_case;*/
-
 drop table if exists iss_case;
 
 drop table if exists iss_instance;
 
 drop table if exists iss_location;
-
-/*drop index case_match_FK on iss_match;*/
 
 drop table if exists iss_match;
 
@@ -45,38 +41,27 @@ create table commit
 (
    commit_id           varchar(35) not null,
    commit_hash          varchar(40) not null,
-   repo_path            varchar(255) not null,
    committer            varchar(40) not null,
-   commit_time          datetime not null,
-   commit_msg           varchar(255),
    committer_email      varchar(255),
+   commit_msg           varchar(255),
+   commit_time          datetime not null,
+   repo_path            varchar(255) not null,
    parent_commit_hash   varchar(40),
    primary key (commit_id)
 );
 
--- create unique index commit_from_file_FK on commit
--- (
---   file_path
--- );
-
--- create unique index repo_commit_FK on commit
--- (
---    repo_path
--- );
-
 /*==============================================================*/
 /* Table: iss_file
-   file_id              int not null auto_increment,                                     */
 /*==============================================================*/
-create table iss_file
-(
-
-   file_name            varchar(40) not null,
-   repo_path            varchar(255) not null,
-   file_path            varchar(255) not null,
-   created_time         datetime not null,
-   primary key (file_path,repo_path)
-);
+-- create table iss_file
+-- (
+--
+--   file_name            varchar(40) not null,
+--   repo_path            varchar(255) not null,
+--   file_path            varchar(255) not null,
+--   created_time         datetime not null,
+--   primary key (file_path,repo_path)
+-- );
 
 /*==============================================================*/
 /* Table: iss_case                                              */
@@ -85,32 +70,11 @@ create table iss_case
 (
    case_id              varchar(36) not null,
    type_id              varchar(20) not null,
-   commit_hash_new      varchar(40) not null,
-   committer_new        varchar(40) not null,
-   commit_hash_last     varchar(40) not null,
-   commit_hash_disappear varchar(40) not null,
-   committer_disappear  varchar(40) not null,
-   time_disappear       datetime,
-   update_time          datetime not null,
-   create_time          datetime not null,
+   commit_id_new        varchar(40) not null,
+   commit_id_last       varchar(40) not null,
    case_status          varchar(20) not null,
    primary key (case_id)
 );
-
--- create table type_message
--- (
---   type_id              varchar(20) not null,
---   message              varchar(255) not null,
---   primary key (type_id)
--- );
-
-/*==============================================================*/
-/* Index: case_match_FK                                         */
-/*==============================================================*/
--- create unique index case_match_FK on iss_case
--- (
---    case_id
--- );
 
 /*==============================================================*/
 /* Table: iss_instance                                          */
@@ -119,7 +83,7 @@ create table iss_instance
 (
    inst_id              varchar(36) not null,
    type_id              varchar(20) not null,
-   commit_hash          varchar(40) not null,
+   commit_id          varchar(40) not null,
    primary key (inst_id)
 );
 
@@ -130,22 +94,18 @@ create table instance_location
    primary key (inst_id, location_id)
 );
 
-
-
 /*==============================================================*/
 /* Table: iss_location                                          */
 /*==============================================================*/
 create table iss_location
 (
-   location_id         varchar(36) not null,
-   inst_id              varchar(36) not null,
-   class_                varchar(60) not null,
+   location_id          varchar(36) not null,
+   class_               varchar(60) not null,
    method               varchar(60) not null,
    start_line           int unsigned not null,
    end_line             int unsigned not null,
    start_col            int unsigned not null,
    end_col              int unsigned not null,
-   line_offset          int unsigned not null,
    code                 varchar(255) not null,
    file_path            varchar(255) not null,
    primary key (location_id)
@@ -153,7 +113,6 @@ create table iss_location
 
 /*==============================================================*/
 /* Table: iss_match                   
-   case_id              int unsigned auto_increment,                          */
 /*==============================================================*/
 create table iss_match
 (
@@ -164,29 +123,20 @@ create table iss_match
 );
 
 /*==============================================================*/
-/* Index: case_match_FK                                         */
-/*==============================================================*/
--- create index case_match_FK on iss_match
--- (
---    case_id
--- );
-
-/*==============================================================*/
 /* Table: repository                        
-   repo_id              int not null auto_increment,                    */
 /*==============================================================*/
-create table repository
-(
-   repo_name            varchar(30) not null,
-   path                 varchar(255) not null,
-   primary key (path)
-);
-
- alter table commit add constraint FK_repo_commit foreign key (repo_path)
-      references repository (path) on delete restrict on update restrict;
-
-alter table iss_file add constraint FK_file_from_repo foreign key (repo_path)
-      references repository (path) on delete restrict on update restrict;
+-- create table repository
+-- (
+--   repo_name            varchar(30) not null,
+--   path                 varchar(255) not null,
+--   primary key (path)
+-- );
+--
+-- alter table commit add constraint FK_repo_commit foreign key (repo_path)
+--      references repository (path) on delete restrict on update restrict;
+--
+-- alter table iss_file add constraint FK_file_from_repo foreign key (repo_path)
+--      references repository (path) on delete restrict on update restrict;
 
 -- alter table iss_file add constraint FK_file_in_location foreign key (file_path)
 --      references iss_location (file_path) on delete restrict on update restrict;
@@ -209,8 +159,8 @@ alter table instance_location add constraint FK_locatie_in foreign key (location
  alter table iss_match add constraint FK_case_match foreign key (case_id)
        references iss_case (case_id) on delete restrict on update restrict;
 
- alter table iss_match add constraint FK_instance_match foreign key (inst_id)
-       references iss_instance (inst_id) on delete restrict on update restrict;
+-- alter table iss_match add constraint FK_instance_match foreign key (inst_id)
+--       references iss_instance (inst_id) on delete restrict on update restrict;
 
 -- alter table iss_match add constraint FK_instance_match2 foreign key (parent_inst_id)
 --      references iss_instance (inst_id) on delete restrict on update restrict;

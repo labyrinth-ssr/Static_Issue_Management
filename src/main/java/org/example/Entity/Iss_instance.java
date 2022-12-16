@@ -9,7 +9,7 @@ import java.util.List;
 public class Iss_instance {
     String inst_id;
     String type_id;
-    String commit_hash;
+    String commit_id;
 //    Date commit_time;
 //    String committer;
 //    String file_path;
@@ -31,15 +31,15 @@ public class Iss_instance {
         this.type_id = type_id;
     }
 
-    public String getCommit_hash() {
-        return commit_hash;
+    public String getCommit_id() {
+        return commit_id;
     }
 
-    public void setCommit_hash(String commit_hash) {
-        this.commit_hash = commit_hash;
+    public void setCommit_id(String commit_id) {
+        this.commit_id = commit_id;
     }
 
-//    public Date getCommit_time() {
+    //    public Date getCommit_time() {
 //        return commit_time;
 //    }
 //
@@ -75,7 +75,7 @@ public class Iss_instance {
             for (SonarIssues sonarIssues1:sonarIssues) {
                 Iss_instance iss_instance=new Iss_instance();
                 iss_instance.inst_id = sonarIssues1.getId();
-                iss_instance.commit_hash=commit.getCommit_hash();
+                iss_instance.commit_id=commit.getCommit_id();
 //                iss_instance.commit_time=commit.getCommit_time();
 //                iss_instance.committer=commit.getCommitter();
 //                iss_instance.file_path=sonarIssues1.getFilePath();

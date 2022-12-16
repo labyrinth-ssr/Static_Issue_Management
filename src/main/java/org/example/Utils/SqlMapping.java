@@ -86,7 +86,7 @@ public class SqlMapping {
         sql.append("); ");
         return sql.toString();
     }
-    /*
+
         private String getUpdateSQL(Object obj, String tableName) {
             // 拼SQL语句
             StringBuffer sql = new StringBuffer();
@@ -105,11 +105,11 @@ public class SqlMapping {
             sql.append("=?");
             return sql.toString();
         }
-
-        private String getDeleteSQL(Object obj, String tableName) {
-            return "delete from " + "`" + tableName + "` " + " where " + fields[0].getName() + "=?";
-        }
-    */
+    /*
+            private String getDeleteSQL(Object obj, String tableName) {
+                return "delete from " + "`" + tableName + "` " + " where " + fields[0].getName() + "=?";
+            }
+        */
     private String getSelectSQL(List<? extends Map.Entry<String, ?>> list) {
         StringBuffer s = new StringBuffer();
         s.append("select * from " + "`").append(tableName).append("` ");
@@ -198,25 +198,23 @@ public class SqlMapping {
         }
         return result;
     }
+
+//    public boolean update(Object obj) throws Exception {
+//        // 获取obj的属性的值
+//        List list = getFields(obj);
+//        // 获取sql
+//        String sql = getUpdateSQL(obj);
+//        // 通过DbUtil
+//        Connection conn = connection.getConnection();
+//        PreparedStatement ps = conn.prepareStatement(sql);
+//        for (int i = 1; i < list.size(); i++) {
+//            ps.setObject(i, list.get(i));
+//        }
+//        ps.setInt(list.size(), (Integer) list.get(0));
+//        boolean flag = ps.executeUpdate() > 0;
+//        return flag;
+//    }
 /*
-    public boolean update(Object obj) throws Exception {
-        // 获取obj的属性的值
-        List list = getFields(obj);
-        // 获取sql
-        String sql = getUpdateSQL(obj);
-        // 通过DbUtil
-        Connection conn = connection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        for (int i = 1; i < list.size(); i++) {
-            ps.setObject(i, list.get(i));
-        }
-        ps.setInt(list.size(), (Integer) list.get(0));
-        boolean flag = ps.executeUpdate() > 0;
-        return flag;
-    }
-
-
-
     public boolean delete(Object obj,Integer id) throws Exception {
         // 获取obj的属性的值
         List list = getFields(obj);
