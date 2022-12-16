@@ -78,11 +78,11 @@ public class RawIssueMatch {
                 preLocation1.setStartToken(0);
                 preLocation1.setCode("");
                 preRawIssue1.setLocations(Collections.singletonList(preLocation1));
-                System.out.println("empty");
+//                System.out.println("empty");
             }
             else {
                 preRawIssue1.setLocations(locationList);
-                System.out.println("not empty");
+//                System.out.println("not empty");
             }
             preRawIssueList.add(preRawIssue1);
 
@@ -137,11 +137,11 @@ public class RawIssueMatch {
                     preLocation1.setStartToken(0);
                     preLocation1.setCode("");
                     preRawIssue1.setLocations(Collections.singletonList(preLocation1));
-                    System.out.println("empty");
+//                    System.out.println("empty");
                 }
                 else {
                     preRawIssue1.setLocations(locationList);
-                    System.out.println("not empty");
+//                    System.out.println("not empty");
                 }
                 preRawIssueList.add(preRawIssue1);
         }
@@ -196,7 +196,7 @@ public class RawIssueMatch {
 
         for (RawIssue i: curRawIssueList) {
             for (Location location: i.getLocations()) {
-                if (curRawIssueList.indexOf(i)==-1) continue;
+//                if (curRawIssueList.indexOf(i)==-1) continue;
                 Iss_location iss_location = new Iss_location();
                 iss_location.setMethod(location.getAnchorName());
                 iss_location.setClass_(location.getClassName());
@@ -259,6 +259,8 @@ public class RawIssueMatch {
         //对于没有childMap的issue，设置case disappear
         for (RawIssue preRawIssue:preRawIssueList) {
             if (preRawIssue.getMappedRawIssue() == null){
+                System.out.println("issue solved");
+
                 //通过matchList中的case_id找到对应的case
                 Iss_case iss_case = Iss_case.look_up_case(iss_caseList,Iss_match.instIdLookUpCaseId(iss_matchList,preRawIssue.getUuid()));
                 if (iss_case==null){

@@ -52,7 +52,9 @@ public class JGitTest {
         List<Instance_location> instance_locationList = new ArrayList<>();
         List<SonarRules> sonarRulesList = new ArrayList<>();
 
-        for (int i = 3; i >=2; i--) {
+        for (int i = 28; i >=24; i--) {
+
+            System.out.println(i+":"+commitList.get(i).getCommit_msg());
 
             Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
 
@@ -77,14 +79,15 @@ public class JGitTest {
             }
             sonarIssuesPre = new ArrayList<> (sonarIssues);
 
-            boolean b = sqlMapping.save(iss_files);
-            boolean g = sqlMapping.save(iss_locations);
-            boolean d =sqlMapping.save(issInstanceList);
-            boolean h = sqlMapping.save(instance_locationList);
-            boolean j =sqlMapping.save(iss_caseList);
-            boolean f = sqlMapping.save(iss_matchList);
-            boolean k = sqlMapping.save(sonarRulesList);
+
         }
+        boolean b = sqlMapping.save(iss_files);
+        boolean g = sqlMapping.save(iss_locations);
+        boolean d =sqlMapping.save(issInstanceList);
+        boolean h = sqlMapping.save(instance_locationList);
+        boolean j =sqlMapping.save(iss_caseList);
+        boolean f = sqlMapping.save(iss_matchList);
+        boolean k = sqlMapping.save(sonarRulesList);
 
         boolean c =sqlMapping.save(commitList1);
 
