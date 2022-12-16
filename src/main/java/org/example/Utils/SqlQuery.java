@@ -54,25 +54,37 @@ public class SqlQuery {
 
     //! 此处有根据commit_id查找type_id需求
     public List<DefectTypeEntity> getDefectType(String commit_id) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql = "select ii.type_id, sr.description, avg(TIMESTAMPDIFF(SECOND,iss_case.create_time, commit_time)) average_exist_duration " +
-                "from (iss_instance ii join sonarrules sr on ii.type_id = sr.id) join commit c on ii.commit_hash = `c`.commit_hash, iss_case " +
-                "where ii.commit_hash = '" + commit_id +"' and case_id in (select case_id from iss_match where inst_id = ii.inst_id) "+
+        String sql = "select ii.type_id, sr.description, " +
+                "avg(" +
+                "case ic.case_status when 'close' " +
+                "then TIMESTAMPDIFF(SECOND,ic.create_time, ic.update_time) " +
+                "else TIMESTAMPDIFF(SECOND,ic.create_time, now()) end) average_exist_duration " +
+                "from (iss_instance ii join sonarrules sr on ii.type_id = sr.id) " +
+                "join iss_match im on im.inst_id = ii.inst_id " +
+                "join iss_case ic on ic.case_id = im.case_id " +
+                "where ii.commit_hash = '" + commit_id + '\'' +
                 "group by ii.type_id " +
                 "order by average_exist_duration desc";
-//        System.out.println("getDefectType_sql: "+sql);
+        System.out.println("getDefectType_sql: "+sql);
         return (List<DefectTypeEntity>) sqlMapping.select(new DefectTypeEntity(), sql);
     }
 
+    public List<UserAnalysisAllEntity> getUserAnalysisAllEntity(String user, Integer status, String type, boolean defect_type){
+
+    }
     public List<DefectEntity> getDefectEntity(String commit_id, String type_id) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql = "select timestampdiff(SECOND, ic.create_time, c.commit_time) as exist_duration, im.case_id, ii.inst_id, il.file_path, il.start_line, il.end_line, il.start_col, il.end_col, il.class_,il.method,il.code " +
-                "from iss_instance ii left outer join instance_location ilo on ii.inst_id = ilo.inst_id " +
-                "join iss_location il on ilo.location_id = il.location_id " +
+        String sql = "select " +
+                "case ic.case_status when 'close' " +
+                "then TIMESTAMPDIFF(SECOND,ic.create_time, ic.update_time) " +
+                "else TIMESTAMPDIFF(SECOND,ic.create_time, now()) end as exist_duration, " +
+                "im.case_id, ii.inst_id, il.file_path, il.class_,il.method,il.code " +
+                "from iss_instance ii LEFT OUTER JOIN instance_location ilo on ii.inst_id = ilo.inst_id " +
+                "LEFT OUTER JOIN iss_location il on ilo.location_id = il.location_id " +
                 "LEFT OUTER JOIN iss_match im on ii.inst_id = im.inst_id " +
                 "LEFT OUTER JOIN iss_case ic on im.case_id = ic.case_id " +
-                "LEFT JOIN commit c on c.commit_hash = ii.commit_hash " +
                 "where ii.commit_hash = '"+commit_id +"' and ii.type_id = '"+type_id+"' " +
                 "order by exist_duration desc;";
-//        System.out.println("getDefectEntity_sql: "+sql);
+        System.out.println("getDefectEntity_sql: "+sql);
         return (List<DefectEntity>) sqlMapping.select(new DefectEntity(), sql);
     }
 
@@ -120,8 +132,12 @@ public class SqlQuery {
         sqlMapping.execute(drop_sql);
         String view_sql =
                 "create view tt as " +
-                "(select ic.case_id, ic.type_id, sr.type, case_status, timestampdiff(SECOND, ic.create_time, now()) as duration " +
+                "(select ic.case_id, ic.type_id, sr.type, case_status, " +
+                "(case case_status when 'close' " +
+                    "then timestampdiff(SECOND, ic.create_time, c1.commit_time) " +
+                    "else timestampdiff(SECOND, ic.create_time, now()) end) as duration " +
                 "from (iss_case ic join commit c on ic.commit_hash_new = c.commit_hash)" +
+                "join commit c1 on ic.commit_hash_last = c1.commit_hash " +
                 "join sonarrules sr on ic.type_id = sr.id ";
         String sql_commit = isEmpty(commit_hash) ? "" : ("c.commit_hash = '" + commit_hash + "' && ");
         String sql_begin_time = isEmpty(begin_time) ? "" : ("c.create_time >= '" + begin_time + "' && ");

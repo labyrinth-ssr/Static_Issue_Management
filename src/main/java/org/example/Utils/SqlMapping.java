@@ -137,6 +137,7 @@ public class SqlMapping {
 
     public boolean save(List<?> objs) throws Exception {
         List<List<?>> list = getFields(objs);
+        System.out.println(list.toString());
         String sql = getInsertSQL();
 
         Connection conn = connection.getConnection();

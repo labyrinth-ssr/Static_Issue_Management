@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class JGitTest {
     //获取版本信息和issue。
@@ -77,18 +78,22 @@ public class JGitTest {
             }
             sonarIssuesPre = new ArrayList<> (sonarIssues);
 
-            boolean b = sqlMapping.save(iss_files);
-            boolean g = sqlMapping.save(iss_locations);
-            boolean d =sqlMapping.save(issInstanceList);
-            boolean h = sqlMapping.save(instance_locationList);
-            boolean j =sqlMapping.save(iss_caseList);
-            boolean f = sqlMapping.save(iss_matchList);
-            boolean k = sqlMapping.save(sonarRulesList);
+            if(list_not_empty(iss_files)) sqlMapping.save(iss_files);
+            if(list_not_empty(iss_locations)) sqlMapping.save(iss_locations);
+            if(list_not_empty(issInstanceList)) sqlMapping.save(issInstanceList);
+            if(list_not_empty(instance_locationList)) sqlMapping.save(instance_locationList);
+            if(list_not_empty(iss_caseList)) sqlMapping.save(iss_caseList);
+            if(list_not_empty(iss_matchList)) sqlMapping.save(iss_matchList);
+            if(list_not_empty(sonarRulesList)) sqlMapping.save(sonarRulesList);
         }
 
         boolean c =sqlMapping.save(commitList1);
 
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
+    }
+
+    static public boolean list_not_empty(List<?> obj){
+        return !(obj == null || obj.size() == 0);
     }
 
     private static void printLines(String cmd, InputStream ins) throws Exception {

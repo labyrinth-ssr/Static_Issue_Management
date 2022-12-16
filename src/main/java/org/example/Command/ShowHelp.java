@@ -37,4 +37,7 @@ public class ShowHelp {
     public static void commits(){}
     public static void display(){}
     public static void show(){}
+
+    public static void userDefect() {
+    }
 }

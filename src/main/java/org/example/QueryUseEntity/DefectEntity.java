@@ -7,10 +7,6 @@ public class DefectEntity {
     String case_id;
     String inst_id;
     String file_path;
-    Long start_line;
-    Long end_line;
-    Long start_col;
-    Long end_col;
     String class_;
     String method;
     String code;
@@ -21,15 +17,11 @@ public class DefectEntity {
                 "inst_id='" + inst_id + '\'' + ", case_id='" + case_id + '\'' + ", exist_duration='" + exist_duration +'\'' +
                 "\n\t\t\t" +
                 "file_path='" + file_path + '\'' +
-                ", start_line='" + start_line + '\'' +
-                ", end_line='" + end_line + '\'' +
-                ", start_col='" + start_col + '\'' +
-                ", end_col='" + end_col + '\'' +
                 "\n\t\t\t" +
-                "class_='" + class_ + '\'' +
+                "class='" + class_ + '\'' +
                 ", method='" + method + '\'' +
                 "\n\t\t\t" +
-                "code='" + code + '\'';
+                "code=\n\033[31m" + code + "\033[30m";
     }
 
     public String getInst_id() {
@@ -46,38 +38,6 @@ public class DefectEntity {
 
     public void setFile_path(String file_path) {
         this.file_path = file_path;
-    }
-
-    public Long getStart_line() {
-        return start_line;
-    }
-
-    public void setStart_line(Long start_line) {
-        this.start_line = start_line;
-    }
-
-    public Long getEnd_line() {
-        return end_line;
-    }
-
-    public void setEnd_line(Long end_line) {
-        this.end_line = end_line;
-    }
-
-    public Long getStart_col() {
-        return start_col;
-    }
-
-    public void setStart_col(Long start_col) {
-        this.start_col = start_col;
-    }
-
-    public Long getEnd_col() {
-        return end_col;
-    }
-
-    public void setEnd_col(Long end_col) {
-        this.end_col = end_col;
     }
 
     public String getClass_() {

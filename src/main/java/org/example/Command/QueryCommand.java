@@ -99,12 +99,59 @@ public class QueryCommand {
         }
 
     }
+    /**
+     * 用户数据分析统计
+     * 应使用命令：uanalysis [user_name](user)
+     * 默认情况：指定开发人员，根据引入缺陷、解决他人引入缺陷、自己引入且尚未解决缺陷、自己引入且被他人解决缺陷的分类统计，平均存活时间（存活周期）统计。
+     * -u 指定开发人员，此项为必须项
+     * -n [0,1,2,3] 分别显示上边四种类型
+     * -l 显示详细列表（inst，引入人员，解决人员）
+     * -d [type_id](type_id) 指定缺陷类型
+     * -f [defect-type](defect) 指定缺陷大类,与‘-d’不能同时存在
+     *
+    */
+    public void ShowUserDefect(List<String> args){
+        String user = null;
+        Integer status = null;
+        boolean list = false;
+        String  type = null;
+        boolean defect_type = false;
+        for(String arg : args){
+            arg = arg.trim();
+            if(arg.startsWith("-u")){
+                user = arg.substring(2).trim();
+            }else if(arg.startsWith("-n")){
+                status = Integer.valueOf(arg.substring(2).trim());
+            }else if(arg.startsWith("-l")){
+                list = true;
+            }else if(arg.startsWith("-d")){
+                if(defect_type) {
+                    ShowHelp.userDefect();
+                    return;
+                }
+                defect_type = false;
+                type = arg.substring(2).trim();
+            }else if(arg.startsWith("-f")){
+                defect_type = true;
+                type = arg.substring(2).trim();
+            } else{
+              ShowHelp.userDefect();
+            }
+        }
+        if(user == null || user.length() == 0) {
+            ShowHelp.userDefect();
+            return;
+        }
+
+        List<UserAnalysisAllEntity> sqlQuery.getUserAnalysisAllEntity(user, status, type, defect_type);
+
+
+    }
 
     /**
      * 数据分析统计
      * 应使用命令：analysis
      * 默认情况：所有时间内引入静态缺陷的数量、解决数量、解决率，按总量以及各个缺陷大类和具体类型统计
-     * -u [user_name](user) 指定开发人员，根据引入缺陷、解决他人引入缺陷、自己引入且尚未解决缺陷、自己引入且被他人解决缺陷的分类统计，平均存活时间（存活周期）统计。
      * -t [time_begin--time_end](time) 指定时间段
      * -c [commit_hash](commit) 指定版本
      * -d [type_id](type_id) 指定缺陷类型
