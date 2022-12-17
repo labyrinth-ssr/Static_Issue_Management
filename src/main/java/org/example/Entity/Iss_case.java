@@ -14,7 +14,16 @@ public class Iss_case {
     String type_id;
     String commit_id_new;
     String commit_id_last;
+    String commit_id_disappear;
     String case_status;
+
+    public String getCommit_id_disappear() {
+        return commit_id_disappear;
+    }
+
+    public void setCommit_id_disappear(String commit_id_disappear) {
+        this.commit_id_disappear = commit_id_disappear;
+    }
 
     public String getCase_id() {
         return case_id;

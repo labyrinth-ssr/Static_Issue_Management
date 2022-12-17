@@ -71,6 +71,7 @@ create table iss_case
    case_id              varchar(36) not null,
    type_id              varchar(20) not null,
    commit_id_new        varchar(40) not null,
+   commit_id_disappear  varchar(40) not null,
    commit_id_last       varchar(40) not null,
    case_status          varchar(20) not null,
    primary key (case_id)

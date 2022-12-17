@@ -51,7 +51,7 @@ public class JGitTest {
         List<Instance_location> instance_locationList = new ArrayList<>();
         List<SonarRules> sonarRulesList = new ArrayList<>();
 
-        for (int i = 28; i >=24; i--) {
+        for (int i = 28; i >=26; i--) {
 
             System.out.println(i+":"+commitList.get(i).getCommit_msg());
 

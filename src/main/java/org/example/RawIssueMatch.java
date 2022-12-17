@@ -222,6 +222,7 @@ public class RawIssueMatch {
                 iss_match.setCase_id(iss_case.getCase_id());
                 iss_case.setCase_status("SOLVED");
                 iss_case.setCommit_id_last(preRawIssue.getCommitId());
+                iss_case.setCommit_id_disappear(preRawIssue.getCommitId());
 //                System.out.println("iss close:"+"case id:"+iss_match.getCase_id()+"inst id:"+iss_match.getInst_id()+iss_match.getParent_inst_id());
                 iss_matchList.add(iss_match);
                 closedRawIssues.add(preRawIssue);
@@ -231,9 +232,6 @@ public class RawIssueMatch {
         List<RawIssue> newRawIssueList = new ArrayList<>();
 
         for (RawIssue curRawIssue:curRawIssueList) {
-
-
-
             if (curRawIssue.getMappedRawIssue() == null){
 //                Iss_case iss_case = new Iss_case();
 //                iss_case.setType_id(curRawIssue.getType());
