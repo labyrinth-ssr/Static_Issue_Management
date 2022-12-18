@@ -55,6 +55,8 @@ public class JGitTest {
 
         for (int i = commitList.size()-2; i >=2; i--) {
 
+            System.out.println(i+":"+commitList.get(i).getCommit_msg());
+
             Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
 
             runProcess(pj_path,"sonar-scanner -D sonar.projectKey=cim");
@@ -78,14 +80,14 @@ public class JGitTest {
             }
             sonarIssuesPre = new ArrayList<> (sonarIssues);
 
-            if(list_not_empty(iss_files)) sqlMapping.save(iss_files);
-            if(list_not_empty(iss_locations)) sqlMapping.save(iss_locations);
-            if(list_not_empty(issInstanceList)) sqlMapping.save(issInstanceList);
-            if(list_not_empty(instance_locationList)) sqlMapping.save(instance_locationList);
-            if(list_not_empty(iss_caseList)) sqlMapping.save(iss_caseList);
-            if(list_not_empty(iss_matchList)) sqlMapping.save(iss_matchList);
-            if(list_not_empty(sonarRulesList)) sqlMapping.save(sonarRulesList);
         }
+        boolean b = sqlMapping.save(iss_files);
+        boolean g = sqlMapping.save(iss_locations);
+        boolean d =sqlMapping.save(issInstanceList);
+        boolean h = sqlMapping.save(instance_locationList);
+        boolean j =sqlMapping.save(iss_caseList);
+        boolean f = sqlMapping.save(iss_matchList);
+        boolean k = sqlMapping.save(sonarRulesList);
 
         boolean c =sqlMapping.save(commitList1);
 

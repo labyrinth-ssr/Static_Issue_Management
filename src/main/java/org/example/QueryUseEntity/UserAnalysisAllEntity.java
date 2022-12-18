@@ -8,7 +8,6 @@ public class UserAnalysisAllEntity {
     String user_out;
     String status;
     long total;
-    BigDecimal percentage;
     String average_exist_duration;
 
     public String getType() {
@@ -49,14 +48,6 @@ public class UserAnalysisAllEntity {
 
     public void setTotal(long total) {
         this.total = total;
-    }
-
-    public BigDecimal getPercentage() {
-        return percentage;
-    }
-
-    public void setPercentage(BigDecimal percentage) {
-        this.percentage = percentage;
     }
 
     public String getAverage_exist_duration() {

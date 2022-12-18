@@ -69,8 +69,8 @@ public class SqlQuery {
         return (List<DefectTypeEntity>) sqlMapping.select(new DefectTypeEntity(), sql);
     }
 
-    public List<UserAnalysisAllEntity> getUserAnalysisAllEntity(String user, Integer status, String type, boolean defect_type){
-
+    public List<UserAnalysisAllEntity> getUserAnalysisAllEntity(String user){
+        String sql = "select "
     }
     public List<DefectEntity> getDefectEntity(String commit_id, String type_id) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql = "select " +

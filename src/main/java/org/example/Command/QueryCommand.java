@@ -143,7 +143,9 @@ public class QueryCommand {
             return;
         }
 
-        List<UserAnalysisAllEntity> sqlQuery.getUserAnalysisAllEntity(user, status, type, defect_type);
+        if(type == null && status == null) {
+            List<UserAnalysisAllEntity> userAnalysisAllEntities = sqlQuery.getUserAnalysisAllEntity(user);
+        }
 
 
     }
