@@ -76,8 +76,6 @@ public class JGitTest {
                 RawIssueMatch.match(iss_locations,iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList1.get(commitList1.size()-1),commitList1.get(commitList1.size()-2));
             }
             sonarIssuesPre = new ArrayList<> (sonarIssues);
-
-
         }
 //        boolean b = sqlMapping.save(iss_files);
         boolean g = sqlMapping.save(iss_locations);

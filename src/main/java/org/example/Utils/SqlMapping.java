@@ -140,7 +140,6 @@ public class SqlMapping {
 //                for(int i = 0; i<ns.length; i++){
 //                    if(ns[i] <= 0){
 //                        //System.out.println(String.valueOf(++kk)+": "+list.get(i).toString());
-//
 //                    }
 //                }
                 batchNum = 0;
@@ -190,15 +189,14 @@ public class SqlMapping {
                             e.printStackTrace();
                         }
                     }
-
                 }
-
             }
             result.add(o);
         }
         return result;
     }
 
+// 批量更新：case。
 //    public boolean update(Object obj) throws Exception {
 //        // 获取obj的属性的值
 //        List list = getFields(obj);
