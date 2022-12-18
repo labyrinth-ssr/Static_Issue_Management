@@ -7,12 +7,15 @@ public class DefectTypeEntity {
     String description;
     String average_exist_duration;
 
+    Long count;
+
     @Override
     public String toString() {
-        return "\t" +
+        return "\t\033[32m" +
                 "type_id='" + type_id + '\'' +
                 ", description='" + description + '\'' +
-                ", average_exist_duration='" + average_exist_duration + '\'';
+                ", average_exist_duration='" + average_exist_duration + '\''+
+                ", 缺陷数:" + count+"\033[m";
     }
 
     public String getType_id() {
@@ -48,5 +51,13 @@ public class DefectTypeEntity {
         }else if(diffHours > 0) s.append(diffHours).append("时");
         s.append(diffMinutes).append("分").append(diffSeconds).append("秒");
         this.average_exist_duration = s.toString();
+    }
+
+    public Long getCount() {
+        return count;
+    }
+
+    public void setCount(Long count) {
+        this.count = count;
     }
 }

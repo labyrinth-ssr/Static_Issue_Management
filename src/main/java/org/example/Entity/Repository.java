@@ -2,34 +2,24 @@ package org.example.Entity;
 
 public class Repository {
 
-    String repo_name;
-    String path;
+    String repo_path;
 
-
-    public String getRepo_name() {
-        return repo_name;
+    public String getRepo_path() {
+        return repo_path;
     }
 
-    public void setRepo_name(String repo_name) {
-        this.repo_name = repo_name;
+    public void setRepo_path(String repo_path) {
+        this.repo_path = repo_path;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public void pathToName(){
-        String[] temp = path.split("\\\\");
-        this.repo_name=temp[temp.length-1];
+    public String pathToName(){
+        String[] temp = repo_path.split("/");
+        return temp[temp.length-1];
     }
 
     @Override
     public String toString() {
-        return "repo_name='" + repo_name + '\'' +
-                ", path='" + path + '\'';
+        return "repo_name='" + pathToName() + '\'' +
+                ", path='" + repo_path + '\'';
     }
 }

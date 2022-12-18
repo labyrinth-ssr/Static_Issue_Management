@@ -89,7 +89,7 @@ public class SqlMapping {
         sql.append("); ");
         return sql.toString();
     }
-    /*
+
         private String getUpdateSQL(Object obj, String tableName) {
             // 拼SQL语句
             StringBuffer sql = new StringBuffer();
@@ -108,11 +108,9 @@ public class SqlMapping {
             sql.append("=?");
             return sql.toString();
         }
-
         private String getDeleteSQL(Object obj, String tableName) {
             return "delete from " + "`" + tableName + "` " + " where " + fields[0].getName() + "=?";
         }
-    */
     private String getSelectSQL(Object want, List<? extends Map.Entry<String, ?>> list, String more) {
         StringBuffer s = new StringBuffer();
         if(want == null) s.append("select * from " + "`").append(tableName).append("` ");
@@ -182,9 +180,9 @@ public class SqlMapping {
                             //System.out.println("method: "+m);
                             value.invoke(o, rs.getObject(j + 1));
                         } catch (Exception e) {
-                            System.out.println("m: "+m);
-                            System.out.println(rs.getObject(j + 1).getClass().toString());
-                            e.printStackTrace();
+//                            System.out.println("m: "+m);
+//                            System.out.println(rs.getObject(j + 1).getClass().toString());
+//                            e.printStackTrace();
                         }
                     }
 
@@ -207,7 +205,6 @@ public class SqlMapping {
         l.add(obj);
         List<List<?>> ls = getFields(l);
         String sql = getSelectSQL(want, match, more);
-        System.out.println("select_sql "+ sql);
         Connection conn = connection.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
         if(match != null){
@@ -261,8 +258,6 @@ public class SqlMapping {
         boolean flag = ps.executeUpdate() > 0;
         return flag;
     }
-
-
 
     public boolean delete(Object obj,Integer id) throws Exception {
         // 获取obj的属性的值

@@ -9,11 +9,11 @@ public class Commit implements Cloneable{
 
     String commit_id;
     String commit_hash;
-    String repo_path;
     String committer;
-    Date commit_time;
-    String commit_msg;
     String committer_email;
+    String commit_msg;
+    Date commit_time;
+    String repo_path;
     String parent_commit_hash;
 
     public String getCommit_id() {
@@ -87,6 +87,7 @@ public class Commit implements Cloneable{
     @Override
     public String toString() {
         return "commit_hash='" + commit_hash + '\'' + '\n' +
+                "\tcommit_id='" + commit_id + '\'' + '\n' +
                 "\tcommit_time='" + commit_time + '\'' +
                 ", commit_msg='" + commit_msg + '\'' + '\n'  +
                 "\tcommitter='" + committer + '\'' +

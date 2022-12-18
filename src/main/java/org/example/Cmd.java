@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Command.QueryCommand;
+import org.example.Command.ShowHelp;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
 
@@ -38,6 +39,12 @@ public class Cmd {
                 str = str.substring(8).trim();
                 my_args = List.of(str.split("(?= -)"));
                 queryCommand.ShowAnalysis(my_args);
+            }else if(str.startsWith("ustatistic")) {
+                str = str.substring(0).trim();
+                my_args = List.of(str.split("(?= -)"));
+                queryCommand.UserStatistic(my_args);
+            }else {
+                ShowHelp.show();
             }
 
         }

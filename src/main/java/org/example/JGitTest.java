@@ -29,14 +29,14 @@ public class JGitTest {
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
-        Repository repository=new Repository();
-        repository.setPath(pj_path.replace("\\","/"));
-        repository.pathToName();
-        boolean a = sqlMapping.save(Collections.singletonList(repository));
+//        Repository repository=new Repository();
+//        repository.setPath(pj_path.replace("\\","/"));
+//        repository.pathToName();
+//        boolean a = sqlMapping.save(Collections.singletonList(repository));
 
         Git git = JgitUtil.openRpo(pj_path);
 
-        List<Iss_file> iss_files = JgitUtil.gitFileList(git, repository.getPath());
+//        List<Iss_file> iss_files = JgitUtil.gitFileList(git, repository.getPath());
 
         List<Commit> commitList = JgitUtil.gitLog(git);
         Commit curCommit = JgitUtil.gitCurLog(git);
@@ -53,7 +53,7 @@ public class JGitTest {
         List<SonarRules> sonarRulesList = new ArrayList<>();
 
 
-        for (int i = commitList.size()-2; i >=2; i--) {
+        for (int i = 28; i >=26; i--) {
 
             System.out.println(i+":"+commitList.get(i).getCommit_msg());
 
@@ -64,8 +64,7 @@ public class JGitTest {
             List<SonarIssues> sonarIssues = SonarResult.getSonarIssues();
 
             Commit commit = new Commit();
-            commit.setCommit(commitList.get(i),repository.getPath());
-            System.out.println(commit);
+            commit.setCommit(commitList.get(i),pj_path.replace("\\","/"));
             commitList1.add(commit);
 
             Iss_instance.setInstance(issInstanceList,sonarIssues,commit);
@@ -73,15 +72,15 @@ public class JGitTest {
             SonarRules.setSonarRules(sonarRulesList,sonarIssues);
 //            Iss_location.setLocation(iss_locations,sonarIssues);
 
-            if (i==1) {
-                RawIssueMatch.firstMatch(iss_locations,iss_matchList,iss_caseList,sonarIssues,commitList.get(1));
+            if (commitList1.size()==1) {
+                RawIssueMatch.firstMatch(iss_locations,iss_matchList,iss_caseList,sonarIssues,commitList1.get(0));
             }else {
-                RawIssueMatch.match(iss_locations,iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList.get(i+1),commitList.get(i));
+                RawIssueMatch.match(iss_locations,iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList1.get(commitList1.size()-1),commitList1.get(commitList1.size()-2));
             }
             sonarIssuesPre = new ArrayList<> (sonarIssues);
 
         }
-        boolean b = sqlMapping.save(iss_files);
+//        boolean b = sqlMapping.save(iss_files);
         boolean g = sqlMapping.save(iss_locations);
         boolean d =sqlMapping.save(issInstanceList);
         boolean h = sqlMapping.save(instance_locationList);

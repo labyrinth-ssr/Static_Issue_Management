@@ -17,7 +17,7 @@ public class QueryCommand {
 
     public SqlConnect connect;
     public SqlQuery sqlQuery;
-    public QueryCommand(SqlConnect connect) {
+    public QueryCommand(SqlConnect connect) throws SQLException {
         this.connect = connect;
         this.sqlQuery = new SqlQuery(connect);
     }
@@ -32,6 +32,8 @@ public class QueryCommand {
      * -av (all version) 所有版本
      * -t [time_begin(yyyy-MM-dd)--time_end(yyyy-MM-dd)](time) 指定时间段，可以只使用一部分
      * -d [type_id] 指定缺陷
+     * -s [IN/OUT] 指定是引入还是解决
+     * -l 显示详细列表
      * 显示类型：
      * commit_id, committer, commit_time, commit_message -- DefectCommitEntity
      *      type_id, type_msg
@@ -41,13 +43,15 @@ public class QueryCommand {
      *                  code -- DefectEntity
     */
     public void ShowDefect(List<String> args) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        System.out.println(args.toString());
+//        System.out.println(args.toString());
         boolean all_version = false;
         boolean all_time = true;
         boolean all_type = true;
         String commit_id = null;
         String begin_time = null, end_time = null;
         String type_id = null;
+        String status = null;
+        boolean list = false;
         for(String arg : args){
             arg = arg.trim();
             if(arg.startsWith("-av")){
@@ -70,6 +74,10 @@ public class QueryCommand {
                 type_id = arg.substring(2).trim();
             }else if(arg.equals("")){
                 continue;
+            }else if(arg.startsWith("-s")){
+                status = arg.substring(2).trim();
+            }else if(arg.startsWith("-l")){
+                list = true;
             }else{
                 System.out.println("arg" + arg);
                 ShowHelp.defect();
@@ -78,76 +86,92 @@ public class QueryCommand {
         }
 
         if(!all_version && commit_id == null) commit_id = sqlQuery.getLatestCommitId();
-        List<DefectCommitEntity> defectCommitEntities = sqlQuery.getDefetcCommit(commit_id, begin_time, end_time);
+        List<DefectCommitEntity> defectCommitEntities = sqlQuery.getDefectCommit(commit_id, begin_time, end_time);
+
         for(DefectCommitEntity defectCommitEntity: defectCommitEntities){
             System.out.println(defectCommitEntity.toString());
-            List<DefectTypeEntity> defectTypeEntities = null;
-            if(all_type) {
-                defectTypeEntities = sqlQuery.getDefectType(defectCommitEntity.getCommit_hash());
-            }
-            List<DefectEntity> defectEntities = null;
-            if(defectTypeEntities != null){
-                for(DefectTypeEntity defectType : defectTypeEntities) {
-                    System.out.println(defectType.toString());
-                    defectEntities = sqlQuery.getDefectEntity(defectCommitEntity.getCommit_hash(), defectType.getType_id());
-                    for(DefectEntity defect : defectEntities) System.out.println(defect.toString());
+            if(status == null || status == "IN") {
+                List<DefectTypeEntity> defectTypeEntities = null;
+                if (all_type) {
+                    defectTypeEntities = sqlQuery.getDefectType(defectCommitEntity.getCommit_hash(), "IN");
                 }
-            }else{
-                defectEntities = sqlQuery.getDefectEntity(defectCommitEntity.getCommit_hash(), type_id);
-                for(DefectEntity defect : defectEntities) System.out.println(defect.toString());
+                List<DefectEntity> defectEntities = null;
+                if (defectTypeEntities != null && defectTypeEntities.size() != 0 && defectTypeEntities.get(0).getType_id()!=null) {
+                    System.out.println("引入缺陷：");
+                    for (DefectTypeEntity defectType : defectTypeEntities) {
+                        System.out.println(defectType.toString());
+                        defectEntities = sqlQuery.getDefectEntity(defectCommitEntity.getCommit_hash(), defectType.getType_id(), "IN");
+                        for (DefectEntity defect : defectEntities) System.out.println(defect.toString(list));
+                    }
+                } else if(defectTypeEntities == null){
+                    System.out.println("引入缺陷：");
+                    defectEntities = sqlQuery.getDefectEntity(defectCommitEntity.getCommit_hash(), type_id, "IN");
+                    for (DefectEntity defect : defectEntities) System.out.println(defect.toString(list));
+                }
+            }
+            if(status == null || status == "OUT") {
+                List<DefectTypeEntity> defectTypeEntities = null;
+                if(all_type) {
+                    defectTypeEntities = sqlQuery.getDefectType(defectCommitEntity.getCommit_hash(),"OUT");
+                }
+                List<DefectEntity> defectEntities = null;
+                if (defectTypeEntities != null && defectTypeEntities.size() != 0 && defectTypeEntities.get(0).getType_id()!=null) {
+                    System.out.println("解决缺陷：");
+                    for(DefectTypeEntity defectType : defectTypeEntities) {
+                        System.out.println(defectType.toString());
+                        defectEntities = sqlQuery.getDefectEntity(defectCommitEntity.getCommit_hash(), defectType.getType_id(),"OUT");
+                        for(DefectEntity defect : defectEntities) System.out.println(defect.toString(list));
+                    }
+                }else if(defectTypeEntities == null){
+                    System.out.println("解决缺陷：");
+                    defectEntities = sqlQuery.getDefectEntity(defectCommitEntity.getCommit_hash(), type_id,"OUT");
+                    for(DefectEntity defect : defectEntities) System.out.println(defect.toString(list));
+                }
             }
         }
 
     }
+
     /**
-     * 用户数据分析统计
-     * 应使用命令：uanalysis [user_name](user)
-     * 默认情况：指定开发人员，根据引入缺陷、解决他人引入缺陷、自己引入且尚未解决缺陷、自己引入且被他人解决缺陷的分类统计，平均存活时间（存活周期）统计。
-     * -u 指定开发人员，此项为必须项
-     * -n [0,1,2,3] 分别显示上边四种类型
-     * -l 显示详细列表（inst，引入人员，解决人员）
-     * -d [type_id](type_id) 指定缺陷类型
-     * -f [defect-type](defect) 指定缺陷大类,与‘-d’不能同时存在
-     *
-    */
-    public void ShowUserDefect(List<String> args){
+     * 用户引入统计
+     * 应使用命令：ustatistic [user]
+     * 默认情况 某个开发人员引入缺陷、解决他人引入缺陷、自己引入且尚未解决缺陷、自己引入且被他人解决缺陷的分类统计，存活周期统计
+     * */
+    public void UserStatistic(List<String> args) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String user = null;
-        Integer status = null;
-        boolean list = false;
-        String  type = null;
-        boolean defect_type = false;
-        for(String arg : args){
+        System.out.println(args.toString());
+        for(String arg: args){
             arg = arg.trim();
-            if(arg.startsWith("-u")){
-                user = arg.substring(2).trim();
-            }else if(arg.startsWith("-n")){
-                status = Integer.valueOf(arg.substring(2).trim());
-            }else if(arg.startsWith("-l")){
-                list = true;
-            }else if(arg.startsWith("-d")){
-                if(defect_type) {
-                    ShowHelp.userDefect();
-                    return;
-                }
-                defect_type = false;
-                type = arg.substring(2).trim();
-            }else if(arg.startsWith("-f")){
-                defect_type = true;
-                type = arg.substring(2).trim();
-            } else{
-              ShowHelp.userDefect();
+            if(arg.startsWith("ustatistic")){
+                user = arg.substring(10).trim();
+            }else{
+                ShowHelp.userStatistic();
+                return;
             }
         }
-        if(user == null || user.length() == 0) {
-            ShowHelp.userDefect();
+        if(isEmpty(user)){
+            ShowHelp.userStatistic();
             return;
         }
+        String[] str = {"开发人员引入缺陷","开发人员解决他人引入缺陷","开发人员引入且尚未解决缺陷", "开发人员引入且被他人解决缺陷"};
+        for(int i = 1; i<=4; i++){
+            System.out.println(str[i-1]);
+            List<List<AnalysisEntity>> analysisEntities = sqlQuery.getUserStatistic(user,i);
+            List<AnalysisEntity> totalEntity = analysisEntities.get(0);
+            List<AnalysisEntity> defectEntity = analysisEntities.get(1);
+            List<AnalysisEntity> typeEntity = analysisEntities.get(2);
+            System.out.println(totalEntity.get(0).toString_total());
 
-        if(type == null && status == null) {
-            List<UserAnalysisAllEntity> userAnalysisAllEntities = sqlQuery.getUserAnalysisAllEntity(user);
+            if (defectEntity.size() > 0) System.out.println("\ndefect:");
+            for (AnalysisEntity ae : defectEntity) {
+                System.out.println(ae.toString_defect());
+            }
+
+            if (typeEntity.size() > 0) System.out.println("\ntype:");
+            for (AnalysisEntity ae : typeEntity) {
+                System.out.println(ae.toString_type());
+            }
         }
-
-
     }
 
     /**
@@ -162,6 +186,7 @@ public class QueryCommand {
      * */
     public void ShowAnalysis(List<String> args) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String user = null;
+        Integer status = null;
         String begin_time = null;
         String end_time =null;
         String min_duration = null;
@@ -172,16 +197,12 @@ public class QueryCommand {
         for(String arg : args){
             arg = arg.trim();
             if(arg.equals("")) continue;
-            else if(arg.startsWith("-u")){
-                user = arg.substring(2).trim();
-            }else if(arg.startsWith("-t")){
+            else if(arg.startsWith("-t")){
                 String twoTime = arg.substring(2).trim();
                 begin_time = twoTime.substring(0, twoTime.indexOf("--")).trim();
                 end_time = twoTime.substring(twoTime.indexOf("--")+2).trim();
             }else if(arg.startsWith("-md")){
                 min_duration = arg.substring(3).trim();
-            }else if(arg.startsWith("-l")){
-                is_list = true;
             }else if(arg.startsWith("-c")){
                 commit_hash = arg.substring(2).trim();
             }else if(arg.startsWith("-d")){
@@ -193,20 +214,19 @@ public class QueryCommand {
                 return;
             }
         }
-
         List<List<AnalysisEntity>> analysisEntities = sqlQuery.getAnalysisEntities(commit_hash, type_id, defect_type, begin_time, end_time, min_duration);
         List<AnalysisEntity> totalEntity = analysisEntities.get(0);
         List<AnalysisEntity> defectEntity = analysisEntities.get(1);
         List<AnalysisEntity> typeEntity = analysisEntities.get(2);
-        if(isEmpty(defect_type) && isEmpty(type_id)) System.out.println(totalEntity.get(0).toString_total());
-        if(isEmpty(type_id)) {
+        if (isEmpty(defect_type) && isEmpty(type_id)) System.out.println(totalEntity.get(0).toString_total());
+        if (isEmpty(type_id)) {
             if (defectEntity.size() > 0) System.out.println("\ndefect:");
             for (AnalysisEntity ae : defectEntity) {
                 System.out.println(ae.toString_defect());
             }
         }
-        if(typeEntity.size() > 0) System.out.println("\ntype:");
-        for(AnalysisEntity ae : typeEntity) {
+        if (typeEntity.size() > 0) System.out.println("\ntype:");
+        for (AnalysisEntity ae : typeEntity) {
             System.out.println(ae.toString_type());
         }
     }
@@ -312,8 +332,8 @@ public class QueryCommand {
         if(case_id <= 0) {ShowHelp.display();return;}
         Iss_case iss_case = sqlQuery.getCaseByCase_id(case_id);
         List<Iss_match> matches = sqlQuery.getMatches(case_id);
-        String original_commit = iss_case.getCommit_hash_new();
-        String final_commit = iss_case.getCommit_hash_last();
+        //String original_commit = iss_case.getCommit_hash_new();
+        //String final_commit = iss_case.getCommit_hash_last();
 //        String inst_begin = down_search ? inst_id : final_commit;
 //        String inst_end = up_search ? inst_id : original_commit;
         //need I do it ?

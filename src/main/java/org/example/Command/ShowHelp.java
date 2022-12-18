@@ -36,8 +36,25 @@ public class ShowHelp {
     public static void use(){}
     public static void commits(){}
     public static void display(){}
-    public static void show(){}
 
     public static void userDefect() {
+    }
+
+    public static void userStatistic() {
+        System.out.println("" +
+                "     * 用户引入统计\n" +
+                "     * 应使用命令：ustatistic [user]\n" +
+                "     * 默认情况 某个开发人员引入缺陷、解决他人引入缺陷、自己引入且尚未解决缺陷、自己引入且被他人解决缺陷的分类统计，存活周期统计\n");
+    }
+
+    public static void show(){
+        System.out.println(""+
+                "   analysis 数据分析统计\n" +
+                "   defect 显示静态缺陷数量的分类统计和详细列表\n" +
+                "   ustatistic 用户引入统计\n" +
+                "   repos 显示仓库列表\n" +
+                "   commits 显示提交列表\n" +
+                "   devs 显示开发成员列表\n" +
+                "   quit 退出");
     }
 }
