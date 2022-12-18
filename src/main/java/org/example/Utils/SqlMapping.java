@@ -254,7 +254,7 @@ public class SqlMapping {
 //        boolean flag = ps.executeUpdate() > 0;
 //        return flag;
 //    }
-/*
+
     public void execute(String sql) throws SQLException {
         SqlConnect.sqlBatch(Collections.singletonList(sql));
     }

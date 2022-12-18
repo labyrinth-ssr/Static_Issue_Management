@@ -37,6 +37,7 @@ public class SqlQuery {
             "\tic.case_status,\n" +
             "\tc1.committer committer_new,\n" +
             "\tc2.committer committer_disappear,\n" +
+//            "\t*\n"+
             "\tCASE ic.case_status\n" +
             "WHEN 'SOLVED' THEN\n" +
             "\tTIMESTAMPDIFF(\n" +

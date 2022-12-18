@@ -142,8 +142,8 @@ create table iss_match
 -- alter table iss_file add constraint FK_file_in_location foreign key (file_path)
 --      references iss_location (file_path) on delete restrict on update restrict;
 
--- alter table iss_instance add constraint FK_commit foreign key (commit_hash)
---     references commit (commit_hash) on delete restrict on update restrict;
+ alter table iss_instance add constraint FK_commit foreign key (commit_id)
+     references commit (commit_hash) on delete restrict on update restrict;
 
 -- alter table iss_location add constraint FK_instance_locate foreign key (inst_id)
 --       references iss_instance (inst_id) on delete restrict on update restrict;

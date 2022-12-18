@@ -211,21 +211,21 @@ public class RawIssueMatch {
         //对于没有childMap的issue，设置case disappear
         for (RawIssue preRawIssue:preRawIssueList) {
             if (preRawIssue.getMappedRawIssue() == null){
-                Iss_match iss_match = new Iss_match();
-                iss_match.setParent_inst_id(preRawIssue.getUuid());
-                iss_match.setInst_id("");
+//                Iss_match iss_match = new Iss_match();
+//                iss_match.setParent_inst_id(preRawIssue.getUuid());
+//                iss_match.setInst_id("");
                 Iss_case iss_case = Iss_case.look_up_case(iss_caseList,Iss_match.instIdLookUpCaseId(iss_matchList,preRawIssue.getUuid()));
                 //直接更新
                 if (iss_case==null){
                     System.out.println("pre raw issue:"+preRawIssue.getUuid()+" not in case list");
                     continue;
                 }
-                iss_match.setCase_id(iss_case.getCase_id());
+//                iss_match.setCase_id(iss_case.getCase_id());
                 iss_case.setCase_status("SOLVED");
                 iss_case.setCommit_id_last(preRawIssue.getCommitId());
                 iss_case.setCommit_id_disappear(preRawIssue.getCommitId());
 //                System.out.println("iss close:"+"case id:"+iss_match.getCase_id()+"inst id:"+iss_match.getInst_id()+iss_match.getParent_inst_id());
-                iss_matchList.add(iss_match);
+//                iss_matchList.add(iss_match);
                 closedRawIssues.add(preRawIssue);
             }
         }
