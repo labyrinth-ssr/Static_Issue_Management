@@ -1,5 +1,7 @@
 package org.example.Entity;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 
@@ -8,11 +10,11 @@ public class Commit implements Cloneable{
     String commit_id;
     String commit_hash;
     String committer;
-    Date commit_time;
-    String commit_msg;
     String committer_email;
-    String parent_commit_hash;
+    String commit_msg;
+    Date commit_time;
     String repo_path;
+    String parent_commit_hash;
 
     public String getCommit_id() {
         return commit_id;
@@ -49,7 +51,12 @@ public class Commit implements Cloneable{
         return commit_time;
     }
 
-    public void setCommit_time(Date commit_time) {
+    public void setCommit_time(LocalDateTime commit_time) {
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        this.commit_time = Date.from(commit_time.atZone(defaultZoneId).toInstant());
+    }
+
+    public void setCommit_time_(Date commit_time) {
         this.commit_time = commit_time;
     }
 
@@ -79,16 +86,14 @@ public class Commit implements Cloneable{
 
     @Override
     public String toString() {
-        return "Commit{" +
-                "commit_hash='" + commit_hash + '\'' +
-                ", committer='" + committer + '\'' +
-                ", commit_time='" + commit_time + '\'' +
-                ", commit_msg='" + commit_msg + '\'' +
-                ", committer_email='" + committer_email + '\'' +
-                ", parent_commit_hash='" + parent_commit_hash + '\'' +
-                ", repo_path='" + repo_path + '\'' +
-
-                "}\n";
+        return "commit_hash='" + commit_hash + '\'' + '\n' +
+                "\tcommit_id='" + commit_id + '\'' + '\n' +
+                "\tcommit_time='" + commit_time + '\'' +
+                ", commit_msg='" + commit_msg + '\'' + '\n'  +
+                "\tcommitter='" + committer + '\'' +
+                ", committer_email='" + committer_email + '\'' + '\n' +
+                "\tparent_commit_hash='" + parent_commit_hash + '\'' +
+                ", repo_path='" + repo_path + '\'';
     }
 
     @Override

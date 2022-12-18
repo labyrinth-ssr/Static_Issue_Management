@@ -1,6 +1,7 @@
 package org.example.Entity;
 
-import SonarConfig.SonarIssues;
+
+import org.example.SonarConfig.SonarIssues;
 
 import java.util.List;
 

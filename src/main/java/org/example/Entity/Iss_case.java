@@ -1,8 +1,5 @@
 package org.example.Entity;
 
-import SonarConfig.SonarIssues;
-import SonarConfig.SonarLocation;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

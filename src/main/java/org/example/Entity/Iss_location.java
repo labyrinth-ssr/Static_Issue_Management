@@ -1,10 +1,9 @@
 package org.example.Entity;
 
-import SonarConfig.SonarIssues;
-import SonarConfig.SonarLocation;
+import org.example.SonarConfig.SonarIssues;
+import org.example.SonarConfig.SonarLocation;
 import cn.edu.fudan.issue.util.AstParserUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

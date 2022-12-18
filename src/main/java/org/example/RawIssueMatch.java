@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import SonarConfig.SonarIssues;
-import SonarConfig.SonarLocation;
+import org.example.Entity.Iss_case;
+import org.example.SonarConfig.SonarIssues;
+import org.example.SonarConfig.SonarLocation;
 import cn.edu.fudan.issue.core.process.RawIssueMatcher;
 import cn.edu.fudan.issue.entity.dbo.Location;
 import cn.edu.fudan.issue.entity.dbo.RawIssue;

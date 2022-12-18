@@ -39,7 +39,7 @@ create table if not exists `sonarrules`(
 
 create table commit
 (
-   commit_id           varchar(35) not null,
+   commit_id           varchar(50) not null,
    commit_hash          varchar(40) not null,
    committer            varchar(40) not null,
    committer_email      varchar(255),
@@ -68,11 +68,11 @@ create table commit
 /*==============================================================*/
 create table iss_case
 (
-   case_id              varchar(36) not null,
+   case_id              varchar(50) not null,
    type_id              varchar(20) not null,
-   commit_id_new        varchar(40) not null,
-   commit_id_disappear  varchar(40) not null,
-   commit_id_last       varchar(40) not null,
+   commit_id_new        varchar(50) not null,
+   commit_id_disappear  varchar(50) not null,
+   commit_id_last       varchar(50) not null,
    case_status          varchar(20) not null,
    primary key (case_id)
 );
@@ -82,16 +82,16 @@ create table iss_case
 /*==============================================================*/
 create table iss_instance
 (
-   inst_id              varchar(36) not null,
+   inst_id              varchar(50) not null,
    type_id              varchar(20) not null,
-   commit_id          varchar(40) not null,
+   commit_id          varchar(50) not null,
    primary key (inst_id)
 );
 
 create table instance_location
 (
-   inst_id              varchar(36) not null,
-   location_id          varchar(36) not null,
+   inst_id              varchar(50) not null,
+   location_id          varchar(50) not null,
    primary key (inst_id, location_id)
 );
 
@@ -100,7 +100,7 @@ create table instance_location
 /*==============================================================*/
 create table iss_location
 (
-   location_id          varchar(36) not null,
+   location_id          varchar(50) not null,
    class_               varchar(60) not null,
    method               varchar(60) not null,
    start_line           int unsigned not null,
@@ -117,9 +117,9 @@ create table iss_location
 /*==============================================================*/
 create table iss_match
 (
-   inst_id              varchar(36) not null,
-   parent_inst_id       varchar(36) not null,
-   case_id              varchar(36) not null,
+   inst_id              varchar(50) not null,
+   parent_inst_id       varchar(50) not null,
+   case_id              varchar(50) not null,
    primary key (inst_id, parent_inst_id)
 );
 

@@ -1,6 +1,6 @@
 package org.example;
 
-import SonarConfig.SonarResult;
+import org.example.SonarConfig.SonarResult;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
 

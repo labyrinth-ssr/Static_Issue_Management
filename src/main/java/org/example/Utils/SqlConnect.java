@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 
+/**
+ * 负责执行sql文件，创建数据库
+ * */
 public class SqlConnect {
     public String JDBC_URL;// = "jdbc:mysql://localhost:3306";
     public String JDBC_USER;// = "root";

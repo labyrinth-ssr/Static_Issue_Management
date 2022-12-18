@@ -1,7 +1,7 @@
 package org.example;
 
-import SonarConfig.SonarIssues;
-import SonarConfig.SonarResult;
+import org.example.SonarConfig.SonarIssues;
+import org.example.SonarConfig.SonarResult;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Ref;
 import org.example.Entity.*;
@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class JGitTest {
     //获取版本信息和issue。
@@ -24,7 +25,7 @@ public class JGitTest {
         String pj_path = Constant.RepoPath;
 
         SqlConnect mysqlConnect = new SqlConnect();
-//        mysqlConnect.execSqlReadFileContent("crebas2.sql");
+        mysqlConnect.execSqlReadFileContent("crebas2.sql");
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
@@ -50,6 +51,7 @@ public class JGitTest {
         List<Iss_location> iss_locations = new ArrayList<>();
         List<Instance_location> instance_locationList = new ArrayList<>();
         List<SonarRules> sonarRulesList = new ArrayList<>();
+
 
         for (int i = 28; i >=26; i--) {
 
@@ -88,6 +90,10 @@ public class JGitTest {
         boolean c =sqlMapping.save(commitList1);
 
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
+    }
+
+    static public boolean list_not_empty(List<?> obj){
+        return !(obj == null || obj.size() == 0);
     }
 
     private static void printLines(String cmd, InputStream ins) throws Exception {

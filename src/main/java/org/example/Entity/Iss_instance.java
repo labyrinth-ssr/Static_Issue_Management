@@ -1,7 +1,8 @@
 package org.example.Entity;
 
-import SonarConfig.SonarIssues;
+import org.example.SonarConfig.SonarIssues;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

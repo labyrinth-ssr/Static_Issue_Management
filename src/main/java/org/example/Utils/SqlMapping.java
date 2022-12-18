@@ -7,8 +7,11 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
-
+/**
+ * 数据List结构自动化存储进数据库
+ * */
 public class SqlMapping {
     private Field[] fields;
     private String tableName;
@@ -21,7 +24,7 @@ public class SqlMapping {
         tableName = objs.get(0).getClass().getSimpleName().toLowerCase();
         fields = c.getDeclaredFields();
         Method[] methods = c.getMethods();
-
+        System.out.println(tableName +" " + fields.toString()+" "+ methods.toString());
         List<Method> getMethod = new ArrayList<>();
 
         List<String> methodName = new ArrayList<>();
@@ -105,26 +108,34 @@ public class SqlMapping {
             sql.append("=?");
             return sql.toString();
         }
-    /*
-            private String getDeleteSQL(Object obj, String tableName) {
-                return "delete from " + "`" + tableName + "` " + " where " + fields[0].getName() + "=?";
-            }
-        */
-    private String getSelectSQL(List<? extends Map.Entry<String, ?>> list) {
+        private String getDeleteSQL(Object obj, String tableName) {
+            return "delete from " + "`" + tableName + "` " + " where " + fields[0].getName() + "=?";
+        }
+    private String getSelectSQL(Object want, List<? extends Map.Entry<String, ?>> list, String more) {
         StringBuffer s = new StringBuffer();
-        s.append("select * from " + "`").append(tableName).append("` ");
+        if(want == null) s.append("select * from " + "`").append(tableName).append("` ");
+        else {
+            s.append("select ");
+            Field[] want_fields = want.getClass().getDeclaredFields();
+            for(Field field : want_fields){
+                s.append(field.getName().toLowerCase()).append(", ");
+            }
+            s.delete(s.lastIndexOf(","),s.length()).append(" from `").append(tableName).append("` ");
+        }
         if(list != null && list.size() != 0){
             s.append(" where ");
             for(Map.Entry<String, ?> l : list){
                 s.append(l.getKey()).append(" = ? ").append(" & ");
             }
-            return s.toString().trim().substring(0, list.size() - 1) + ";";
+            String str= s.toString().trim().substring(0, s.length() - 3) + (more==null?"":more) +  ";";
+            return str;
         }
-        return s.append(";").toString();
+        return s.toString() + (more==null?"":more) + ";";
     }
 
     public boolean save(List<?> objs) throws Exception {
         List<List<?>> list = getFields(objs);
+        System.out.println(list.toString());
         String sql = getInsertSQL();
 
         Connection conn = connection.getConnection();
@@ -137,55 +148,86 @@ public class SqlMapping {
             ps.addBatch();
             if(batchNum++ == 500){
                 int[] ns = ps.executeBatch();
-//                for(int i = 0; i<ns.length; i++){
-//                    if(ns[i] <= 0){
-//                        //System.out.println(String.valueOf(++kk)+": "+list.get(i).toString());
-//                    }
-//                }
                 batchNum = 0;
                 ps.clearParameters();
             }
         }
         int[] ns = ps.executeBatch();
-//        for(int i = 0; i<ns.length; i++){
-//            if(ns[i] <= 0){
-//                //System.out.println(String.valueOf(++kk)+": "+list.get(i).toString());
-//            }
-//        }
         return true;
     }
 
     public List<?> select(Object obj) throws Exception {
-        return select(obj,null);
+        return select(obj,null,null,null);
     }
 
-    public List<?> select(Object obj, List<? extends Map.Entry<String, ?>> list) throws Exception {
-        List<Object> l = new ArrayList<>();
-        l.add(obj); List<List<?>> ls = getFields(l);
-        String sql = getSelectSQL(list);
+    public List<?> select(Object want, String sql) throws SQLException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+        Connection conn = connection.getConnection();
+//        System.out.println("sql: "+sql);
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        Class<?> c = want.getClass();
+        Method[] method = c.getMethods();
+        Field[] want_fields = c.getDeclaredFields();
+        List<Object> result = new ArrayList<>();
+        while (rs.next()) {
+            Object o = c.getDeclaredConstructor().newInstance();
+            for (int j = 0; j < want_fields.length; j++) {
+                String m = "set" + want_fields[j].getName().toUpperCase().charAt(0)
+                        + want_fields[j].getName().substring(1);
+                for (Method value : method) {
+                    if (value.getName().endsWith(m)) {
+                        try {
+                            //System.out.println("method: "+m);
+                            value.invoke(o, rs.getObject(j + 1));
+                        } catch (Exception e) {
+//                            System.out.println("m: "+m);
+//                            System.out.println(rs.getObject(j + 1).getClass().toString());
+//                            e.printStackTrace();
+                        }
+                    }
 
+                }
+            }
+            result.add(o);
+        }
+        return result;
+    }
+
+    /**
+     * 自动生成查询语句并返回结果
+     * obj：表对象
+     * want：结果对象
+     * match：where判断
+     * more：附加条件
+     * */
+    public List<?> select(Object obj, Object want, List<? extends Map.Entry<String, ?>> match, String more) throws Exception {
+        List<Object> l = new ArrayList<>();
+        l.add(obj);
+        List<List<?>> ls = getFields(l);
+        String sql = getSelectSQL(want, match, more);
         Connection conn = connection.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
-        if(list != null){
-            for(int i = 1; i <= list.size(); i++) {
-                ps.setObject(i, list.get(i-1).getValue());
+        if(match != null){
+            for(int i = 1; i <= match.size(); i++) {
+                ps.setObject(i, match.get(i-1).getValue());
             }
         }
         ResultSet rs = ps.executeQuery();
-        Class<?> c = obj.getClass();
+        Class<?> c = (want == null ? obj.getClass() : want.getClass());
+        Field[] want_fields = c.getDeclaredFields();
         Method[] method = c.getMethods();
         List<Object> result = new ArrayList<>();
         while (rs.next()) {
-            Object o = c.newInstance();
-            for (int j = 0; j < fields.length; j++) {
-                String m = "set" + fields[j].getName().toUpperCase().charAt(0)
-                        + fields[j].getName().substring(1);
+            Object o = c.getDeclaredConstructor().newInstance();
+            for (int j = 0; j < want_fields.length; j++) {
+                String m = "set" + want_fields[j].getName().toUpperCase().charAt(0)
+                        + want_fields[j].getName().substring(1);
                 for (Method value : method) {
                     if (value.getName().endsWith(m)) {
                         try {
                             value.invoke(o, rs.getObject(j + 1));
                         } catch (Exception e) {
-                            System.out.println(rs.getObject(j + 1).getClass().toString());
+                            System.out.println(m + rs.getObject(j + 1).getClass().toString());
                             e.printStackTrace();
                         }
                     }
@@ -213,6 +255,26 @@ public class SqlMapping {
 //        return flag;
 //    }
 /*
+    public void execute(String sql) throws SQLException {
+        SqlConnect.sqlBatch(Collections.singletonList(sql));
+    }
+    /*
+    public boolean update(Object obj) throws Exception {
+        // 获取obj的属性的值
+        List list = getFields(obj);
+        // 获取sql
+        String sql = getUpdateSQL(obj);
+        // 通过DbUtil
+        Connection conn = connection.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql);
+        for (int i = 1; i < list.size(); i++) {
+            ps.setObject(i, list.get(i));
+        }
+        ps.setInt(list.size(), (Integer) list.get(0));
+        boolean flag = ps.executeUpdate() > 0;
+        return flag;
+    }
+
     public boolean delete(Object obj,Integer id) throws Exception {
         // 获取obj的属性的值
         List list = getFields(obj);
