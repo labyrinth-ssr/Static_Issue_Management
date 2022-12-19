@@ -223,7 +223,7 @@ public class RawIssueMatch {
 //                iss_match.setCase_id(iss_case.getCase_id());
                 iss_case.setCase_status("SOLVED");
                 iss_case.setCommit_id_last(preRawIssue.getCommitId());
-                iss_case.setCommit_id_disappear(preRawIssue.getCommitId());
+                iss_case.setCommit_id_disappear(curCommit.getCommit_id());
 //                System.out.println("iss close:"+"case id:"+iss_match.getCase_id()+"inst id:"+iss_match.getInst_id()+iss_match.getParent_inst_id());
 //                iss_matchList.add(iss_match);
                 closedRawIssues.add(preRawIssue);
@@ -259,7 +259,9 @@ public class RawIssueMatch {
 
                 iss_match.setParent_inst_id(curRawIssue.getMappedRawIssue().getUuid());
                 iss_case.setCommit_id_last(curRawIssue.getCommitId());
-                iss_case.setCase_status("NONCHG");
+                if (iss_case.getCase_status()!="REOPEN"){
+                    iss_case.setCase_status("NONCHG");
+                }
                 //在match中设置case_id，发现匹配时，在match list中搜索其parentMappedIssue对应的case_id
                 iss_match.setCase_id(Iss_match.instIdLookUpCaseId(iss_matchList,curRawIssue.getMappedRawIssue().getUuid()));
                 iss_matchList.add(iss_match);

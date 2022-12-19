@@ -74,6 +74,7 @@ create table iss_case
    commit_id_disappear  varchar(50) not null,
    commit_id_last       varchar(50) not null,
    case_status          varchar(20) not null,
+   CONSTRAINT chk_caseStatus CHECK (case_status = 'NEW' OR case_status = 'NONCHG' OR case_status = 'REOPEN' OR case_status = 'SOLVED'),
    primary key (case_id)
 );
 
@@ -143,7 +144,7 @@ create table iss_match
 --      references iss_location (file_path) on delete restrict on update restrict;
 
  alter table iss_instance add constraint FK_commit foreign key (commit_id)
-     references commit (commit_hash) on delete restrict on update restrict;
+     references commit (commit_id) on delete restrict on update restrict;
 
 -- alter table iss_location add constraint FK_instance_locate foreign key (inst_id)
 --       references iss_instance (inst_id) on delete restrict on update restrict;
