@@ -75,7 +75,7 @@ public class SqlConnect {
             st.executeBatch();
             return 1;
         }catch (SQLException e){
-            e.printStackTrace();
+//            e.printStackTrace();
             return 0;
         }
     }

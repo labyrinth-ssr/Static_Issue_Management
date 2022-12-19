@@ -76,7 +76,8 @@ public class SqlQuery {
     //获取最新版本commit_id
     public String getLatestCommitId() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
 
-        String sql = "select commit_id as commit_hash from commit where commit_hash not in (select parent_commit_hash from commit);";
+//        String sql = "select commit_id as commit_hash from commit where commit_hash not in (select parent_commit_hash from commit);";
+        String sql = "SELECT commit_id from commit where commit_time = (select max(commit_time) from commit);";
         List<commit> c = (List<commit>) sqlMapping.select(new commit(),sql);
         return c.get(0).getCommit_hash();
     }
@@ -94,7 +95,7 @@ public class SqlQuery {
             sql = sql.substring(0, sql.lastIndexOf("&&"));
         }
         sql += " order by commit_time desc;";
-//        System.out.println("getDefetcCommit_sql: "+sql);
+        System.out.println("getDefetcCommit_sql: "+sql);
         return (List<DefectCommitEntity>) sqlMapping.select(new DefectCommitEntity(), sql);
     }
 
@@ -115,7 +116,7 @@ public class SqlQuery {
 
 
     public List<DefectEntity> getDefectEntity(String commit_id, String type_id,String status) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql = "SELECT a.exist_duration, a.case_id, a.inst_id, il.file_path, il.class_, il.method, il.`code`, il.start_line, il.start_col, case a.case_status when 'RESOLVED' then '已解决' else '未解决' end status\n" +
+        String sql = "SELECT a.exist_duration, a.case_id, a.inst_id, il.file_path, il.class_, il.method, il.`code`, il.start_line, il.start_col, case a.case_status when 'SOLVED' then '已解决' else '未解决' end status\n" +
                 "FROM( SELECT duration AS exist_duration, case_id, inst_id, location_id, case_status FROM full_view\n" +
                 "\t\tWHERE\n" +
                 "\t\t\tcommit_id = '" + commit_id + "'\n" +
@@ -142,18 +143,18 @@ public class SqlQuery {
         }else if(status == 3) {
             tmp += " where committer_new = '" + user + "' and status = 'IN' and case_status <> 'SOLVED'";
         }else if(status == 4){
-            tmp += " where committer_new = '" + user + "' and status = 'IN' and case_status = 'RESOLVED' and committer_disappear <> '" + user+"'";
+            tmp += " where committer_new = '" + user + "' and status = 'IN' and case_status = 'SOLVED' and committer_disappear <> '" + user+"'";
         }
         String total_sql = "select total, done, concat(round((done/total)*100,2),'%') as percentage, type, average_exist_duration\n" +
-                "from (select count(*) total ,COUNT(if(case_status = 'RESOLVED',1,null)) done, null as type, AVG(duration) average_exist_duration from " + tmp + ") a \n" +
+                "from (select count(*) total ,COUNT(if(case_status = 'SOLVED',1,null)) done, null as type, AVG(duration) average_exist_duration from " + tmp + ") a \n" +
                 "order by (done/total) asc, total desc;";
         String defect_sql = "select total, done, concat(round((done/total)*100,2),'%') as percentage, type, average_exist_duration\n" +
                 "from \n" +
-                "(select count(*) total, count(if(case_status = 'RESOLVED',1,null)) done, type, AVG(duration) average_exist_duration from " + tmp + " group by type) a\n" +
+                "(select count(*) total, count(if(case_status = 'SOLVED',1,null)) done, type, AVG(duration) average_exist_duration from " + tmp + " group by type) a\n" +
                 "order by percentage asc, total desc;";
         String type_sql = "select total, done, concat(round((done/total)*100,2),'%') as percentage, type, average_exist_duration\n" +
                 "from \n" +
-                "(select count(*) total, count(if(case_status = 'RESOLVED',1,null)) done, type_id as type, AVG(duration) average_exist_duration from " + tmp + " group by type_id) a\n" +
+                "(select count(*) total, count(if(case_status = 'SOLVED',1,null)) done, type_id as type, AVG(duration) average_exist_duration from " + tmp + " group by type_id) a\n" +
                 "order by percentage asc, total desc;";
         List<AnalysisEntity> totalEntity = (List<AnalysisEntity>) sqlMapping.select(new AnalysisEntity(), total_sql);
         List<AnalysisEntity> defectEntity = (List<AnalysisEntity>) sqlMapping.select(new AnalysisEntity(), defect_sql);
@@ -213,15 +214,15 @@ public class SqlQuery {
         tmp = tmp + sql_commit + sql_begin_time + sql_end_time + sql_type + sql_defect + sql_min + sql_c;
         tmp = tmp + ") t ";
         String total_sql = "select total, done, concat(round((done/total)*100,2),'%') as percentage, type, average_exist_duration\n" +
-                "from (select count(*) total ,COUNT(if(case_status = 'RESOLVED',1,null)) done, null as type, AVG(duration) average_exist_duration from " + tmp + ") a \n" +
+                "from (select count(*) total ,COUNT(if(case_status = 'SOLVED',1,null)) done, null as type, AVG(duration) average_exist_duration from " + tmp + ") a \n" +
                 "order by (done/total) asc, total desc;";
         String defect_sql = "select total, done, concat(round((done/total)*100,2),'%') as percentage, type, average_exist_duration\n" +
                 "from \n" +
-                "(select count(*) total, count(if(case_status = 'RESOLVED',1,null)) done, type, AVG(duration) average_exist_duration from " + tmp + " group by type) a\n" +
+                "(select count(*) total, count(if(case_status = 'SOLVED',1,null)) done, type, AVG(duration) average_exist_duration from " + tmp + " group by type) a\n" +
                 "order by percentage asc, total desc;";
         String type_sql = "select total, done, concat(round((done/total)*100,2),'%') as percentage, type, average_exist_duration\n" +
                 "from \n" +
-                "(select count(*) total, count(if(case_status = 'RESOLVED',1,null)) done, type_id as type, AVG(duration) average_exist_duration from " + tmp + " group by type_id) a\n" +
+                "(select count(*) total, count(if(case_status = 'SOLVED',1,null)) done, type_id as type, AVG(duration) average_exist_duration from " + tmp + " group by type_id) a\n" +
                 "order by percentage asc, total desc;";
         List<AnalysisEntity> totalEntity = (List<AnalysisEntity>) sqlMapping.select(new AnalysisEntity(), total_sql);
         List<AnalysisEntity> defectEntity = (List<AnalysisEntity>) sqlMapping.select(new AnalysisEntity(), defect_sql);

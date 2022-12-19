@@ -9,10 +9,7 @@ import org.example.Utils.JgitUtil;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,14 +30,16 @@ public class JGitTest {
 //        repository.setPath(pj_path.replace("\\","/"));
 //        repository.pathToName();
 //        boolean a = sqlMapping.save(Collections.singletonList(repository));
-
+        PrintStream console = System.out;
+        System.setOut(null);
         Git git = JgitUtil.openRpo(pj_path);
 
 //        List<Iss_file> iss_files = JgitUtil.gitFileList(git, repository.getPath());
 
         List<Commit> commitList = JgitUtil.gitLog(git);
         Commit curCommit = JgitUtil.gitCurLog(git);
-        System.out.println("cur" + curCommit.getCommit_hash());
+        System.setOut(console);
+        System.out.println("cur: " + curCommit.getCommit_hash());
 
         List<Commit> commitList1 = new ArrayList<>();
         List<SonarIssues> sonarIssuesPre = new ArrayList<>();
@@ -53,9 +52,9 @@ public class JGitTest {
         List<SonarRules> sonarRulesList = new ArrayList<>();
 
 
-        for (int i = 28; i >=26; i--) {
+        for (int i = commitList.size()-1; i >=commitList.size()-11; i--) {
 
-            System.out.println(i+":"+commitList.get(i).getCommit_msg());
+            System.out.print(i+":"+commitList.get(i).getCommit_msg());
 
             Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
 
@@ -71,13 +70,15 @@ public class JGitTest {
             Instance_location.setInstanceLocation(sonarIssues,instance_locationList);
             SonarRules.setSonarRules(sonarRulesList,sonarIssues);
 //            Iss_location.setLocation(iss_locations,sonarIssues);
-
+            System.setOut(null);
             if (commitList1.size()==1) {
                 RawIssueMatch.firstMatch(iss_locations,iss_matchList,iss_caseList,sonarIssues,commitList1.get(0));
             }else {
                 RawIssueMatch.match(iss_locations,iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList1.get(commitList1.size()-1),commitList1.get(commitList1.size()-2));
             }
             sonarIssuesPre = new ArrayList<> (sonarIssues);
+            System.setOut(console);
+
 
         }
 //        boolean b = sqlMapping.save(iss_files);
@@ -102,17 +103,19 @@ public class JGitTest {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(ins));
         while ((line = in.readLine()) != null) {
-            System.out.println(cmd + " " + line);
+//            System.out.println(cmd + " " + line);
         }
     }
 
     private static void runProcess(String path, String command) throws Exception {
 
+
+        System.out.print(", Sonarqube scanning ...");
         Process pro = Runtime.getRuntime().exec("cmd /c "+ command, null, new File(path));
         printLines(command + " stdout:", pro.getInputStream());
         printLines(command + " stderr:", pro.getErrorStream());
         pro.waitFor();
-        System.out.println(command + " exitValue() " + pro.exitValue());
+        System.out.println(command + " " + (pro.exitValue()==0?"DONE!":"FAIL"));
     }
 }
 

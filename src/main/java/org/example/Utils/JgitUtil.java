@@ -14,6 +14,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.example.Entity.Commit;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -50,8 +51,11 @@ public class JgitUtil {
 
     public static Ref gitReset(Git git, String commit_hash){
         try {
+            PrintStream console = System.out;
+            System.setOut(null);
             RevWalk walk = new RevWalk(git.getRepository());    //获取walk对象
             Ref ref = git.reset().setMode(ResetCommand.ResetType.HARD).setRef(commit_hash).call();  //设置参数
+            System.setOut(console);
             return ref;
         } catch (GitAPIException e) {
             throw new RuntimeException(e);
