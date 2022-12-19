@@ -79,7 +79,8 @@ public class JGitTest {
             }
             sonarIssuesPre = new ArrayList<> (sonarIssues);
         }
-//        boolean b = sqlMapping.save(iss_files);
+//      boolean b = sqlMapping.save(iss_files);
+        boolean c =sqlMapping.save(commitList1);
         boolean g = sqlMapping.save(iss_locations);
         boolean d =sqlMapping.save(issInstanceList);
         boolean h = sqlMapping.save(instance_locationList);
@@ -87,7 +88,6 @@ public class JGitTest {
         boolean f = sqlMapping.save(iss_matchList);
         boolean k = sqlMapping.save(sonarRulesList);
 
-        boolean c =sqlMapping.save(commitList1);
 
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
     }
