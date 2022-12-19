@@ -1,17 +1,18 @@
 package org.example.Utils;
 
+import com.google.common.collect.Lists;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.example.Entity.Commit;
+import org.sonar.api.issue.internal.FieldDiffs;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -39,6 +40,12 @@ public class JgitUtil {
             e.printStackTrace();
         }
         return git;
+    }
+
+    public static Repository getRepo(String dir) throws IOException {
+        return new FileRepositoryBuilder()
+                .setGitDir(Paths.get(dir, ".git").toFile())
+                .build();
     }
 
     public static List<Ref> gitBranchList(Git git){
@@ -102,6 +109,67 @@ public class JgitUtil {
         } catch (GitAPIException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<RevCommit> gitLogRev(Git git){
+        try {
+            Iterable<RevCommit> logs = git.log().all().call();
+            List<RevCommit> rvc = new ArrayList<>();
+            logs.forEach(rvc::add);
+            return  rvc;
+        } catch (GitAPIException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Commit> revCommitList2Commit(List<RevCommit> logs){
+        List<Commit> commitList = new ArrayList<>();
+        logs.forEach(c->{
+            Commit commit = RevCommit2Commit(c);
+            commitList.add(commit);
+        });
+        return commitList;
+    }
+
+
+    public static List<String> getChangedFileList(RevCommit newCommit , RevCommit preCommit, Git git) throws IOException, GitAPIException {
+//        List<DiffEntry> returnDiffs = null;
+        ObjectId head=newCommit.getTree().getId();
+        ObjectId oldHead=preCommit.getTree().getId();
+
+        System.out.println("Printing diff between the Revisions: " + newCommit.getName() + " and " + preCommit.getName());
+
+        // prepare the two iterators to compute the diff between
+//            try (ObjectReader reader = repo.newObjectReader()) {
+        ObjectReader reader = git.getRepository().newObjectReader();
+        CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+        oldTreeIter.reset(reader, oldHead);
+        CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+        newTreeIter.reset(reader, head);
+
+        List<DiffEntry> diffs= git.diff().setNewTree(newTreeIter).setOldTree(oldTreeIter).call();
+        List<String> str = new ArrayList<>();
+        for(DiffEntry diffEntry : diffs) if(diffEntry.getNewPath().endsWith(".java")) str.add(diffEntry.getNewPath());
+        return str;
+    }
+
+    public static RevCommit getPrevHash(RevCommit commit, Repository repo)  throws  IOException {
+
+        try (RevWalk walk = new RevWalk(repo)) {
+            // Starting point
+            walk.markStart(commit);
+            int count = 0;
+            for (RevCommit rev : walk) {
+                // got the previous commit.
+                if (count == 1) {
+                    return rev;
+                }
+                count++;
+            }
+            walk.dispose();
+        }
+        //Reached end and no previous commits.
+        return null;
     }
 
 //    public static List<Iss_file> gitFileList(Git git,String repo_name){

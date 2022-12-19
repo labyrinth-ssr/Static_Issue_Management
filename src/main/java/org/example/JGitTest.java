@@ -1,5 +1,6 @@
 package org.example;
 
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.example.SonarConfig.SonarIssues;
 import org.example.SonarConfig.SonarResult;
 import org.eclipse.jgit.api.Git;
@@ -36,7 +37,9 @@ public class JGitTest {
 
 //        List<Iss_file> iss_files = JgitUtil.gitFileList(git, repository.getPath());
 
-        List<Commit> commitList = JgitUtil.gitLog(git);
+        List<RevCommit> revCommitList = JgitUtil.gitLogRev(git);
+//        List<Commit> commitList = JgitUtil.gitLog(git);
+        List<Commit> commitList = JgitUtil.revCommitList2Commit(revCommitList);
         Commit curCommit = JgitUtil.gitCurLog(git);
         System.setOut(console);
         System.out.println("cur: " + curCommit.getCommit_hash());
@@ -52,14 +55,19 @@ public class JGitTest {
         List<SonarRules> sonarRulesList = new ArrayList<>();
 
 
-        for (int i = commitList.size()-1; i >=commitList.size()-11; i--) {
+        for (int i = commitList.size()-2; i >=commitList.size()-11; i--) {
 
             System.out.print(i+":"+commitList.get(i).getCommit_msg());
 
-            Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
+//            Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
+            System.out.println("size"+ commitList.size()+" size"+revCommitList.size());
+            System.setOut(null);
+//            List<String> changedFile = JgitUtil.getChangedFileList(revCommitList.get(i),revCommitList.get(i+1), git);
+            System.setOut(console);
 
             runProcess(pj_path,"sonar-scanner -D sonar.projectKey=cim");
 
+//            if(changedFile!=null) System.out.println("changedFile:" + changedFile.toString());
             List<SonarIssues> sonarIssues = SonarResult.getSonarIssues();
 
             Commit commit = new Commit();
