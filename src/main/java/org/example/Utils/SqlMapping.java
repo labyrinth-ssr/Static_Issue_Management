@@ -231,13 +231,29 @@ public class SqlMapping {
                             e.printStackTrace();
                         }
                     }
-
                 }
             }
             result.add(o);
         }
         return result;
     }
+
+// 批量更新：case。
+//    public boolean update(Object obj) throws Exception {
+//        // 获取obj的属性的值
+//        List list = getFields(obj);
+//        // 获取sql
+//        String sql = getUpdateSQL(obj);
+//        // 通过DbUtil
+//        Connection conn = connection.getConnection();
+//        PreparedStatement ps = conn.prepareStatement(sql);
+//        for (int i = 1; i < list.size(); i++) {
+//            ps.setObject(i, list.get(i));
+//        }
+//        ps.setInt(list.size(), (Integer) list.get(0));
+//        boolean flag = ps.executeUpdate() > 0;
+//        return flag;
+//    }
 
     public void execute(String sql) throws SQLException {
         SqlConnect.sqlBatch(Collections.singletonList(sql));

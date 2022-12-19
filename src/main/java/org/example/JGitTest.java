@@ -55,12 +55,12 @@ public class JGitTest {
         List<SonarRules> sonarRulesList = new ArrayList<>();
 
 
-        for (int i = commitList.size()-2; i >=commitList.size()-11; i--) {
+        for (int i = commitList.size()-2; i >=commitList.size()-4; i--) {
 
             System.out.print(i+":"+commitList.get(i).getCommit_msg());
 
 //            Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
-            System.out.println("size"+ commitList.size()+" size"+revCommitList.size());
+//            System.out.println("size"+ commitList.size()+" size"+revCommitList.size());
             System.setOut(null);
 //            List<String> changedFile = JgitUtil.getChangedFileList(revCommitList.get(i),revCommitList.get(i+1), git);
             System.setOut(console);
@@ -89,7 +89,8 @@ public class JGitTest {
 
 
         }
-//        boolean b = sqlMapping.save(iss_files);
+//      boolean b = sqlMapping.save(iss_files);
+        boolean c =sqlMapping.save(commitList1);
         boolean g = sqlMapping.save(iss_locations);
         boolean d =sqlMapping.save(issInstanceList);
         boolean h = sqlMapping.save(instance_locationList);
@@ -97,7 +98,6 @@ public class JGitTest {
         boolean f = sqlMapping.save(iss_matchList);
         boolean k = sqlMapping.save(sonarRulesList);
 
-        boolean c =sqlMapping.save(commitList1);
 
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
     }
