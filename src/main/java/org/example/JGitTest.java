@@ -55,7 +55,7 @@ public class JGitTest {
         List<SonarRules> sonarRulesList = new ArrayList<>();
 
 
-        for (int i = commitList.size()-2; i >=commitList.size()-4; i--) {
+        for (int i = commitList.size()-1; i >=commitList.size()-2; i--) {
 
             System.out.print(i+":"+commitList.get(i).getCommit_msg());
 
@@ -82,7 +82,7 @@ public class JGitTest {
             if (commitList1.size()==1) {
                 RawIssueMatch.firstMatch(iss_locations,iss_matchList,iss_caseList,sonarIssues,commitList1.get(0));
             }else {
-                RawIssueMatch.match(iss_locations,iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList1.get(commitList1.size()-1),commitList1.get(commitList1.size()-2));
+                RawIssueMatch.match(iss_locations,iss_matchList,iss_caseList,sonarIssuesPre,sonarIssues,commitList1.get(commitList1.size()-2),commitList1.get(commitList1.size()-1));
             }
             sonarIssuesPre = new ArrayList<> (sonarIssues);
             System.setOut(console);
@@ -97,8 +97,6 @@ public class JGitTest {
         boolean j =sqlMapping.save(iss_caseList);
         boolean f = sqlMapping.save(iss_matchList);
         boolean k = sqlMapping.save(sonarRulesList);
-
-
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
     }
 

@@ -256,12 +256,17 @@ public class RawIssueMatch {
                 iss_match.setInst_id(curRawIssue.getUuid());
 
                 Iss_case iss_case = Iss_case.look_up_case(iss_caseList,Iss_match.instIdLookUpCaseId(iss_matchList,curRawIssue.getMappedRawIssue().getUuid()));
-
+                if (iss_case==null) System.out.println("inst"+curRawIssue.getMappedRawIssue().getUuid()+"no case");
                 iss_match.setParent_inst_id(curRawIssue.getMappedRawIssue().getUuid());
                 iss_case.setCommit_id_last(curRawIssue.getCommitId());
                 if (iss_case.getCase_status()!="REOPEN"){
                     iss_case.setCase_status("NONCHG");
                 }
+//                System.out.println("iss case:"+iss_case.getCase_id()+iss_case.getCommit_id_new());
+//                System.out.println("iss case:");
+//                System.out.println(iss_case.getCommit_id_new());
+//                System.out.println(iss_case.getCommit_id_last());
+//                System.out.println(iss_case.getCase_id());
                 //在match中设置case_id，发现匹配时，在match list中搜索其parentMappedIssue对应的case_id
                 iss_match.setCase_id(Iss_match.instIdLookUpCaseId(iss_matchList,curRawIssue.getMappedRawIssue().getUuid()));
                 iss_matchList.add(iss_match);
@@ -294,7 +299,7 @@ public class RawIssueMatch {
                 iss_case.setCommit_id_last(newRawIssue.getCommitId());
                 String case_id = Iss_case.getUuidFromIssueCase(iss_case,++case_id_num);
                 iss_case.setCase_id(case_id);
-                System.out.println("iss case new:"+iss_case.getCase_id()+","+iss_case.getType_id()+","+iss_case.getCommit_id_new()+","+iss_case.getCommit_id_last()+","+iss_case.getCase_status());
+//                System.out.println("iss case new:"+iss_case.getCase_id()+","+iss_case.getType_id()+","+iss_case.getCommit_id_new()+","+iss_case.getCommit_id_last()+","+iss_case.getCase_status());
                 //允许没有parent的match，用于和case保持一致
                 iss_match.setParent_inst_id("");
                 iss_match.setCase_id(case_id);
