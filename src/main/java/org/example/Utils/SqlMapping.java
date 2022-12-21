@@ -1,6 +1,8 @@
 package org.example.Utils;
 
 
+import org.example.Entity.Iss_case;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,7 +26,7 @@ public class SqlMapping {
         tableName = objs.get(0).getClass().getSimpleName().toLowerCase();
         fields = c.getDeclaredFields();
         Method[] methods = c.getMethods();
-        System.out.println(tableName +" " + fields.toString()+" "+ methods.toString());
+//        System.out.println(tableName +" " + fields.toString()+" "+ methods.toString());
         List<Method> getMethod = new ArrayList<>();
 
         List<String> methodName = new ArrayList<>();
@@ -41,7 +43,7 @@ public class SqlMapping {
 
         for(String method : methodName){
             if(!methodMap.containsKey(method)) {
-                System.out.println("method:"+method);
+//                System.out.println("method:"+method);
                 throw new RuntimeException("method dosen't exist");
 
             }
@@ -134,8 +136,9 @@ public class SqlMapping {
     }
 
     public boolean save(List<?> objs) throws Exception {
+        if(objs == null || objs.size() == 0) return false;
         List<List<?>> list = getFields(objs);
-        System.out.println(list.toString());
+//        System.out.println(list.toString());
         String sql = getInsertSQL();
 
         Connection conn = connection.getConnection();
@@ -254,6 +257,23 @@ public class SqlMapping {
 //        boolean flag = ps.executeUpdate() > 0;
 //        return flag;
 //    }
+    public void updateCase(List<Iss_case> issCaseList) throws Exception {
+        // 获取obj的属性的值
+        // 获取sql
+        if(issCaseList == null || issCaseList.size() == 0) return;
+        String sql = "update iss_case set commit_id_disappear = ?, commit_id_last = ?, case_status = ? where case_id = ?";
+        // 通过DbUtil
+        Connection conn = connection.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql);
+        for(Iss_case iss_case:issCaseList){
+            ps.setString(1, iss_case.getCommit_id_disappear());
+            ps.setString(2, iss_case.getCommit_id_last());
+            ps.setString(3, iss_case.getCase_status());
+            ps.setString(4, iss_case.getCase_id());
+            ps.addBatch();
+        }
+        ps.executeBatch();
+    }
 
     public void execute(String sql) throws SQLException {
         SqlConnect.sqlBatch(Collections.singletonList(sql));

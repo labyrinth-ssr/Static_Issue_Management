@@ -13,7 +13,7 @@ public class Main {
 
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
-        boolean a = sqlMapping.save(SonarResult.getSonarIssues());
+        boolean a = sqlMapping.save(SonarResult.getSonarIssues("cim"));
         boolean b = sqlMapping.save(SonarResult.getSonartype());
 //        boolean c = sqlMapping.save(SonarResult.getCommit());
 

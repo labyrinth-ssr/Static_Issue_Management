@@ -36,12 +36,19 @@ public class Instance_location {
                 iss_location.setEnd_line(Integer.parseInt(location.getEndLine()));
                 iss_location.setStart_col(Integer.parseInt(location.getStartOffset()));
                 iss_location.setEnd_col(Integer.parseInt(location.getEndOffset()));
-                iss_location.setFile_path(sonarIssue.getFilePath().split(":")[1]);
 
                 instance_location.setInst_id(sonarIssue.getId());
                 instance_location.setLocation_id(Iss_location.getUuidFromLocation(iss_location));
                 instance_locations.add(instance_location);
             }
         }
+    }
+
+    public Instance_location(String inst_id, String location_id) {
+        this.inst_id = inst_id;
+        this.location_id = location_id;
+    }
+
+    public Instance_location() {
     }
 }

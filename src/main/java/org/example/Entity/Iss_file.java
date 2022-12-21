@@ -87,5 +87,15 @@ public class Iss_file {
 //                issfileList.add(fti);
 //            }
 //        }
+
+    public Iss_file(String file_name, String file_path, Date created_time, String repo_path) {
+        this.file_name = file_name;
+        this.file_path = file_path;
+        this.created_time = created_time;
+        this.repo_path = repo_path;
+    }
+
+    public Iss_file() {
+    }
 }
 

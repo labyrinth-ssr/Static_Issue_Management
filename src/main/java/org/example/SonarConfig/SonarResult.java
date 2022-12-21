@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 
 public class SonarResult {
 
-    public static List<SonarIssues> getSonarIssues() {
-        String result = HTTPUtil.sendGet("http://127.0.0.1:9000/api/issues/search?componentKeys=cim&additionalFields=_all&s=FILE_LINE&resolved=false");
+    public static List<SonarIssues> getSonarIssues(String key) {
+        String result = HTTPUtil.sendGet("http://127.0.0.1:9000/api/issues/search?componentKeys="+key+"&additionalFields=_all&s=FILE_LINE&resolved=false");
         JSONObject sonarData = JSONObject.parseObject(result);
         JSONArray issueRawData = sonarData.getJSONArray("issues");
         List<SonarIssues> sonarIssueEntities = JSON.parseArray(String.valueOf(issueRawData), SonarIssues.class);

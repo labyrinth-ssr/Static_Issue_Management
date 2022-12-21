@@ -1,6 +1,7 @@
 package org.example.Entity;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Iss_match {
     String inst_id;
@@ -51,12 +52,21 @@ public class Iss_match {
 
     public static String instIdLookUpCaseId(List<Iss_match>iss_matchList,String inst_id){
         for (Iss_match iss_match:iss_matchList) {
-            if (iss_match.inst_id==inst_id){
+            if (Objects.equals(iss_match.inst_id, inst_id)){
                 return iss_match.case_id;
             }
         }
         System.out.println("given case id not found case id");
         return "";
+    }
+
+    public Iss_match(String inst_id, String parent_inst_id, String case_id) {
+        this.inst_id = inst_id;
+        this.parent_inst_id = parent_inst_id;
+        this.case_id = case_id;
+    }
+
+    public Iss_match() {
     }
 }
 

@@ -65,4 +65,15 @@ public class SonarRules {
 
         }
     }
+
+    public SonarRules(String id, String description, String severity, String lang, String type) {
+        this.id = id;
+        this.description = description;
+        this.severity = severity;
+        this.lang = lang;
+        this.type = type;
+    }
+
+    public SonarRules() {
+    }
 }
