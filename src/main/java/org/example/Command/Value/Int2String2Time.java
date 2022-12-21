@@ -10,7 +10,7 @@ public class Int2String2Time {
     String time;
 
     public Long getIntValue1() {
-        return intValue1;
+        return intValue1== null ? 0 : intValue1;
     }
 
     public void setIntValue1(Long intValue1) {
@@ -18,7 +18,7 @@ public class Int2String2Time {
     }
 
     public Long getIntValue2() {
-        return intValue2;
+        return intValue2== null ? 0 : intValue2;
     }
 
     public void setIntValue2(Long intValue2) {

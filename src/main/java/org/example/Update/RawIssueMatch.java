@@ -23,12 +23,10 @@ public class RawIssueMatch {
 
     public static List<RawIssue> closedRawIssues = new ArrayList<>();
 
-    //private static final String baseRepoPath1 = "C:\\Users\\31324\\Desktop\\ss-backend\\lab2_back-end";
     private static final String baseRepoPath1 = Constant.RepoPath;
 
     private static final String SEPARATOR = System.getProperty("file.separator");
 
-    private static int case_id_num = -1;
 
     public static void firstMatch(List<Iss_location> iss_locationList, List<Iss_match> iss_matchList, List<Iss_case> iss_caseList, List<SonarIssues> issInstanceListCur, Commit curCommit){
         List<RawIssue> preRawIssueList = new ArrayList<>();
@@ -43,9 +41,9 @@ public class RawIssueMatch {
             RawIssue preRawIssue1 = newRawIssue(iss_instance.getId(),iss_instance.getTypeId(),iss_instance.getMessage(),curCommit.getCommit_id(),iss_instance.getFilePath().split(":")[1]);
             List<Location> locationList = new ArrayList<>();
             for (SonarLocation location : iss_instance.getLocation())
-                locationList.add(newLocation(Integer.parseInt(location.getStartLine()),Integer.parseInt(location.getEndLine()),Integer.parseInt(location.getStartOffset()),Integer.parseInt(location.getEndOffset()),""));
+                locationList.add(newLocation(Integer.parseInt(location.getStartLine()),Integer.parseInt(location.getEndLine()),Integer.parseInt(location.getStartOffset()),Integer.parseInt(location.getEndOffset())));
 
-            if (locationList.isEmpty()) preRawIssue1.setLocations(Collections.singletonList(newLocation(0,0,0,0,"")));
+            if (locationList.isEmpty()) preRawIssue1.setLocations(Collections.singletonList(newLocation(0,0,0,0)));
             else preRawIssue1.setLocations(locationList);
 
             preRawIssueList.add(preRawIssue1);
@@ -69,7 +67,7 @@ public class RawIssueMatch {
             RawIssue preRawIssue = newRawIssue(instance.getId(), instance.getTypeId(), instance.getMessage(), preCommit.getCommit_id(), instance.getFilePath().split(":")[1]);
             List<Location> locationList = new ArrayList<>();
             for (SonarLocation location : instance.getLocation())
-                locationList.add(newLocation(Integer.parseInt(location.getStartLine()), Integer.parseInt(location.getEndLine()), Integer.parseInt(location.getStartOffset()), Integer.parseInt(location.getEndOffset()), ""));
+                locationList.add(newLocation(Integer.parseInt(location.getStartLine()), Integer.parseInt(location.getEndLine()), Integer.parseInt(location.getStartOffset()), Integer.parseInt(location.getEndOffset())));
             preRawIssue.setLocations(locationList);
             preRawIssueList.add(preRawIssue);
         }
@@ -80,7 +78,7 @@ public class RawIssueMatch {
             RawIssue curRawIssue = newRawIssue(instance.getId(), instance.getTypeId(), instance.getMessage(), curCommit.getCommit_id(), instance.getFilePath().split(":")[1]);
             List<Location> locationList = new ArrayList<>();
             for (SonarLocation location : instance.getLocation()) {
-                locationList.add(newLocation(Integer.parseInt(location.getStartLine()), Integer.parseInt(location.getEndLine()), Integer.parseInt(location.getStartOffset()), Integer.parseInt(location.getEndOffset()), ""));
+                locationList.add(newLocation(Integer.parseInt(location.getStartLine()), Integer.parseInt(location.getEndLine()), Integer.parseInt(location.getStartOffset()), Integer.parseInt(location.getEndOffset())));
             }
             curRawIssue.setLocations(locationList);
             curRawIssueList.add(curRawIssue);
@@ -169,7 +167,7 @@ public class RawIssueMatch {
             List<Iss_location> locations = match.getLocation();
             RawIssue preRawIssue = newRawIssue(matchInfo.getInst_id_last(),matchInfo.getType_id(),matchInfo.getMessage(),matchInfo.getCommit_id_last(), matchInfo.getFile_name());
             List<Location> tmplocationList = new ArrayList<>();
-            locations.forEach(location -> tmplocationList.add(newLocation(location.getStart_line(),location.getEnd_line(),location.getStart_col(),location.getEnd_col(),"")));
+            locations.forEach(location -> tmplocationList.add(newLocation(location.getStart_line(),location.getEnd_line(),location.getStart_col(),location.getEnd_col())));
             preRawIssue.setLocations(tmplocationList);
             preRawIssueList.add(preRawIssue);
             hashMap.put(matchInfo.getInst_id_last(), match);
@@ -192,6 +190,10 @@ public class RawIssueMatch {
         for (RawIssue curRawIssue : curRawIssueList) {
             Iss_case iss_case;
             List<Iss_location> locations = new ArrayList<>();
+            curRawIssue.getLocations().forEach(location -> {
+                Iss_location issLocation = newIssLocation(location);
+                locations.add(issLocation);
+            });
             if (curRawIssue.getMappedRawIssue() == null){
                 iss_case = new Iss_case(curRawIssue.getType(),curCommit.getCommit_id(),curCommit.getCommit_id(),null,"NEW");
                 caseList.add(iss_case);
@@ -199,20 +201,18 @@ public class RawIssueMatch {
 //                hashMap.put(iss_case.getCase_id(), matches_);
                 matches.add(matches_);
             }else{
-                System.out.println("ssssssssssssssssss================================");
                 String case_status = hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_status();
                 if(case_status.equals("SOLVED")) case_status = "REOPEN";
                 if(case_status.equals("NEW")) case_status = "UNDONE";
-                iss_case = new Iss_case(curRawIssue.getMappedRawIssue().getIssueId(), curRawIssue.getType(), curCommit.getCommit_id(), curCommit.getCommit_id(), hashMap.get(curRawIssue.getIssueId()).getInfo().commit_id_disappear, case_status);
+                System.out.println(case_status);
+                iss_case = new Iss_case(hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_id(), curRawIssue.getType(), curCommit.getCommit_id(), curCommit.getCommit_id(), hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().commit_id_disappear, case_status);
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(curRawIssue.getMappedRawIssue().getUuid());
                 setMatches(matches_, iss_case, curRawIssue, locations);
             }
-            curRawIssue.getLocations().forEach(location -> {
-                Iss_location issLocation = newIssLocation(location);
-                locationList.add(issLocation);
-                instanceLocationList.add(new Instance_location(curRawIssue.getUuid(),issLocation.getLocation_id()));
-            });
+
+            locationList.addAll(locations);
+            locations.forEach(issLocation -> instanceLocationList.add(new Instance_location(curRawIssue.getUuid(),issLocation.getLocation_id())));
             instanceList.add(new Iss_instance(curRawIssue.getUuid(),curRawIssue.getType(), curCommit.getCommit_id(),curRawIssue.getMappedRawIssue() == null ? null:curRawIssue.getMappedRawIssue().getUuid(), iss_case.getCase_id(), curRawIssue.getFileName()));
         }
 
@@ -222,8 +222,6 @@ public class RawIssueMatch {
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
                 setMatchesPre(matches_, iss_case, preRawIssue);
-            }else if(preRawIssue.getMappedRawIssue()!=null){
-                System.out.println("=========================");
             }
         }
         sqlMapping.execute("start transaction");
@@ -257,7 +255,7 @@ public class RawIssueMatch {
             RawIssue curRawIssue = newRawIssue(instance.getId(),instance.getTypeId(),instance.getMessage(),curCommit.getCommit_id(), instance.getFilePath().split(":")[1]);
             List<Location> tmplocationList = new ArrayList<>();
             for (SonarLocation location : instance.getLocation()) {
-                tmplocationList.add(newLocation(Integer.parseInt(location.getStartLine()),Integer.parseInt(location.getEndLine()),Integer.parseInt(location.getStartOffset()),Integer.parseInt(location.getEndOffset()),""));
+                tmplocationList.add(newLocation(Integer.parseInt(location.getStartLine()),Integer.parseInt(location.getEndLine()),Integer.parseInt(location.getStartOffset()),Integer.parseInt(location.getEndOffset())));
             }
             curRawIssue.setLocations(tmplocationList);
             curRawIssueList.add(curRawIssue);
@@ -286,19 +284,6 @@ public class RawIssueMatch {
         return location;
     }
 
-    public static Location newLocation(String location_id, Integer startLine, Integer endLine, Integer startToken, Integer endToken, String code, String class_, String method){
-        Location location = new Location();
-        location.setStartLine(startLine);
-        location.setEndLine(endLine);
-        location.setStartToken(startToken);
-        location.setEndToken(endToken);
-        location.setCode(code);
-        location.setClassName(class_);
-        location.setOffset(0);
-        location.setAnchorName(method);
-        location.setUuid(location_id);
-        return location;
-    }
 
     public static Iss_location newIssLocation(Location l){
         return new Iss_location(l.getClassName(), l.getAnchorName(), l.getStartLine(), l.getEndLine(), l.getStartToken(), l.getEndToken(), l.getCode(), l.getFilePath());

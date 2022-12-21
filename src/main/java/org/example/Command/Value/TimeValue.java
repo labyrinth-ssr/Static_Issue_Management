@@ -2,32 +2,14 @@ package org.example.Command.Value;
 
 import java.math.BigDecimal;
 
-public class IntStringTime {
-    Long intValue;
-    String stringValue;
+public class TimeValue {
     String time;
-
-    public Long getIntValue() {
-        return intValue  == null ? 0 : intValue;
-    }
-
-    public void setIntValue(Long intValue) {
-        this.intValue = intValue;
-    }
-
-    public String getStringValue() {
-        return stringValue;
-    }
-
-    public void setStringValue(String stringValue) {
-        this.stringValue = stringValue;
-    }
-
     public String getTime() {
         return time;
     }
-    public void setTime(BigDecimal time) {
-        long time_duration = time.longValue();
+
+    public void setTime(Long time) {
+        long time_duration = time;
         long diffSeconds = time_duration % 60;
         long diffMinutes = time_duration / (60) % 60;
         long diffHours = time_duration / (60 * 60) % 24;

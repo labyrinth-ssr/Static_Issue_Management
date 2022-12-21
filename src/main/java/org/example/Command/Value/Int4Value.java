@@ -7,7 +7,7 @@ public class Int4Value {
     Long intValue4;
 
     public Long getIntValue1() {
-        return intValue1;
+        return intValue1 == null ? 0 : intValue1;
     }
 
     public void setIntValue1(Long intValue1) {
@@ -15,7 +15,7 @@ public class Int4Value {
     }
 
     public Long getIntValue2() {
-        return intValue2;
+        return intValue2 == null ? 0 : intValue2;
     }
 
     public void setIntValue2(Long intValue2) {
@@ -23,7 +23,7 @@ public class Int4Value {
     }
 
     public Long getIntValue3() {
-        return intValue3;
+        return intValue3 == null ? 0 : intValue3;
     }
 
     public void setIntValue3(Long intValue3) {
@@ -31,7 +31,7 @@ public class Int4Value {
     }
 
     public Long getIntValue4() {
-        return intValue4;
+        return intValue4 == null ? 0 : intValue4;
     }
 
     public void setIntValue4(Long intValue4) {

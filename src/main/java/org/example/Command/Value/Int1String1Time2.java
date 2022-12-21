@@ -10,7 +10,7 @@ public class Int1String1Time2 {
     String time2;
 
     public Long getIntValue() {
-        return intValue;
+        return intValue== null ? 0 : intValue;
     }
 
     public void setIntValue(Long intValue) {

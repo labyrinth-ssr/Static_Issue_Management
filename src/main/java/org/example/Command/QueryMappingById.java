@@ -37,8 +37,9 @@ public class QueryMappingById {
     }
 
     public void getListInLatest() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        String commit_id = getCommitLatest();
         String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
-                "from iss_case ic join iss_instance ii on ic.commit_id_new = ii.commit_id " +
+                "from iss_case ic join iss_instance ii on ic.commit_id_new = ii.commit_id and ii.commit_id = '"+commit_id+"' " +
                 "join sonarrules sr on ic.type_id = sr.id " +
                 "where ic.case_status = 'NEW' order by ic.type_id, file_path";
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
@@ -62,16 +63,23 @@ public class QueryMappingById {
     }
 
     public void getGCountUnsolvedByCommit_id(String commit_id) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql = "select count(*) intValue, type_id stringValue, avg(TIMESTAMPDIFF(SECOND, c1.commit_time, localtime())) time1,  median(TIMESTAMPDIFF(SECOND, c1.commit_time, localtime())) time2 from " +
-                "iss_case ic join commit c1 on ic.commit_id_new = c1.commit_id and ic.commit_id_new = '" + commit_id +"' " +
-                "group by type_id order by avg(TIMESTAMPDIFF(SECOND, c1.commit_time, localtime())) desc, type_id";
-        List<Int1String1Time2> int1String1Time2s = (List<Int1String1Time2>) sqlMapping.select(new Int1String1Time2(), sql);
+        String sql = "select count(*) intValue, ii.type_id stringValue, avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) time from " +
+                "iss_instance ii join iss_case ic on ii.case_id = ic.case_id and ii.commit_id = '" + commit_id +"' and ic.case_status <> 'SOLVED' " +
+                "join commit c on ii.commit_id = c.commit_id " +
+                "group by ii.type_id order by avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) desc, ii.type_id";
+        List<IntStringTime> intStringTimes = (List<IntStringTime>) sqlMapping.select(new IntStringTime(), sql);
         System.out.println("当前版本现存缺陷类型统计: ");
-        for(Int1String1Time2 int1String1Time2 : int1String1Time2s){
-            System.out.println("类型: "+ int1String1Time2.getStringValue() +
-                    ",数量: " + int1String1Time2.getIntValue() +
-                    ",平均存续时长: " + int1String1Time2.getTime1() +
-                    ",存续时长中位数: " + int1String1Time2.getTime2());
+        for(IntStringTime intStringTime : intStringTimes){
+                String sql_median = "select TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) time from " +
+                        "iss_instance ii join iss_case ic on ii.case_id = ic.case_id and ii.commit_id = '" + commit_id +"' " +
+                        "and ic.case_status <> 'RESOLVED' and ii.type_id = '"+intStringTime.getStringValue()+"' " +
+                        "join commit c on ii.commit_id = c.commit_id " +
+                        "order by TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
+                String time = ((List<TimeValue>)sqlMapping.select(new TimeValue(), sql_median)).get(0).getTime();
+                System.out.println("类型: "+ intStringTime.getStringValue() +
+                ",数量: " + intStringTime.getIntValue() +
+                ",平均存续时长: " + intStringTime.getTime() +
+                ",存续时长中位数: " + time);
         }
     }
 
@@ -131,7 +139,8 @@ public class QueryMappingById {
 
     public void getCountDoneByCommit_id(String commit_id) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql = "select count(*) intValue from iss_case where case_status in ('SOLVED','REOPEN') and commit_id_disappear = '" +commit_id+"'";
-        System.out.println("当前版本解决缺陷数量: " + ((List<StringValue>)sqlMapping.select(new StringValue(),sql)).get(0).getStringValue());
+        IntValue stringValue = ((List<IntValue>)sqlMapping.select(new IntValue(),sql)).get(0);
+        System.out.println("当前版本解决缺陷数量: " + stringValue.getIntValue());
     }
 
     public void getCountDoneInTypeByCommit_id(String commit_id) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {

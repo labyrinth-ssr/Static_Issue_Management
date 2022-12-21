@@ -54,14 +54,14 @@ public class Save {
             }
             matches.add(new Matches(matchInfo,locations));
         });
-        for (int i = commitList.size()-20; i >=commitList.size()-30; i--) {
+        for (int i = commitList.size()-1; i >=0; i--) {
             System.out.print(i + ":" + commitList.get(i).getCommit_msg());
 
             Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
 //            Thread.sleep(1000 * 5);
             String key = pj_path.split("/")[pj_path.split("/").length-1]+commitList.get(i).getCommit_hash();
             CmdUtil.runProcess(pj_path,"sonar-scanner -D sonar.projectKey="+key);
-            Thread.sleep(1000 * 2);
+//            Thread.sleep(1000 * 2);
             List<SonarIssues> sonarIssues = SonarResult.getSonarIssues(key);
 
             if(sonarIssues!=null||sonarIssues.size()!=0) System.out.println("saving defects");

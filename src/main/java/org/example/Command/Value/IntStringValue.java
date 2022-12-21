@@ -1,15 +1,15 @@
 package org.example.Command.Value;
 
 public class IntStringValue {
-    Integer intValue;
+    Long intValue;
 
     String stringValue;
 
-    public Integer getIntValue() {
-        return intValue;
+    public Long getIntValue() {
+        return intValue  == null ? 0 : intValue;
     }
 
-    public void setIntValue(Integer intValue) {
+    public void setIntValue(Long intValue) {
         this.intValue = intValue;
     }
 

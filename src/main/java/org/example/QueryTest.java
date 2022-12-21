@@ -21,7 +21,7 @@ public class QueryTest {
         queryMappingByTime = new QueryMappingByTime(mysqlConnect);
         queryMappingByDev = new QueryMappingByDev(mysqlConnect);
 
-        MappingIdTest();
+//        MappingIdTest();
         MappingTimeTest();
         MappingDevTest();
     }
@@ -41,10 +41,10 @@ public class QueryTest {
     public static void MappingTimeTest() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String begin_time = "2020-12-12 23:12:12";
         String end_time = "2022-12-12 23:12:12";
-        queryMappingByTime.getCountDoneByCommit_time(begin_time,end_time,pj_path);
-        queryMappingByTime.getCountDoneInTypeByCommit_time(begin_time,end_time,pj_path);
-        queryMappingByTime.getGCountInTypeByCommit_time(begin_time,end_time,pj_path);
-        queryMappingByTime.getListInByCommit_time(begin_time,end_time,pj_path);
+//        queryMappingByTime.getCountDoneByCommit_time(begin_time,end_time,pj_path);
+//        queryMappingByTime.getCountDoneInTypeByCommit_time(begin_time,end_time,pj_path);
+//        queryMappingByTime.getGCountInTypeByCommit_time(begin_time,end_time,pj_path);
+//        queryMappingByTime.getListInByCommit_time(begin_time,end_time,pj_path);
         queryMappingByTime.getGCountUnsolvedByCommit_time(begin_time,end_time,pj_path);
         queryMappingByTime.getListDoneByCommit_time(begin_time,end_time,pj_path);
         queryMappingByTime.getCountInByCommit_time(begin_time,end_time,pj_path);
@@ -56,7 +56,7 @@ public class QueryTest {
         queryMappingByTime.getDefectListMoreThanDuration(duration,pj_path);
     }
     public static void MappingDevTest() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        queryMappingByDev.getDevCountByDevs("Wanggengyu",pj_path);
-        queryMappingByDev.getDevTypeCountByDevs("Wanggengyu",pj_path);
+        queryMappingByDev.getDevCountByDevs("alex",pj_path);
+        queryMappingByDev.getDevTypeCountByDevs("alex",pj_path);
     }
 }
