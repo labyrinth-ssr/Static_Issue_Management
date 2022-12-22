@@ -115,3 +115,11 @@ create table if not exists  instance_location
         on update restrict
 );
 
+create table if not exists  repos
+(
+   repo_path              varchar(50) not null,
+   latest_commit_id       varchar(50) not null,
+   commit_num             INT unsigned not null default 0,
+   PRIMARY KEY(repo_path)
+);
+

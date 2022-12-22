@@ -19,28 +19,27 @@ import java.util.UUID;
 public class Mock {
     public static void main(String[] args) throws Exception {
         List<SonarRules> sonarRulesList = get_sonar_rules();
+//
 
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.execSqlReadFileContent("mock.sql");
         mysqlConnect.useDataBase("sonarissuemock");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
-
-        List<Commit> commitList = get_commit_list();
+        List<Repos> reposList = new ArrayList<>();
+        List<Commit> commitList = get_commit_list_and_repos(reposList);
         List<String> fileList = get_file_list();
         List<Iss_case> issCaseList = new ArrayList<>();
         List<Iss_location> issLocationList = generate_loaction_list(1500);
-        List<Iss_instance> issInstanceList = generate_iss_instance_and_case_list(issCaseList,sqlMapping,1000,sonarRulesList,commitList,fileList);
+        List<Iss_instance> issInstanceList = generate_iss_instance_and_case_list(issCaseList,1000,sonarRulesList,commitList,fileList);
         List<Instance_location> instanceLocationList = match_inst_location(issInstanceList,issLocationList);
+        sqlMapping.save(reposList);
         sqlMapping.save(commitList);
         sqlMapping.save(sonarRulesList);
         sqlMapping.save(issLocationList);
         sqlMapping.save(issInstanceList);
         sqlMapping.save(issCaseList);
         sqlMapping.save(instanceLocationList);
-
-
         System.out.println("done");
-
     }
 
     public static List<Instance_location> match_inst_location(List<Iss_instance> issInstanceList,List<Iss_location> issLocationList){
@@ -61,29 +60,34 @@ public class Mock {
         });
         return instanceLocationList;
     }
-    public static List<Commit> get_commit_list(){
+    public static List<Commit> get_commit_list_and_repos(List<Repos> reposList){
         String pj_path = Constant.MockPath;
         PrintStream console = System.out;
         System.setOut(null);
         Git git = JgitUtil.openRpo(pj_path);
         List<Commit> commitList = JgitUtil.gitLog(git);
-        int index = 0;
+        Repos repos = new Repos();
+        repos.setRepo_path("MockRepo");
+        repos.setCommit_num((long)commitList.size());
+        String latest_commit = null;
         for (Commit commit:commitList) {
             commit.setCommit_id(Commit.getUuidFromCommit(commit));
-            commit.setRepo_path("MockRepo"+ ((++index)/(commitList.size()/4)));
+            commit.setRepo_path("MockRepo");
+            if (commit.getParent_commit_hash()==null) latest_commit=commit.getCommit_id();
         }
+        repos.setLatest_commit_id(latest_commit);
+
+        reposList.add(repos);
         System.setOut(console);
         System.out.println("commitList:"+commitList.toString());
         return commitList;
     }
-
     public static List<String> get_file_list(){
         String pj_path = Constant.MockPath;
         Git git = JgitUtil.openRpo(pj_path);
         List<String> iss_files = JgitUtil.gitFileList(git, pj_path);
         return iss_files;
     }
-
     public static List<SonarRules> get_sonar_rules() throws Exception {
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.useDataBase("sonar");
@@ -91,7 +95,7 @@ public class Mock {
         List<SonarRules> sonarRulesList= (List<SonarRules>) sqlMapping.select(new SonarRules());
         return sonarRulesList;
     }
-    public static List<Iss_instance> generate_iss_instance_and_case_list(List<Iss_case>issCaseList,SqlMapping sqlMapping,int N,List<SonarRules> sonarRulesList,List<Commit> commitList,List<String> fileList) throws Exception {
+    public static List<Iss_instance> generate_iss_instance_and_case_list(List<Iss_case>issCaseList,int N,List<SonarRules> sonarRulesList,List<Commit> commitList,List<String> fileList) throws Exception {
         List<Iss_instance> issInstanceList = new ArrayList<>();
         int commit_id_range = 10;
         int iss_per_commit = N/commit_id_range;
@@ -205,6 +209,5 @@ public class Mock {
 //        }
 //        return null;
 //    }
-
 
 }
