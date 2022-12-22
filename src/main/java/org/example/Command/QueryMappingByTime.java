@@ -1,5 +1,6 @@
 package org.example.Command;
 
+import org.apache.commons.lang.StringUtils;
 import org.example.Command.QueryUseEntity.GetListInLatestInst;
 import org.example.Command.Value.*;
 import org.example.Utils.SqlConnect;
@@ -8,6 +9,7 @@ import org.example.Utils.SqlMapping;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class QueryMappingByTime {
@@ -15,36 +17,6 @@ public class QueryMappingByTime {
 
     public QueryMappingByTime(SqlConnect connect) throws SQLException {
         sqlMapping = new SqlMapping(connect);
-    }
-
-    String getUniversalSqlCondition(String begin_time, String end_time, String repo, String alis){
-        String sql = "";
-        if(begin_time!=null && !begin_time.trim().equals("")) sql+=alis+".commit_time >= '"+begin_time+"' and ";
-        if(end_time!=null && !end_time.trim().equals("")) sql+=alis+".commit_time <= '" + end_time +"' and ";
-        sql+= alis + ".repo_path = '"+repo+"' ";
-        return sql;
-    }
-
-    public void getGCountUnsolvedByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
-        String sql = "select count(*) intValue, ii.type_id stringValue, avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) time from " +
-                "iss_instance ii join iss_case ic on ii.case_id = ic.case_id and ic.case_status <> 'SOLVED' " +
-                "join commit c on ii.commit_id = c.commit_id and " + sql_condition +
-                "group by ii.type_id order by avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) desc, ii.type_id";
-        List<IntStringTime> intStringTimes = (List<IntStringTime>) sqlMapping.select(new IntStringTime(), sql);
-        System.out.println("当前版本现存缺陷类型统计: ");
-        for(IntStringTime intStringTime : intStringTimes){
-            String sql_median = "select TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) time from " +
-                    "iss_instance ii join iss_case ic on ii.case_id = ic.case_id " +
-                    "and ic.case_status <> 'RESOLVED' and ii.type_id = '"+intStringTime.getStringValue()+"' " +
-                    "join commit c on ii.commit_id = c.commit_id and " + sql_condition +
-                    "order by TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
-            String time = ((List<TimeValue>)sqlMapping.select(new TimeValue(), sql_median)).get(0).getTime();
-            System.out.println("类型: "+ intStringTime.getStringValue() +
-                    ", 数量: " + intStringTime.getIntValue() +
-                    ", 平均存续时长: " + intStringTime.getTime() +
-                    ", 存续时长中位数: " + time);
-        }
     }
 
     public List<String> getCommit_idListByTimeAndRepo(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
@@ -57,19 +29,39 @@ public class QueryMappingByTime {
         return strings;
     }
 
+    String getUniversalSqlCondition(String begin_time, String end_time, String repo, String alis){
+        String sql = "";
+        if(begin_time!=null && !begin_time.trim().equals("")) sql+=alis+".commit_time >= '"+begin_time+"' and ";
+        if(end_time!=null && !end_time.trim().equals("")) sql+=alis+".commit_time <= '" + end_time +"' and ";
+        sql+= alis + ".repo_path = '"+repo+"' ";
+        return sql;
+    }
+
     public void getCountInByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
         String sql = "select count(*) intValue from iss_case ic join commit c on ic.commit_id_new = c.commit_id where " + sql_condition;
-        System.out.println("当前版本缺陷引入数: "+ ((List<IntValue>)sqlMapping.select(new IntValue(), sql)).get(0).getIntValue());
+        System.out.println("引入缺陷数量: "+ ((List<IntValue>)sqlMapping.select(new IntValue(), sql)).get(0).getIntValue());
     }
 
     public void getGCountInTypeByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
-        String sql = "select count(*) intValue, type_id stringValue from iss_case join commit c on iss_case.commit_id_new = c.commit_id where " + sql_condition + " group by type_id order by count(*)";
-        List<IntStringValue> intStringValues = (List<IntStringValue>) sqlMapping.select(new IntStringValue(), sql);
-        System.out.println("分类引入数: ");
-        for(IntStringValue intStringValue : intStringValues){
-            System.out.println("缺陷类型: "+ intStringValue.getStringValue() +", 数量: "+intStringValue.getIntValue());
+        String sql = "select count(*) intValue, ic.type_id stringValue, avg(TIMESTAMPDIFF(SECOND, c.commit_time, case ic.case_status when 'SOLVED' then c1.commit_time else localtime() end)) time from " +
+                "iss_case ic join commit c on ic.commit_id_new = c.commit_id and " + sql_condition +
+                "left join commit c1 on c1.commit_id = ic.commit_id_disappear " +
+                "group by ic.type_id order by avg(TIMESTAMPDIFF(SECOND, c.commit_time, case ic.case_status when 'SOLVED' then c1.commit_time else localtime() end)) desc, ic.type_id";
+        List<IntStringTime> intStringTimes = (List<IntStringTime>) sqlMapping.select(new IntStringTime(), sql);
+        System.out.println("引入缺陷分类统计: ");
+        for(IntStringTime intStringTime : intStringTimes){
+            String sql_median = "select TIMESTAMPDIFF(SECOND, c.commit_time, case ic.case_status when 'SOLVED' then c1.commit_time else localtime() end) time from " +
+                    "iss_case ic join commit c on ic.commit_id_new = c.commit_id and " + sql_condition +
+                    "and ic.type_id = '"+intStringTime.getStringValue()+"' " +
+                    "left join commit c1 on ic.commit_id_disappear = c1.commit_id " +
+                    "order by TIMESTAMPDIFF(SECOND, c.commit_time, case ic.case_status when 'SOLVED' then c1.commit_time else localtime() end) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
+            String time = ((List<TimeValue>)sqlMapping.select(new TimeValue(), sql_median)).get(0).getTime();
+            System.out.println("类型: "+ intStringTime.getStringValue() +
+                    ", 数量: " + intStringTime.getIntValue() +
+                    ", 平均存续时长: " + intStringTime.getTime() +
+                    ", 存续时长中位数: " + time);
         }
     }
 
@@ -81,7 +73,7 @@ public class QueryMappingByTime {
                 "join commit c on c.commit_id = ic.commit_id_new " +
                 "where "+ sql_condition +" order by ic.type_id, file_path";
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
-        System.out.println("引入缺陷分类统计: ");
+        System.out.println("引入缺陷详情: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
                     "from iss_instance ii left join instance_location ilo on ii.inst_id = ilo.inst_id and ii.inst_id = '" + getListInLatestInst.getInst_id() +"' " +
@@ -108,12 +100,25 @@ public class QueryMappingByTime {
     }
 
     public void getCountDoneInTypeByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
-        String sql = "select count(*) intValue, type_id stringValue from iss_case join commit c on iss_case.commit_id_disappear = c.commit_id where case_status in ('SOLVED','REOPEN') and "+sql_condition+" group by type_id";
-        List<IntStringValue> list = (List<IntStringValue>) sqlMapping.select(new IntStringValue(),sql);
+        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c1");
+        String sql = "select count(*) intValue, ic.type_id stringValue, avg(TIMESTAMPDIFF(SECOND, c.commit_time, c1.commit_time)) time from " +
+                "iss_case ic join commit c1 on ic.commit_id_disappear = c1.commit_id and " + sql_condition +
+                "and ic.case_status = 'SOLVED' " +
+                "join commit c on ic.commit_id_new = c.commit_id " +
+                "group by ic.type_id order by avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) desc, ic.type_id";
+        List<IntStringTime> intStringTimes = (List<IntStringTime>) sqlMapping.select(new IntStringTime(), sql);
         System.out.println("解决缺陷分类统计: ");
-        for(IntStringValue intStringValue : list){
-            System.out.println("类型: "+intStringValue.getStringValue() +", 数量: "+intStringValue.getIntValue());
+        for(IntStringTime intStringTime : intStringTimes){
+            String sql_median = "select TIMESTAMPDIFF(SECOND, c.commit_time, c1.commit_time) time from " +
+                    "iss_case ic join commit c1 on ic.commit_id_disappear = c1.commit_id and " + sql_condition +
+                    "and ic.case_status = 'SOLVED' and ic.type_id = '"+intStringTime.getStringValue()+"' " +
+                    "join commit c on ic.commit_id_new = c.commit_id " +
+                    "order by TIMESTAMPDIFF(SECOND, c.commit_time, c1.commit_time) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
+            String time = ((List<TimeValue>)sqlMapping.select(new TimeValue(), sql_median)).get(0).getTime();
+            System.out.println("类型: "+ intStringTime.getStringValue() +
+                    ", 数量: " + intStringTime.getIntValue() +
+                    ", 平均存续时长: " + intStringTime.getTime() +
+                    ", 存续时长中位数: " + time);
         }
     }
 
@@ -131,7 +136,7 @@ public class QueryMappingByTime {
                     "from iss_instance ii left join instance_location ilo on ii.inst_id = ilo.inst_id and ii.inst_id = '" + getListInLatestInst.getInst_id() +"' " +
                     "join iss_location il on ilo.location_id = il.location_id order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new IntStringValue(), sql1);
-            System.out.print(", 缺陷类型: "+ getListInLatestInst.getType_id() +
+            System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     ", 描述: " + getListInLatestInst.getDescription() +
                     ", 文件: " + getListInLatestInst.getFile_path());
             if(list_not_empty(int2String2s)){
@@ -142,6 +147,28 @@ public class QueryMappingByTime {
                 }
             }
             System.out.print("\n");
+        }
+    }
+
+    public void getGCountUnsolvedByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
+        String sql = "select count(*) intValue, ii.type_id stringValue, avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) time from " +
+                "iss_instance ii join iss_case ic on ii.case_id = ic.case_id and ic.case_status <> 'SOLVED' " +
+                "join commit c on ii.commit_id = c.commit_id and " + sql_condition +
+                "group by ii.type_id order by avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) desc, ii.type_id";
+        List<IntStringTime> intStringTimes = (List<IntStringTime>) sqlMapping.select(new IntStringTime(), sql);
+        System.out.println("现存缺陷类型统计: ");
+        for(IntStringTime intStringTime : intStringTimes){
+            String sql_median = "select TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) time from " +
+                    "iss_instance ii join iss_case ic on ii.case_id = ic.case_id " +
+                    "and ic.case_status <> 'RESOLVED' and ic.type_id = '"+intStringTime.getStringValue()+"' " +
+                    "join commit c on ii.commit_id = c.commit_id and " + sql_condition +
+                    "order by TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
+            String time = ((List<TimeValue>)sqlMapping.select(new TimeValue(), sql_median)).get(0).getTime();
+            System.out.println("类型: "+ intStringTime.getStringValue() +
+                    ", 数量: " + intStringTime.getIntValue() +
+                    ", 平均存续时长: " + intStringTime.getTime() +
+                    ", 存续时长中位数: " + time);
         }
     }
 
@@ -167,10 +194,12 @@ public class QueryMappingByTime {
                 "concat(round((count(if(iss_case.case_status = 'SOLVED',1,null))*100)/count(*) ,2),'%') stringValue1, " +
                 "sr.type stringValue2, " +
                 "avg(if(case_status='SOLVED',TIMESTAMPDIFF(SECOND, c1.commit_time, c2.commit_time),null)) time from " +
-                "iss_case join commit c1 on c1.commit_id = iss_case.commit_id_new " +
+                "iss_case join commit c1 on c1.commit_id = iss_case.commit_id_new and " + sql_condition +
                 "left join commit c2 on c2.commit_id = iss_case.commit_id_disappear " +
-                "join sonarrules sr on iss_case.type_id = sr.id and "+ sql_condition + " group by sr.type";
+                "join sonarrules sr on iss_case.type_id = sr.id group by sr.type";
+        System.out.println(sql);
         List<Int2String2Time> int2String2Times = (List<Int2String2Time>) sqlMapping.select(new Int2String2Time(), sql);
+        System.out.println("按大类分类统计");
         for(Int2String2Time int2String2Time : int2String2Times) {
             System.out.println("缺陷大类: " + int2String2Time.getStringValue2() +
                     ", 缺陷引入数: " + int2String2Time.getIntValue1() +
@@ -180,17 +209,17 @@ public class QueryMappingByTime {
         }
     }
 
-
     public void getAnalysisCountByType_idByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c1");
         String sql = "select count(*) intValue1, count(if(iss_case.case_status = 'SOLVED',1,null)) intValue2, " +
                 "concat(round( (count(if(iss_case.case_status ='SOLVED',1,null))/count(*))*100,2),'%') stringValue1, " +
                 "iss_case.type_id stringValue2, " +
                 "avg(if(case_status='SOLVED',TIMESTAMPDIFF(SECOND, c1.commit_time, c2.commit_time),null)) time from " +
-                "iss_case join commit c1 on c1.commit_id = iss_case.commit_id_new " +
-                "left join commit c2 on c2.commit_id = iss_case.commit_id_disappear and " +
-                sql_condition + " group by iss_case.type_id";
+                "iss_case join commit c1 on c1.commit_id = iss_case.commit_id_new and " + sql_condition +
+                "left join commit c2 on c2.commit_id = iss_case.commit_id_disappear group by iss_case.type_id";
+        System.out.println(sql);
         List<Int2String2Time> int2String2Times = (List<Int2String2Time>) sqlMapping.select(new Int2String2Time(), sql);
+        System.out.println("按类型分类统计: ");
         for(Int2String2Time int2String2Time : int2String2Times) {
             System.out.println("缺陷类型: " + int2String2Time.getStringValue2() +
                     ", 缺陷引入数: " + int2String2Time.getIntValue1() +
@@ -218,29 +247,18 @@ public class QueryMappingByTime {
     String getTimeStamp(String duration){
         duration = duration.trim();
         Long timestamp = 0L;
-        String[] t = duration.split("天");
-        if(t.length == 2){
-            timestamp = Long.valueOf(t[0])*24;
-            duration = t[1];
-        }else if(t.length == 1) duration = t[0];
-        else return "0";
-        String[] h = duration.split("时");
-        if(h.length == 2){
-            timestamp = (timestamp + Long.valueOf(h[0]))*12;
-            duration = h[1];
-        }else if(h.length == 1) duration = h[0];
-        else return "0";
-        String[] m = duration.split("分");
-        if(m.length == 2){
-            timestamp = (timestamp + Long.valueOf(m[0]))*60;
-            duration = m[1];
-        }else if(m.length == 1) duration = m[0];
-        else return "0";
-        String[] s = duration.split("秒");
-        if(s.length == 2){
-            timestamp = timestamp + Long.valueOf(s[0]);
-            duration = s[1];
+        String[] t = duration.split("(?<=天)|(?<=时)|(?<=分)|(?<=秒)");
+        List<String> list = new ArrayList<>();
+        Collections.addAll(list, t);
+        System.out.println("list: " + list.toString());
+        String tmp;
+        for(String l : list){
+            if(l.endsWith("天") && StringUtils.isNumeric(tmp = l.substring(0, l.indexOf("天")))) timestamp += Long.parseLong(tmp)*24*60*60;
+            if(l.endsWith("时") && StringUtils.isNumeric(tmp = l.substring(0, l.indexOf("时")))) timestamp += Long.parseLong(tmp)*60*60;
+            if(l.endsWith("分") && StringUtils.isNumeric(tmp = l.substring(0, l.indexOf("分")))) timestamp += Long.parseLong(tmp)*60;
+            if(l.endsWith("秒") && StringUtils.isNumeric(tmp = l.substring(0, l.indexOf("秒")))) timestamp += Long.parseLong(tmp);
         }
+        System.out.println(timestamp);
         return timestamp.toString();
     }
 

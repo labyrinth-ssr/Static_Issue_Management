@@ -41,7 +41,7 @@ public class Main {
             if(str.startsWith("latest_defect")){
                 String latest = queryMappingById.getCommitLatest();
                 queryMappingById.getCountInByCommit_id(latest);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingById.getGCountInTypeByCommit_id(latest);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingById.getListInByCommit_id(latest);
@@ -49,54 +49,44 @@ public class Main {
 
 
                 queryMappingById.getCountDoneByCommit_id(latest);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingById.getCountDoneInTypeByCommit_id(latest);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingById.getListDoneByCommit_id(latest);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
 
                 queryMappingById.getGCountUnsolvedByCommit_id(latest);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
-
             }else if(str.startsWith("defect -c")){
                 String commit_hash = queryMappingById.getCommit_idByCommit_hashAndRepo(str.substring(9).trim(), Constant.RepoPath);
                 queryMappingById.getCountInByCommit_id(commit_hash);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingById.getGCountInTypeByCommit_id(commit_hash);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingById.getListInByCommit_id(commit_hash);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
 
                 queryMappingById.getCountDoneByCommit_id(commit_hash);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingById.getCountDoneInTypeByCommit_id(commit_hash);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingById.getListDoneByCommit_id(commit_hash);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
-
-                queryMappingById.getGCountUnsolvedByCommit_id(commit_hash);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
             }else if(str.startsWith("defect -t")){
                 str = str.substring(9).trim();
                 String[] s = str.split("=");
                 if(!checkTimeString(s)) continue;
                 String begin_time = s[0];
                 String end_time = getString2(s);
-                System.out.println(begin_time+" "+end_time);
                 queryMappingByTime.getCountInByCommit_time(begin_time,end_time,Constant.RepoPath);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingByTime.getGCountInTypeByCommit_time(begin_time,end_time,Constant.RepoPath);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingByTime.getListInByCommit_time(begin_time,end_time,Constant.RepoPath);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingByTime.getCountDoneByCommit_time(begin_time,end_time,Constant.RepoPath);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingByTime.getCountDoneInTypeByCommit_time(begin_time,end_time,Constant.RepoPath);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingByTime.getListDoneByCommit_time(begin_time,end_time,Constant.RepoPath);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
-                queryMappingByTime.getGCountUnsolvedByCommit_time(begin_time,end_time,Constant.RepoPath);
-
             }else if(str.startsWith("analysis")){
                 str = str.substring(8).trim();
                 String[] s = str.split("=");
@@ -104,21 +94,19 @@ public class Main {
                 String begin_time = s[0];
                 String end_time = getString2(s);
                 queryMappingByTime.getAnalysisCountByCommit_time(begin_time,end_time,Constant.RepoPath);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingByTime.getAnalysisCountByTypeByCommit_time(begin_time,end_time,Constant.RepoPath);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingByTime.getAnalysisCountByType_idByCommit_time(begin_time,end_time,Constant.RepoPath);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
             }else if(str.startsWith("duration")){
                 str = str.substring(8).trim();
                 queryMappingByTime.getDefectListMoreThanDuration(str,Constant.RepoPath);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
             }else if(str.startsWith("devs")){
                 str = str.substring(4).trim();
+                if(str.equals("")) continue;
                 queryMappingByDev.getDevCountByDevs(str,Constant.RepoPath);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingByDev.getDevTypeCountByDevs(str,Constant.RepoPath);
-                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
             }
         }
     }
@@ -130,17 +118,18 @@ public class Main {
 
     public static boolean checkTimeString(String[] str){
         for(String s : str) {
-            if(s.trim()=="") continue;
+            s = s.trim();
+            if(s.equals("")) continue;
             String[] sl = s.split(" ");
-            boolean i = sl[0].contains("-");
+            if(!sl[0].contains("-")) return false;
             String s1 = sl[0];
             if (sl.length > 2) return false;
-            if (i && s1.split("-").length != 3) return false;
+            if (s1.split("-").length != 3) return false;
             else
                 for (String sd : s1.split("-")) {
                     if (!StringUtils.isNumeric(sd)) return false;
                 }
-            if (!i || (sl.length == 2 && (s1 = sl[1]).length() != 0)) {
+            if (sl.length == 2 && (s1 = sl[1]).length() != 0) {
                 if (s1.split(":").length != 3) return false;
                 else {
                     for (String sd : s1.split(":")) {
