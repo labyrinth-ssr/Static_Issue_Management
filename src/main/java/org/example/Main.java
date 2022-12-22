@@ -42,13 +42,15 @@ public class Main {
                 String latest = queryMappingById.getCommitLatest();
                 queryMappingById.getCountInByCommit_id(latest);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
-                queryMappingById.getCountDoneInTypeByCommit_id(latest);
+                queryMappingById.getGCountInTypeByCommit_id(latest);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingById.getListInByCommit_id(latest);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
 
 
                 queryMappingById.getCountDoneByCommit_id(latest);
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                queryMappingById.getCountDoneInTypeByCommit_id(latest);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingById.getListDoneByCommit_id(latest);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
@@ -59,12 +61,15 @@ public class Main {
             }else if(str.startsWith("defect -c")){
                 String commit_hash = queryMappingById.getCommit_idByCommit_hashAndRepo(str.substring(9).trim(), Constant.RepoPath);
                 queryMappingById.getCountInByCommit_id(commit_hash);
-                queryMappingById.getCountDoneInTypeByCommit_id(commit_hash);
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                queryMappingById.getGCountInTypeByCommit_id(commit_hash);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingById.getListInByCommit_id(commit_hash);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
 
                 queryMappingById.getCountDoneByCommit_id(commit_hash);
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
+                queryMappingById.getCountDoneInTypeByCommit_id(commit_hash);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
                 queryMappingById.getListDoneByCommit_id(commit_hash);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
