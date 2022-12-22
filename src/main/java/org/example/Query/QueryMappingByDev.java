@@ -22,7 +22,7 @@ public class QueryMappingByDev {
                 "(select count(if(c1.committer = '" + name +"' and ic.case_status <> 'SOLVED',1,null))) intValue3, " +
                 "(select count(if(c1.committer = '" + name +"' and c2.committer <> '"+name+"',1,null))) intValue4 " +
                 "from iss_case ic join commit c1 on ic.commit_id_new = c1.commit_id " +
-                "left join commit c2 on ic.commit_id_last = c2.commit_id " +
+                "left join commit c2 on ic.commit_id_disappear = c2.commit_id " +
                 "where c1.repo_path = '"+repo+"'";
         Int4Value int4Value = ((List<Int4Value>) sqlMapping.select(new Int4Value(), sql)).get(0);
 
@@ -47,7 +47,7 @@ public class QueryMappingByDev {
                 "(select avg(if( c1.committer = '" + name +"' and c2.committer <> '"+name+"',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null))) time4, " +
                 " ic.type_id stringValue " +
                 "from iss_case ic join commit c1 on ic.commit_id_new = c1.commit_id " +
-                "left join commit c2 on ic.commit_id_last = c2.commit_id " +
+                "left join commit c2 on ic.commit_id_disappear = c2.commit_id " +
                 "where c1.repo_path = '"+repo+"' group by ic.type_id";
         List<Int4Time4String1Value> int4Float4String1Values = (List<Int4Time4String1Value>) sqlMapping.select(new Int4Time4String1Value(), sql);
         System.out.println("\n引入缺陷: ");

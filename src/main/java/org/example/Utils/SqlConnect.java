@@ -27,34 +27,49 @@ public class SqlConnect {
 
     public SqlConnect() {
         try {
+            Properties properties = new Properties();
+            File file =new File(System.getProperty("user.dir") + "/conf.properties");
+            FileInputStream fileInputStream =new FileInputStream(file);
+            properties.load(fileInputStream);
             JDBC_URL = Constant.jdbc_url;
             JDBC_USER = Constant.jdbc_user;
             JDBC_PASSWORD = Constant.jdbc_password;
 
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            JDBC_URL = properties.getProperty("jdbc_url");
+            JDBC_USER = properties.getProperty("jdbc_user");
+            JDBC_PASSWORD = properties.getProperty("jdbc_password");
+
             connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
-        } catch (SQLException | ClassNotFoundException e){
+        } catch (SQLException e){
             e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public SqlConnect(String database) {
         try {
-            JDBC_URL = Constant.jdbc_url;
-            JDBC_USER = Constant.jdbc_user;
-            JDBC_PASSWORD = Constant.jdbc_password;
+            Properties properties = new Properties();
+            File file =new File(System.getProperty("user.dir") + "/conf.properties");
+            FileInputStream fileInputStream =new FileInputStream(file);
+            properties.load(fileInputStream);
+            JDBC_URL = properties.getProperty("jdbc_url");
+            JDBC_USER = properties.getProperty("jdbc_user");
+            JDBC_PASSWORD = properties.getProperty("jdbc_password");
 
-            Class.forName("com.mysql.cj.jdbc.Driver");
             String DATABASE_URL = JDBC_URL + "/" + database;
             connection = DriverManager.getConnection(DATABASE_URL, JDBC_USER, JDBC_PASSWORD);
-        } catch (SQLException | ClassNotFoundException e){
+        } catch (SQLException e){
             e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public void useDataBase(String database) throws SQLException {
         releaseConnect();
         String DATABASE_URL = JDBC_URL + "/" + database;
+
         connection = DriverManager.getConnection(DATABASE_URL, JDBC_USER, JDBC_PASSWORD);
     }
 

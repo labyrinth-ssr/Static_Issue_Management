@@ -5,9 +5,6 @@ import org.eclipse.jgit.lib.Ref;
 import org.example.Entity.*;
 import org.example.SonarConfig.SonarIssues;
 import org.example.SonarConfig.SonarResult;
-import org.example.Update.Match_Info;
-import org.example.Update.Matches;
-import org.example.Update.RawIssueMatch;
 import org.example.Utils.*;
 
 import java.io.PrintStream;
@@ -19,7 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Save {
-    public static void save(String repo_path) throws Exception {
+    public static void save(String repo_path, Integer num) throws Exception {
+
+
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.execSqlReadFileContent("crebas2.sql");
         mysqlConnect.useDataBase("sonarissue");
@@ -31,15 +30,18 @@ public class Save {
         List<Commit> commitList = JgitUtil.gitLog(git);
         Commit curCommit = JgitUtil.gitCurLog(git);
         System.setOut(console);
-
+        int count = num == null ? commitList.size()-1:num-1;
+        if(num!=null && num > commitList.size()){
+            System.err.println("当前仓库分支数: "+ commitList.size() + ", 预扫描数: " + num);
+            throw new Exception();
+        }
         System.out.println("cur: " + curCommit.getCommit_hash());
 
         repo_path = repo_path.replace("\\","/");
         repoCheck(repo_path, sqlMapping);
         HashMap<String, SonarRules> rulesHashMap = getRules(sqlMapping);
         List<Matches> matches = getMatches(sqlMapping, repo_path);
-
-        for (int i = 10; i >=0; i--) {
+        for (int i = count; i >=0; i--) {
             Commit commit = new Commit();
             commit.setCommit(commitList.get(i), repo_path);
             System.out.print(i + ":" + commit.getCommit_msg() +", hash: "+commit.getCommit_hash());

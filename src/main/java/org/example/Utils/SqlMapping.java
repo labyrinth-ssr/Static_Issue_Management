@@ -241,23 +241,6 @@ public class SqlMapping {
         }
         return result;
     }
-
-// 批量更新：case。
-//    public boolean update(Object obj) throws Exception {
-//        // 获取obj的属性的值
-//        List list = getFields(obj);
-//        // 获取sql
-//        String sql = getUpdateSQL(obj);
-//        // 通过DbUtil
-//        Connection conn = connection.getConnection();
-//        PreparedStatement ps = conn.prepareStatement(sql);
-//        for (int i = 1; i < list.size(); i++) {
-//            ps.setObject(i, list.get(i));
-//        }
-//        ps.setInt(list.size(), (Integer) list.get(0));
-//        boolean flag = ps.executeUpdate() > 0;
-//        return flag;
-//    }
     public void updateCase(List<Iss_case> issCaseList) throws Exception {
         // 获取obj的属性的值
         // 获取sql
@@ -284,35 +267,5 @@ public class SqlMapping {
         String sql = "update repos set latest_commit_id = '"+repos.getLatest_commit_id()+"', commit_num = commit_num + 1 where repo_path = '" + repos.getRepo_path()+"'";
         execute(sql);
     }
-    /*
-    public boolean update(Object obj) throws Exception {
-        // 获取obj的属性的值
-        List list = getFields(obj);
-        // 获取sql
-        String sql = getUpdateSQL(obj);
-        // 通过DbUtil
-        Connection conn = connection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        for (int i = 1; i < list.size(); i++) {
-            ps.setObject(i, list.get(i));
-        }
-        ps.setInt(list.size(), (Integer) list.get(0));
-        boolean flag = ps.executeUpdate() > 0;
-        return flag;
-    }
-
-    public boolean delete(Object obj,Integer id) throws Exception {
-        // 获取obj的属性的值
-        List list = getFields(obj);
-        // 获取sql
-        String sql = getDeleteSQL(obj);
-        // 通过DbUtil
-        Connection conn = connection.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, id);
-        boolean flag = ps.executeUpdate() > 0;
-        return flag;
-    }
- */
 }
 
