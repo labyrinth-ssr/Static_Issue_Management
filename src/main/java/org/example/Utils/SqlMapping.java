@@ -19,9 +19,13 @@ public class SqlMapping {
     private Field[] fields;
     private String tableName;
     SqlConnect connection;
+
     public SqlMapping(SqlConnect connection) {
         this.connection = connection;
     }
+
+    public Connection getConnection(){return connection.getConnection();}
+
     private List<List<?>> getFields(List<?> objs) throws InvocationTargetException, IllegalAccessException {
         Class<?> c = objs.get(0).getClass();
         tableName = objs.get(0).getClass().getSimpleName().toLowerCase();

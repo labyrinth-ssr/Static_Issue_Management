@@ -1,6 +1,7 @@
 package org.example.Update;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.lib.Ref;
 import org.example.Entity.*;
 import org.example.SonarConfig.SonarIssues;
@@ -32,7 +33,7 @@ public class Save {
         System.setOut(console);
         int count = num == null ? commitList.size()-1:num-1;
         if(num!=null && num > commitList.size()){
-            System.err.println("当前仓库分支数: "+ commitList.size() + ", 预扫描数: " + num);
+            System.err.println("当前仓库提交数: "+ commitList.size() + ", 预扫描数: " + num);
             throw new Exception();
         }
         System.out.println("cur: " + curCommit.getCommit_hash());

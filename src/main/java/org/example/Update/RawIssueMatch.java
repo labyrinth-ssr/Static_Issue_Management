@@ -15,6 +15,7 @@ import cn.edu.fudan.issue.entity.dbo.RawIssue;
 import cn.edu.fudan.issue.util.AnalyzerUtil;
 import cn.edu.fudan.issue.util.AstParserUtil;
 import org.example.Entity.*;
+import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
 
 public class RawIssueMatch {
@@ -28,7 +29,6 @@ public class RawIssueMatch {
         List<Iss_instance> instanceList = new ArrayList<>();
         List<SonarRules> sonarRules = new ArrayList<>();
         HashMap<String, Matches> hashMap = new HashMap<>();
-
         List<RawIssue> preRawIssueList = new ArrayList<>();
         matches.forEach(match->{
             Match_Info matchInfo = match.getInfo();
@@ -93,7 +93,7 @@ public class RawIssueMatch {
         }
         Repos repos = new Repos(curCommit);
 
-        sqlMapping.execute("start transaction");
+        sqlMapping.getConnection().setAutoCommit(false);
         try {
 //            System.out.println(Collections.singletonList(curCommit));
 //            System.out.println(sonarRules.toString());
@@ -111,8 +111,9 @@ public class RawIssueMatch {
             sqlMapping.save(locationList);
             sqlMapping.save(instanceLocationList);
             sqlMapping.execute("commit");
+            sqlMapping.getConnection().commit();
         }catch (Exception e){
-            sqlMapping.execute("rollback");
+            sqlMapping.getConnection().rollback();
             e.printStackTrace();
         }
     }
