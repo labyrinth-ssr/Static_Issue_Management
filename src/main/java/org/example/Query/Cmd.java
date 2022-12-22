@@ -11,7 +11,6 @@ public class Cmd {
     public static void run() throws Exception {
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.useDataBase("sonarissue");
-        QueryCommand queryCommand = new QueryCommand(mysqlConnect);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String str = null;
         List<String> my_args = null;
