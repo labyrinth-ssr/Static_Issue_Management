@@ -2,6 +2,7 @@ package org.example.Utils;
 
 
 import org.example.Entity.Iss_case;
+import org.example.Entity.Repos;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -277,6 +278,11 @@ public class SqlMapping {
 
     public void execute(String sql) throws SQLException {
         SqlConnect.sqlBatch(Collections.singletonList(sql));
+    }
+
+    public void updateRepos(Repos repos) throws SQLException {
+        String sql = "update repos set latest_commit_id = '"+repos.getLatest_commit_id()+"', commit_num + 1 into commit_num where repo_path = '" + repos.getRepo_path()+"'";
+        execute(sql);
     }
     /*
     public boolean update(Object obj) throws Exception {

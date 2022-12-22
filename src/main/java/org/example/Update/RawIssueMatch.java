@@ -97,6 +97,8 @@ public class RawIssueMatch {
                 System.out.println("--------------------------__"+preRawIssue.getStatus());
             }
         }
+        Repos repos = new Repos(curCommit);
+
         sqlMapping.execute("start transaction");
         try {
 //            System.out.println(Collections.singletonList(curCommit));
@@ -106,7 +108,7 @@ public class RawIssueMatch {
 //            System.out.println(instanceList.toString());
 //            System.out.println(locationList.toString());
 //            System.out.println(instanceLocationList.toString());
-
+            sqlMapping.updateRepos(repos);
             sqlMapping.save(Collections.singletonList(curCommit));
             sqlMapping.save(sonarRules);
             sqlMapping.updateCase(caseListUpdate);

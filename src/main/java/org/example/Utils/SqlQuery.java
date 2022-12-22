@@ -1,7 +1,7 @@
 package org.example.Utils;
 
 
-import org.example.Command.QueryUseEntity.*;
+import org.example.Query.QueryUseEntity.*;
 import org.example.Entity.Commit;
 import org.example.Entity.Iss_case;
 import org.example.Entity.Iss_match;
