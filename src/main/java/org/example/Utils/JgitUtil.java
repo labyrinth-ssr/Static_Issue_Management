@@ -62,9 +62,11 @@ public class JgitUtil {
             System.setOut(null);
             RevWalk walk = new RevWalk(git.getRepository());    //获取walk对象
             Ref ref = git.reset().setMode(ResetCommand.ResetType.HARD).setRef(commit_hash).call();  //设置参数
+            ObjectId headId = git.getRepository().resolve("HEAD");
             System.setOut(console);
+            System.out.println("current_hash: " + headId.getName());
             return ref;
-        } catch (GitAPIException e) {
+        } catch (GitAPIException | IOException e) {
             throw new RuntimeException(e);
         }
     }

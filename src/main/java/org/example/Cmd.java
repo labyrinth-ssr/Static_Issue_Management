@@ -3,13 +3,9 @@ package org.example;
 import org.example.Command.QueryCommand;
 import org.example.Command.ShowHelp;
 import org.example.Utils.SqlConnect;
-import org.example.Utils.SqlMapping;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
 import java.util.List;
 
 public class Cmd {

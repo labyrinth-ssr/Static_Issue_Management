@@ -4,8 +4,8 @@ import org.example.Command.QueryMappingByDev;
 import org.example.Command.QueryMappingById;
 import org.example.Command.QueryMappingByTime;
 import org.example.Utils.SqlConnect;
-import org.example.Utils.SqlMapping;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
@@ -15,7 +15,7 @@ public class QueryTest {
     static QueryMappingById queryMappingById;
     static QueryMappingByTime queryMappingByTime;
     static QueryMappingByDev queryMappingByDev;
-    public static void main(String[] args) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public static void main(String[] args) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException, IOException, InterruptedException {
         mysqlConnect.useDataBase("sonarissue");
         queryMappingById = new QueryMappingById(mysqlConnect);
         queryMappingByTime = new QueryMappingByTime(mysqlConnect);
@@ -24,6 +24,8 @@ public class QueryTest {
 //        MappingIdTest();
         MappingTimeTest();
         MappingDevTest();
+        new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+        System.in.read();
     }
 
     public static void MappingIdTest() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
