@@ -27,18 +27,11 @@ public class JGitTest {
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
-//        Repository repository=new Repository();
-//        repository.setPath(pj_path.replace("\\","/"));
-//        repository.pathToName();
-//        boolean a = sqlMapping.save(Collections.singletonList(repository));
         PrintStream console = System.out;
         System.setOut(null);
         Git git = JgitUtil.openRpo(pj_path);
 
-//        List<Iss_file> iss_files = JgitUtil.gitFileList(git, repository.getPath());
-
         List<RevCommit> revCommitList = JgitUtil.gitLogRev(git);
-//        List<Commit> commitList = JgitUtil.gitLog(git);
         List<Commit> commitList = JgitUtil.revCommitList2Commit(revCommitList);
         Commit curCommit = JgitUtil.gitCurLog(git);
         System.setOut(console);
@@ -46,7 +39,6 @@ public class JGitTest {
 
         List<Commit> commitList1 = new ArrayList<>();
         List<SonarIssues> sonarIssuesPre = new ArrayList<>();
-        Commit commitPre = new Commit();
         List<Iss_match> iss_matchList = new ArrayList<>();
         List<Iss_case> iss_caseList = new ArrayList<>();
         List<Iss_instance> issInstanceList = new ArrayList<>();
@@ -59,8 +51,6 @@ public class JGitTest {
 
             System.out.print(i+":"+commitList.get(i).getCommit_msg());
 
-//            Ref ref = JgitUtil.gitReset(git, commitList.get(i).getCommit_hash());
-//            System.out.println("size"+ commitList.size()+" size"+revCommitList.size());
             System.setOut(null);
 //            List<String> changedFile = JgitUtil.getChangedFileList(revCommitList.get(i),revCommitList.get(i+1), git);
             System.setOut(console);

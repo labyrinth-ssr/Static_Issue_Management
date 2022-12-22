@@ -31,7 +31,6 @@ public class RawIssueMatch {
 
     public static void firstMatch(List<Iss_location>iss_locationList,List<Iss_match>iss_matchList,List<Iss_case>iss_caseList,List<SonarIssues> issInstanceListCur,Commit curCommit){
         List<RawIssue> preRawIssueList = new ArrayList<>();
-
         for (SonarIssues iss_instance:issInstanceListCur) {
             Iss_case iss_case = new Iss_case();
             Iss_match iss_match = new Iss_match();
@@ -80,14 +79,11 @@ public class RawIssueMatch {
                 preRawIssue1.setLocations(locationList);
             }
             preRawIssueList.add(preRawIssue1);
-
         }
-
         AnalyzerUtil.addExtraAttributeInRawIssues(preRawIssueList, baseRepoPath1);
 
         for (RawIssue i: preRawIssueList) {
             for (Location location: i.getLocations()) {
-//                if (preRawIssueList.indexOf(i)==-1) continue;
                 Iss_location iss_location = new Iss_location();
                 iss_location.setMethod(location.getAnchorName());
                 iss_location.setClass_(location.getClassName());
@@ -211,21 +207,15 @@ public class RawIssueMatch {
         //对于没有childMap的issue，设置case disappear
         for (RawIssue preRawIssue:preRawIssueList) {
             if (preRawIssue.getMappedRawIssue() == null){
-//                Iss_match iss_match = new Iss_match();
-//                iss_match.setParent_inst_id(preRawIssue.getUuid());
-//                iss_match.setInst_id("");
                 Iss_case iss_case = Iss_case.look_up_case(iss_caseList,Iss_match.instIdLookUpCaseId(iss_matchList,preRawIssue.getUuid()));
                 //直接更新
                 if (iss_case==null){
                     System.out.println("pre raw issue:"+preRawIssue.getUuid()+" not in case list");
                     continue;
                 }
-//                iss_match.setCase_id(iss_case.getCase_id());
                 iss_case.setCase_status("SOLVED");
                 iss_case.setCommit_id_last(preRawIssue.getCommitId());
                 iss_case.setCommit_id_disappear(curCommit.getCommit_id());
-//                System.out.println("iss close:"+"case id:"+iss_match.getCase_id()+"inst id:"+iss_match.getInst_id()+iss_match.getParent_inst_id());
-//                iss_matchList.add(iss_match);
                 closedRawIssues.add(preRawIssue);
             }
         }
@@ -234,24 +224,9 @@ public class RawIssueMatch {
 
         for (RawIssue curRawIssue:curRawIssueList) {
             if (curRawIssue.getMappedRawIssue() == null){
-//                Iss_case iss_case = new Iss_case();
-//                iss_case.setType_id(curRawIssue.getType());
-//                iss_case.setCase_status("NEW");
-//
-//                iss_case.setCommit_id_new(curRawIssue.getCommitId());
-//                iss_case.setCommit_id_last(curRawIssue.getCommitId());
-//                String case_id = Iss_case.getUuidFromIssueCase(iss_case,++case_id_num);
-//                iss_case.setCase_id(case_id);
-//                System.out.println("iss case new:"+iss_case.getCase_id()+","+iss_case.getType_id()+","+iss_case.getCommit_id_new()+","+iss_case.getCommit_id_last()+","+iss_case.getCase_status());
-//                //允许没有parent的match，用于和case保持一致
-//                iss_match.setParent_inst_id("");
-//                iss_match.setCase_id(case_id);
-//
-//                iss_caseList.add(iss_case);
                 newRawIssueList.add(curRawIssue);
             }
             else {
-//                System.out.println("curRawIssue1:matches " + curRawIssue.getMappedRawIssue().getUuid());
                 Iss_match iss_match = new Iss_match();
                 iss_match.setInst_id(curRawIssue.getUuid());
 
@@ -262,11 +237,6 @@ public class RawIssueMatch {
                 if (iss_case.getCase_status()!="REOPEN"){
                     iss_case.setCase_status("NONCHG");
                 }
-//                System.out.println("iss case:"+iss_case.getCase_id()+iss_case.getCommit_id_new());
-//                System.out.println("iss case:");
-//                System.out.println(iss_case.getCommit_id_new());
-//                System.out.println(iss_case.getCommit_id_last());
-//                System.out.println(iss_case.getCase_id());
                 //在match中设置case_id，发现匹配时，在match list中搜索其parentMappedIssue对应的case_id
                 iss_match.setCase_id(Iss_match.instIdLookUpCaseId(iss_matchList,curRawIssue.getMappedRawIssue().getUuid()));
                 iss_matchList.add(iss_match);
@@ -278,10 +248,8 @@ public class RawIssueMatch {
 
         //对没匹配上的curRawIssue，检查reopen
         for (RawIssue newRawIssue:newRawIssueList) {
-
             Iss_match iss_match = new Iss_match();
             iss_match.setInst_id(newRawIssue.getUuid());
-
             if (newRawIssue.getMappedRawIssue() != null){
                 RawIssue mappedIssue = newRawIssue.getMappedRawIssue();
                 iss_match.setParent_inst_id(mappedIssue.getUuid());
@@ -289,7 +257,6 @@ public class RawIssueMatch {
                 iss_match.setCase_id(iss_case.getCase_id());
                 iss_case.setCase_status("REOPEN");
                 iss_case.setCommit_id_last(newRawIssue.getCommitId());
-//                System.out.println("iss close:"+"case id:"+iss_match.getCase_id()+"inst id:"+iss_match.getInst_id()+iss_match.getParent_inst_id());
                 iss_matchList.add(iss_match);
             } else {
                 Iss_case iss_case = new Iss_case();
@@ -299,7 +266,6 @@ public class RawIssueMatch {
                 iss_case.setCommit_id_last(newRawIssue.getCommitId());
                 String case_id = Iss_case.getUuidFromIssueCase(iss_case,++case_id_num);
                 iss_case.setCase_id(case_id);
-//                System.out.println("iss case new:"+iss_case.getCase_id()+","+iss_case.getType_id()+","+iss_case.getCommit_id_new()+","+iss_case.getCommit_id_last()+","+iss_case.getCase_status());
                 //允许没有parent的match，用于和case保持一致
                 iss_match.setParent_inst_id("");
                 iss_match.setCase_id(case_id);
