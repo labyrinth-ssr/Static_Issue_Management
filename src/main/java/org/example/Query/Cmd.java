@@ -1,6 +1,7 @@
 package org.example.Query;
 
 import org.apache.commons.lang.StringUtils;
+import org.example.Query.Value.String2Value;
 import org.example.Utils.SqlConnect;
 
 import java.io.BufferedReader;
@@ -20,10 +21,10 @@ public class Cmd {
         QueryMappingByDev queryMappingByDev = new QueryMappingByDev(mysqlConnect);
 
         String REPO_PATH;
-        List<String> repos = queryMappingById.getRepo();
+        List<String2Value> repos = queryMappingById.getRepo();
         System.out.println("当前存储仓库: ");
         System.out.println("==================================================================");
-        for(String repo : repos) System.out.println(repo);
+        for(String2Value repo : repos) System.out.println(repo.getStringValue1() + ", " + repo.getStringValue2());
         System.out.println("==================================================================");
         while(true) {
             System.out.print("请选择要查询的仓库路径# ");

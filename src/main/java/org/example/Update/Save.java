@@ -26,12 +26,12 @@ public class Save {
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
         PrintStream console = System.out;
-//        System.setOut(null);
+        System.setOut(null);
         Git git = JgitUtil.openRpo(repo_path);
         List<Commit> commitList = JgitUtil.gitLog(git);
-//        System.setOut(console);
-
         Commit curCommit = JgitUtil.gitCurLog(git);
+        System.setOut(console);
+
         System.out.println("cur: " + curCommit.getCommit_hash());
 
         repo_path = repo_path.replace("\\","/");
@@ -42,10 +42,9 @@ public class Save {
         for (int i = 10; i >=0; i--) {
             Commit commit = new Commit();
             commit.setCommit(commitList.get(i), repo_path);
-            System.out.print(i + ":" + commit.getCommit_msg());
+            System.out.print(i + ":" + commit.getCommit_msg() +", hash: "+commit.getCommit_hash());
 
             List<SonarIssues> sonarIssues = resetAndScanAndFetch(repo_path, commit.getCommit_hash(), git);
-            if(sonarIssues.size()!=0) System.out.println("saving defects");
             RawIssueMatch.myMatch(sqlMapping, matches, rulesHashMap, sonarIssues, commit);
         }
 
@@ -64,7 +63,7 @@ public class Save {
     }
 
     public static  void repoCheck(String repo_path, SqlMapping sqlMapping) throws Exception {
-        List<Repos> stringValues = (List<Repos>)sqlMapping.select(new Repos(),"where repo_path = '"+repo_path+"'");
+        List<Repos> stringValues = (List<Repos>)sqlMapping.select(new Repos(),"select * from repos where repo_path = '"+repo_path+"'");
         if(!list_not_empty(stringValues)){
             Repos repos = new Repos();
             repos.setRepo_path(repo_path);

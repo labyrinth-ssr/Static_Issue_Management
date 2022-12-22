@@ -1,6 +1,5 @@
 package org.example.Query;
 
-import org.example.Query.QueryUseEntity.GetListInLatestInst;
 import org.example.Query.Value.*;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
@@ -17,16 +16,14 @@ public class QueryMappingById {
         sqlMapping = new SqlMapping(connect);
     }
 
-    public List<String> getRepo() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql = "select repo_path stringValue from commit group by repo_path";
-        List<StringValue> stringValues = (List<StringValue>) sqlMapping.select(new StringValue(),sql);
-        List<String> repos = new ArrayList<>();
-        for(StringValue stringValue : stringValues) repos.add(stringValue.getStringValue());
-        return repos;
+    public List<String2Value> getRepo() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        String sql = "select repo_path stringValue1, concat('入库版本量: ', commit_num) stringValue2 from repos";
+        List<String2Value> string2Values = (List<String2Value>) sqlMapping.select(new String2Value(),sql);
+        return string2Values;
     }
 
     public String getCommitLatest(String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql = "select commit_id_new stringValue from iss_case ic join commit c on ic.commit_id_new = c.commit_id and ic.case_status = 'NEW' and c.repo_path = '" + repo + "'limit 1";
+        String sql = "select latest_commit_id stringValue from repos where repo_path = '"+repo+"'";
         return ((List<StringValue>)sqlMapping.select(new StringValue(),sql)).get(0).getStringValue();
     }
     public String getCommit_idByCommit_hashAndRepo(String commit_hash, String repo) throws Exception {

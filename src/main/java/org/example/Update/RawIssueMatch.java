@@ -65,13 +65,11 @@ public class RawIssueMatch {
                 iss_case = new Iss_case(curRawIssue.getType(),curCommit.getCommit_id(),curCommit.getCommit_id(),null,"NEW");
                 caseList.add(iss_case);
                 Matches matches_ = newMatches(iss_case, curRawIssue, locations);
-                System.out.println("============================+++"+curRawIssue.getStatus());
 //                hashMap.put(iss_case.getCase_id(), matches_);
                 matches.add(matches_);
             }
             else{
                 String case_status = hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_status();
-                System.out.println("================================"+curRawIssue.getStatus());
                 if(case_status.equals("SOLVED")) case_status = "REOPEN";
                 if(case_status.equals("NEW")) case_status = "UNDONE";
                 iss_case = new Iss_case(hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_id(), curRawIssue.getType(), curCommit.getCommit_id(), curCommit.getCommit_id(), hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().commit_id_disappear, case_status);
@@ -86,15 +84,11 @@ public class RawIssueMatch {
         }
 
         for (RawIssue preRawIssue:preRawIssueList) {
-            System.out.println("preRawIssue"+hashMap.get(preRawIssue.getUuid()).getInfo().case_status);
             if (preRawIssue.getMappedRawIssue() == null && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED")){
                 Iss_case iss_case = new Iss_case(hashMap.get(preRawIssue.getUuid()).getInfo().getCase_id(),preRawIssue.getType(), null, hashMap.get(preRawIssue.getUuid()).getInfo().commit_id_last, curCommit.getCommit_id(), "SOLVED");
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
                 setMatchesPre(matches_, iss_case, preRawIssue);
-                System.out.println("----------------------------"+preRawIssue.getStatus());
-            }else{
-                System.out.println("--------------------------__"+preRawIssue.getStatus());
             }
         }
         Repos repos = new Repos(curCommit);
@@ -136,7 +130,6 @@ public class RawIssueMatch {
             RawIssue curRawIssue = newRawIssue(instance.getId(),instance.getTypeId(),instance.getMessage(),curCommit.getCommit_id(), instance.getFilePath().split(":")[1]);
             List<Location> tmplocationList = new ArrayList<>();
             for (SonarLocation location : instance.getLocation()) {
-                System.out.println(location.toString());
                 tmplocationList.add(newLocation(Integer.parseInt(location.getStartLine()),Integer.parseInt(location.getEndLine()),Integer.parseInt(location.getStartOffset()),Integer.parseInt(location.getEndOffset())));
             }
             curRawIssue.setLocations(tmplocationList);

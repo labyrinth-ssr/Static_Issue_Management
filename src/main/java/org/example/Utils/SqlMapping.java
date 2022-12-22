@@ -281,7 +281,7 @@ public class SqlMapping {
     }
 
     public void updateRepos(Repos repos) throws SQLException {
-        String sql = "update repos set latest_commit_id = '"+repos.getLatest_commit_id()+"', commit_num + 1 into commit_num where repo_path = '" + repos.getRepo_path()+"'";
+        String sql = "update repos set latest_commit_id = '"+repos.getLatest_commit_id()+"', commit_num = commit_num + 1 where repo_path = '" + repos.getRepo_path()+"'";
         execute(sql);
     }
     /*

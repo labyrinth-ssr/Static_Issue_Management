@@ -5,7 +5,7 @@ import org.example.Update.Save;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-//        Cmd.run();
-        Save.save(Constant.RepoPath);
+        Cmd.run();
+//        Save.save(Constant.RepoPath);
     }
 }

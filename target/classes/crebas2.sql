@@ -89,13 +89,13 @@ create table if not exists  iss_instance
 create table if not exists  iss_location
 (
    location_id          varchar(50) not null,
-   class_               varchar(60) not null,
-   method               varchar(60) not null,
+   class_               varchar(60),
+   method               varchar(60),
    start_line           int unsigned not null,
    end_line             int unsigned not null,
    start_col            int unsigned not null,
    end_col              int unsigned not null,
-   code                 varchar(255) not null,
+   code                 varchar(255),
    primary key (location_id)
 );
 
@@ -113,6 +113,16 @@ create table if not exists  instance_location
    foreign key (location_id) references iss_location (location_id)
         on delete restrict
         on update restrict
+);
+/*==============================================================*/
+/* Table: repos                                     */
+/*==============================================================*/
+create table if not exists  repos
+(
+   repo_path              varchar(50) not null,
+   latest_commit_id       varchar(50) not null,
+   commit_num             INT unsigned not null default 0,
+   PRIMARY KEY(repo_path)
 );
 --
 --delimiter $

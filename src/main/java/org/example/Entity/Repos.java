@@ -22,7 +22,7 @@ public class Repos {
     }
 
     public Long getCommit_num() {
-        return commit_num;
+        return commit_num == null?0:commit_num;
     }
 
     public void setCommit_num(Long commit_num) {

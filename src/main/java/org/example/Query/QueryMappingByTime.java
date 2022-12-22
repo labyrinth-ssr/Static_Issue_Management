@@ -1,7 +1,6 @@
 package org.example.Query;
 
 import org.apache.commons.lang.StringUtils;
-import org.example.Query.QueryUseEntity.GetListInLatestInst;
 import org.example.Query.Value.*;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
