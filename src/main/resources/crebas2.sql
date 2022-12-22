@@ -6,22 +6,14 @@
 drop database if EXISTS SonarIssue;
 
 create database SonarIssue;
-
 use sonarIssue;
 
-
 drop table if exists commit;
-
 drop table if exists iss_file;
-
 drop table if exists iss_case;
-
 drop table if exists iss_instance;
-
 drop table if exists iss_location;
-
 drop table if exists iss_match;
-
 drop table if exists repository;
 
 /*==============================================================*/
@@ -39,7 +31,7 @@ create table if not exists `sonarrules`(
 /*==============================================================*/
 /* Table: commit                                                */
 /*==============================================================*/
-create table commit
+create table if not exists commit
 (
    commit_id            varchar(50) not null,
    commit_hash          varchar(40) not null,
@@ -57,7 +49,7 @@ create table commit
 /*==============================================================*/
 /* Table: iss_case                                              */
 /*==============================================================*/
-create table iss_case
+create table if not exists  iss_case
 (
    case_id              varchar(50) not null,
    type_id              varchar(20) not null,
@@ -76,7 +68,7 @@ create table iss_case
 /*==============================================================*/
 /* Table: iss_instance                                          */
 /*==============================================================*/
-create table iss_instance
+create table if not exists  iss_instance
 (
    inst_id              varchar(50) not null,
    type_id              varchar(20) not null,
@@ -94,7 +86,7 @@ create table iss_instance
 /*==============================================================*/
 /* Table: iss_location                                          */
 /*==============================================================*/
-create table iss_location
+create table if not exists  iss_location
 (
    location_id          varchar(50) not null,
    class_               varchar(60) not null,
@@ -110,7 +102,7 @@ create table iss_location
 /*==============================================================*/
 /* Table: instance_location                                     */
 /*==============================================================*/
-create table instance_location
+create table if not exists  instance_location
 (
    inst_id              varchar(50) not null,
    location_id          varchar(50) not null,
@@ -122,32 +114,31 @@ create table instance_location
         on delete restrict
         on update restrict
 );
-
-
-delimiter $
-create function if not exists get_length(new varchar(50), cur varchar(50)) returns int
-begin
-    declare len int;
-    set len = 0;
-    declare tmp varchar(50);
-    set tmp = new;
-    while new <> cur do
-    select parent_inst_id into tmp from iss_instance
-    where inst_id = tmp;
-    len = len + 1;
-    end while;
-    return len;
-end $
-
-delimiter $
-create function if not exists get_length_by_case_id(c_id varchar(50)) returns int
-begin
-    declare new varchar(50);
-    declare `last` varchar(50);
-    select (commit_id_new, commit_id_last) into (new, `last`) from iss_case
-    where case_id = c_id;
-    return get_length(new, `last`);
-end $
+--
+--delimiter $
+--create function if not exists get_length(new varchar(50), cur varchar(50)) returns int
+--begin
+--    declare len int;
+--    set len = 0;
+--    declare tmp varchar(50);
+--    set tmp = new;
+--    while new <> cur do
+--    select parent_inst_id into tmp from iss_instance
+--    where inst_id = tmp;
+--    len = len + 1;
+--    end while;
+--    return len;
+--end $
+--
+--delimiter $
+--create function if not exists get_length_by_case_id(c_id varchar(50)) returns int
+--begin
+--    declare new varchar(50);
+--    declare `last` varchar(50);
+--    select (commit_id_new, commit_id_last) into (new, `last`) from iss_case
+--    where case_id = c_id;
+--    return get_length(new, `last`);
+--end $
 --
 -- alter table commit add constraint FK_repo_commit foreign key (repo_path)
 --      references repository (path) on delete restrict on update restrict;

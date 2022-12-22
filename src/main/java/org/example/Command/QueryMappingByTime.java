@@ -19,8 +19,8 @@ public class QueryMappingByTime {
 
     String getUniversalSqlCondition(String begin_time, String end_time, String repo, String alis){
         String sql = "";
-        if(begin_time!=null) sql+=alis+".commit_time >= '"+begin_time+"' and ";
-        if(end_time!=null) sql+=alis+".commit_time <= '" + end_time +"' and ";
+        if(begin_time!=null && !begin_time.trim().equals("")) sql+=alis+".commit_time >= '"+begin_time+"' and ";
+        if(end_time!=null && !end_time.trim().equals("")) sql+=alis+".commit_time <= '" + end_time +"' and ";
         sql+= alis + ".repo_path = '"+repo+"' ";
         return sql;
     }
@@ -41,9 +41,9 @@ public class QueryMappingByTime {
                     "order by TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
             String time = ((List<TimeValue>)sqlMapping.select(new TimeValue(), sql_median)).get(0).getTime();
             System.out.println("类型: "+ intStringTime.getStringValue() +
-                    ",数量: " + intStringTime.getIntValue() +
-                    ",平均存续时长: " + intStringTime.getTime() +
-                    ",存续时长中位数: " + time);
+                    ", 数量: " + intStringTime.getIntValue() +
+                    ", 平均存续时长: " + intStringTime.getTime() +
+                    ", 存续时长中位数: " + time);
         }
     }
 
@@ -65,7 +65,7 @@ public class QueryMappingByTime {
 
     public void getGCountInTypeByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
-        String sql = "select count(*) intValue, type_id stringValue from iss_case join commit c on iss_case.commit_id_new = c.commit_id where " + sql_condition + " group by type_id";
+        String sql = "select count(*) intValue, type_id stringValue from iss_case join commit c on iss_case.commit_id_new = c.commit_id where " + sql_condition + " group by type_id order by count(*)";
         List<IntStringValue> intStringValues = (List<IntStringValue>) sqlMapping.select(new IntStringValue(), sql);
         System.out.println("分类引入数: ");
         for(IntStringValue intStringValue : intStringValues){
@@ -76,12 +76,12 @@ public class QueryMappingByTime {
     public void getListInByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
         String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
-                "from iss_case ic join iss_instance ii on ic.commit_id_new = ii.commit_id " +
+                "from iss_case ic join iss_instance ii on ic.commit_id_new = ii.commit_id and ic.case_id = ii.case_id " +
                 "join sonarrules sr on ic.type_id = sr.id " +
                 "join commit c on c.commit_id = ic.commit_id_new " +
                 "where "+ sql_condition +" order by ic.type_id, file_path";
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
-        System.out.println("引入缺陷详情: ");
+        System.out.println("引入缺陷分类统计: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
                     "from iss_instance ii left join instance_location ilo on ii.inst_id = ilo.inst_id and ii.inst_id = '" + getListInLatestInst.getInst_id() +"' " +
@@ -92,9 +92,9 @@ public class QueryMappingByTime {
                     "文件: " + getListInLatestInst.getFile_path());
             if(list_not_empty(int2String2s)){
                 for(Int2String2 int2String2 : int2String2s){
-                    System.out.print("( 类: " + int2String2.getStringValue1() +
-                            "方法: " + int2String2.getStringValue2() +
-                            "起始行列: " + int2String2.getIntValue1()+","+int2String2.getIntValue2()+" ) ");
+                    System.out.print(", ( 类: " + int2String2.getStringValue1() +
+                            ", 方法: " + int2String2.getStringValue2() +
+                            ", 起始行列: " + int2String2.getIntValue1()+","+int2String2.getIntValue2()+" )");
                 }
             }
             System.out.print("\n");
@@ -104,23 +104,23 @@ public class QueryMappingByTime {
     public void getCountDoneByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
         String sql = "select count(*) intValue from iss_case join commit c on iss_case.commit_id_disappear = c.commit_id where case_status in ('SOLVED','REOPEN') and " +sql_condition;
-        System.out.println("当前版本解决缺陷数量: " + ((List<StringValue>)sqlMapping.select(new StringValue(),sql)).get(0).getStringValue());
+        System.out.println("解决缺陷数量: " + ((List<IntValue>)sqlMapping.select(new IntValue(),sql)).get(0).getIntValue());
     }
 
     public void getCountDoneInTypeByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
         String sql = "select count(*) intValue, type_id stringValue from iss_case join commit c on iss_case.commit_id_disappear = c.commit_id where case_status in ('SOLVED','REOPEN') and "+sql_condition+" group by type_id";
         List<IntStringValue> list = (List<IntStringValue>) sqlMapping.select(new IntStringValue(),sql);
-        System.out.println("当前版本解决缺陷分类统计: ");
+        System.out.println("解决缺陷分类统计: ");
         for(IntStringValue intStringValue : list){
-            System.out.println("类型: "+ intStringValue.getIntValue()+", 数量: "+intStringValue.getStringValue());
+            System.out.println("类型: "+intStringValue.getStringValue() +", 数量: "+intStringValue.getIntValue());
         }
     }
 
     public void getListDoneByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
         String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
-                "from iss_case ic join iss_instance ii on ic.commit_id_last = ii.commit_id " +
+                "from iss_case ic join iss_instance ii on ic.commit_id_last = ii.commit_id and ic.case_id = ii.case_id " +
                 "join sonarrules sr on ic.type_id = sr.id " +
                 "join commit c on c.commit_id = ic.commit_id_disappear " +
                 "where "+sql_condition+" order by ic.type_id, file_path";
@@ -131,14 +131,14 @@ public class QueryMappingByTime {
                     "from iss_instance ii left join instance_location ilo on ii.inst_id = ilo.inst_id and ii.inst_id = '" + getListInLatestInst.getInst_id() +"' " +
                     "join iss_location il on ilo.location_id = il.location_id order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new IntStringValue(), sql1);
-            System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
-                    "描述: " + getListInLatestInst.getDescription() +
-                    "文件: " + getListInLatestInst.getFile_path());
+            System.out.print(", 缺陷类型: "+ getListInLatestInst.getType_id() +
+                    ", 描述: " + getListInLatestInst.getDescription() +
+                    ", 文件: " + getListInLatestInst.getFile_path());
             if(list_not_empty(int2String2s)){
                 for(Int2String2 int2String2 : int2String2s){
-                    System.out.print("( 类: " + int2String2.getStringValue1() +
-                            "方法: " + int2String2.getStringValue2() +
-                            "起始行列: " + int2String2.getIntValue1()+","+int2String2.getIntValue2()+" ) ");
+                    System.out.print(", ( 类: " + int2String2.getStringValue1() +
+                            ", 方法: " + int2String2.getStringValue2() +
+                            ", 起始行列: " + int2String2.getIntValue1()+","+int2String2.getIntValue2()+" ) ");
                 }
             }
             System.out.print("\n");
@@ -210,8 +210,8 @@ public class QueryMappingByTime {
         System.out.println("超过指定时长的静态缺陷分类情况统计: ");
         for(IntStringTime intStringTime : intStringTimes){
             System.out.println("类型: " + intStringTime.getStringValue() +
-                    "现存数量: " + intStringTime.getIntValue() +
-                    "平均存续时间: " + intStringTime.getTime());
+                    ", 现存数量: " + intStringTime.getIntValue() +
+                    ", 平均存续时间: " + intStringTime.getTime());
         }
     }
 
