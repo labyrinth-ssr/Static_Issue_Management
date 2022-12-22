@@ -1,9 +1,6 @@
 package org.example.Entity;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Iss_case {
@@ -64,10 +61,9 @@ public class Iss_case {
 
     public static Iss_case look_up_case(List<Iss_case> iss_caseList,String case_id){
         for (Iss_case iss_case:iss_caseList) {
-            if (case_id == iss_case.case_id){
+            if (case_id.equals(iss_case.case_id)){
                 return iss_case;
             }
-
         }
         return null;
     }
@@ -86,6 +82,41 @@ public class Iss_case {
 //
 //        }
 //    }
+
+
+    public Iss_case(String type_id, String commit_id_new, String commit_id_last, String commit_id_disappear, String case_status) {
+        String stringBuilder = commit_id_new + type_id +  System.currentTimeMillis() + Math.random();
+        this.case_id = UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
+        this.type_id = type_id;
+        this.commit_id_new = commit_id_new;
+        this.commit_id_last = commit_id_last;
+        this.commit_id_disappear = commit_id_disappear;
+        this.case_status = case_status;
+    }
+
+    public Iss_case(String case_id, String type_id, String commit_id_new, String commit_id_last, String commit_id_disappear, String case_status) {
+        this.case_id = case_id;
+        this.type_id = type_id;
+        this.commit_id_new = commit_id_new;
+        this.commit_id_last = commit_id_last;
+        this.commit_id_disappear = commit_id_disappear;
+        this.case_status = case_status;
+    }
+
+    public Iss_case() {
+    }
+
+    @Override
+    public String toString() {
+        return "Iss_case{" +
+                "case_id='" + case_id + '\'' +
+                ", type_id='" + type_id + '\'' +
+                ", commit_id_new='" + commit_id_new + '\'' +
+                ", commit_id_last='" + commit_id_last + '\'' +
+                ", commit_id_disappear='" + commit_id_disappear + '\'' +
+                ", case_status='" + case_status + '\'' +
+                '}';
+    }
 }
 
 

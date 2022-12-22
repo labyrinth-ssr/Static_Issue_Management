@@ -16,7 +16,7 @@ public class Iss_location {
     Integer start_col;
     Integer end_col;
     String code;
-    String file_path;
+
 
     public String getLocation_id() {
         return location_id;
@@ -26,9 +26,6 @@ public class Iss_location {
         this.location_id = location_id;
     }
 
-    public void setFile_path(String file_path) {
-        this.file_path = file_path;
-    }
 
     public String getClass_() {
         return class_;
@@ -86,36 +83,44 @@ public class Iss_location {
         this.code = code;
     }
 
-    public String getFile_path() {
-        return file_path;
-    }
 
 //    public void setInst_id(String inst_id) {
 //        this.inst_id = inst_id;
 //    }
 
     public static String getUuidFromLocation(Iss_location location){
-        String stringBuilder =location.getFile_path()+location.getStart_line()+location.getEnd_line()+location.getStart_col()+location.getEnd_col();
+        String stringBuilder =""+location.getStart_line()+location.getEnd_line()+location.getStart_col()+location.getEnd_col()+System.currentTimeMillis();
         return UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
     }
 
-//    public static void setLocation (List<Iss_location>res,List<SonarIssues> sonarIssues){
-//        for (SonarIssues sonarIssues1:sonarIssues) {
-//            for (SonarLocation location:sonarIssues1.getLocation()) {
-//                Iss_location iss_location = new Iss_location();
-//                iss_location.setCode("");
-////                AstParserUtil.getAllClassNamesInFile()
-//                iss_location.setClass_("");
-//                iss_location.setStart_line(Integer.parseInt(location.getStartLine()));
-//                iss_location.setEnd_line(Integer.parseInt(location.getEndLine()));
-//                iss_location.setStart_col(Integer.parseInt(location.getStartOffset()));
-//                iss_location.setEnd_col(Integer.parseInt(location.getEndOffset()));
-//                iss_location.setFile_path(sonarIssues1.getFilePath().split(":")[1]);
-////                iss_location.setInst_id(sonarIssues1.getId());
-//                iss_location.setMethod("");
-//                iss_location.setLocation_id(getUuidFromLocation(iss_location));
-//                res.add(iss_location);
-//            }
-//            }
-//        }
+
+    public Iss_location(String class_, String method, Integer start_line, Integer end_line, Integer start_col, Integer end_col, String code, String file_path) {
+        String stringBuilder =file_path+start_line+end_line+start_col+end_col + System.currentTimeMillis() + Math.random();
+        this.location_id = UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
+        this.class_ = class_;
+        this.method = method;
+        this.start_line = start_line;
+        this.end_line = end_line;
+        this.start_col = start_col;
+        this.end_col = end_col;
+        this.code = code;
+    }
+
+    public Iss_location() {
+    }
+
+
+    @Override
+    public String toString() {
+        return "Iss_location{" +
+                "location_id='" + location_id + '\'' +
+                ", class_='" + class_ + '\'' +
+                ", method='" + method + '\'' +
+                ", start_line=" + start_line +
+                ", end_line=" + end_line +
+                ", start_col=" + start_col +
+                ", end_col=" + end_col +
+                ", code='" + code + '\'' +
+                '}';
+    }
 }

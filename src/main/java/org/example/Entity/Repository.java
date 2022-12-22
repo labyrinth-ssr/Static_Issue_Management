@@ -22,4 +22,11 @@ public class Repository {
         return "repo_name='" + pathToName() + '\'' +
                 ", path='" + repo_path + '\'';
     }
+
+    public Repository(String repo_path) {
+        this.repo_path = repo_path;
+    }
+
+    public Repository() {
+    }
 }

@@ -1,11 +1,11 @@
 package org.example.Utils;
 
 
+import org.example.Command.QueryUseEntity.*;
 import org.example.Entity.Commit;
 import org.example.Entity.Iss_case;
 import org.example.Entity.Iss_match;
 import org.example.Entity.Repository;
-import org.example.QueryUseEntity.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,48 +25,17 @@ public class SqlQuery {
     public SqlMapping sqlMapping;
 
     public String FULL_VIEW = "full_view";
-    public String full_view_sql = "CREATE OR REPLACE VIEW " + FULL_VIEW + " AS " +
-            "SELECT\n" +
-            "\tii.inst_id,\n" +
-            "\tii.type_id,\n" +
-            "\tsr.type,\n" +
-            "\tii.commit_id,\n" +
-            "\til.location_id,\n" +
-            "\tc.commit_time,\n" +
-            "\tic.case_id,\n" +
-            "\tic.case_status,\n" +
-            "\tc1.committer committer_new,\n" +
-            "\tc2.committer committer_disappear,\n" +
-//            "\t*\n"+
-            "\tCASE ic.case_status\n" +
-            "WHEN 'SOLVED' THEN\n" +
-            "\tTIMESTAMPDIFF(\n" +
-            "\t\tSECOND,\n" +
-            "\t\tc1.commit_time,\n" +
-            "\t\tc2.commit_time\n" +
-            "\t)\n" +
-            "ELSE\n" +
-            "\tTIMESTAMPDIFF(\n" +
-            "\t\tSECOND,\n" +
-            "\t\tc1.commit_time,\n" +
-            "\t\tLOCALTIME ()\n" +
-            "\t)\n" +
-            "END AS duration,\n" +
-            "case when ii.commit_id = c1.commit_id\n" +
-            "\tthen 'IN'\n" +
-            "\telse case when ii.commit_id = c2.commit_id\n" +
-            "\tthen 'OUT'\n" +
-            "\telse NULL\n" +
-            "\tend end as `status`" +
-            "FROM\n" +
-            "\tiss_instance ii\n" +
-            "JOIN iss_match im ON ii.inst_id = im.inst_id\n" +
-            "JOIN iss_case ic ON im.case_id = ic.case_id\n" +
-            "JOIN COMMIT c ON ii.commit_id = c.commit_id\n" +
-            "JOIN COMMIT c1 ON ic.commit_id_new = c1.commit_id\n" +
-            "LEFT JOIN COMMIT c2 ON ic.commit_id_disappear = c2.commit_id\n" +
-            "LEFT JOIN instance_location il ON ii.inst_id = il.inst_id\n" +
-            "JOIN sonarrules sr ON ii.type_id = sr.id";
+    public String full_view_sql = "create or replace view full_view as\n" +
+            "select ic.*, sr.type, ii1.inst_id inst_id_new, ii2.inst_id inst_id_last, c1.commit_time time_new, c2.commit_time time_disappear, c1.committer committer_new, c2.committer committer_disappear,\n" +
+            "case case_status when 'SOLVED'\n" +
+            "then TIMESTAMPDIFF(SECOND,c1.commit_time, c2.commit_time)\n" +
+            "else TIMESTAMPDIFF(SECOND,c1.commit_time, LOCALTIME()) END\n" +
+            "duration\n" +
+            "from iss_case ic join commit c1 on ic.commit_id_new = c1.commit_id\n" +
+            "left join commit c2 on ic.commit_id_disappear = c2.commit_id\n" +
+            "join iss_instance ii1 on ic.commit_id_new = ii1.commit_id and ii1.case_id = ic.case_id\n" +
+            "join iss_instance ii2 on ic.commit_id_last = ii2.commit_id and ii2.case_id = ic.case_id\n" +
+            "join sonarrules sr on sr.id = ic.type_id;";
 
     public SqlQuery(SqlConnect connect) throws SQLException {
         sqlMapping = new SqlMapping(connect);
@@ -101,7 +70,7 @@ public class SqlQuery {
     }
 
     //! 此处有根据commit_id查找type_id需求
-    public List<DefectTypeEntity> getDefectType(String commit_id,String status) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public List<DefectTypeEntity> getDefectType(String commit_id, String status) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql = "select type_id, description, average_exist_duration, count\n" +
                 "from\n" +
                 "(select type_id, avg(duration) average_exist_duration, count(*) count\n" +
@@ -111,12 +80,12 @@ public class SqlQuery {
                 "group by type_id\n" +
                 "order by avg(duration) desc, count desc) a, sonarrules sr\n" +
                 "where a.type_id = sr.id";
-//        System.out.println("getDefectType_sql: "+sql);
+        System.out.println("getDefectType_sql: "+sql);
         return (List<DefectTypeEntity>) sqlMapping.select(new DefectTypeEntity(), sql);
     }
 
 
-    public List<DefectEntity> getDefectEntity(String commit_id, String type_id,String status) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public List<DefectEntity> getDefectEntity(String commit_id, String type_id, String status) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         String sql = "SELECT a.exist_duration, a.case_id, a.inst_id, il.file_path, il.class_, il.method, il.`code`, il.start_line, il.start_col, case a.case_status when 'SOLVED' then '已解决' else '未解决' end status\n" +
                 "FROM( SELECT duration AS exist_duration, case_id, inst_id, location_id, case_status FROM full_view\n" +
                 "\t\tWHERE\n" +
@@ -125,7 +94,7 @@ public class SqlQuery {
                 "\t\tAND status = '" + status + "'\n" +
                 "\t\tORDER BY duration DESC\n" +
                 "\t) a left JOIN iss_location il ON a.location_id = il.location_id";
-//        System.out.println("getDefectEntity_sql: "+sql);
+        System.out.println("getDefectEntity_sql: "+sql);
         return (List<DefectEntity>) sqlMapping.select(new DefectEntity(), sql);
     }
 

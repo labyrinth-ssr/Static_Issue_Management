@@ -1,16 +1,15 @@
 package org.example.Command;
 
+import org.example.Command.QueryUseEntity.*;
 import org.example.Entity.Commit;
 import org.example.Entity.Iss_case;
 import org.example.Entity.Iss_match;
 import org.example.Entity.Repository;
-import org.example.QueryUseEntity.*;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlQuery;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class QueryCommand {

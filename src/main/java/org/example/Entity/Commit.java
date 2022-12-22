@@ -116,4 +116,18 @@ public class Commit implements Cloneable{
         this.repo_path=repo_path;
         this.committer_email=commit.getCommitter_email();
     }
+
+    public Commit(String commit_id, String commit_hash, String committer, String committer_email, String commit_msg, Date commit_time, String repo_path, String parent_commit_hash) {
+        this.commit_id = commit_id;
+        this.commit_hash = commit_hash;
+        this.committer = committer;
+        this.committer_email = committer_email;
+        this.commit_msg = commit_msg;
+        this.commit_time = commit_time;
+        this.repo_path = repo_path;
+        this.parent_commit_hash = parent_commit_hash;
+    }
+
+    public Commit() {
+    }
 }
