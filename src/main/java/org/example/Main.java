@@ -4,22 +4,33 @@ import org.apache.commons.lang.StringUtils;
 import org.example.Query.Cmd;
 import org.example.Update.Save;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-//        System.out.println("welcome");
-//        int len = args.length;
-//        if(len == 1 && Objects.equals(args[0], "run")) Cmd.run();
-//        else if(len >=2 && Objects.equals(args[0], "save")){
-//            if(len == 2) Save.save(args[1], null);
-//            else if(len == 3 && StringUtils.isNumeric(args[2])) Save.save(args[1], Integer.valueOf(args[2]));
-//            else showHelp();
-//        }else{
-//            showHelp();
-//        }
+        System.out.println("welcome");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        args = br.readLine().split(" ");
+        int len = args.length;
+        if(len > 0) {
+            if (Objects.equals(args[0].trim(), "run")) Cmd.run(false);
+            else if (Objects.equals(args[0].trim(),"mock")) Mock.mock();
+            else if(Objects.equals(args[0].trim(),"mocktest")) Cmd.run("sonarissuemock",true);
+            else if (len >= 2 && Objects.equals(args[0].trim(), "save")) {
+                if (len == 2) Save.save(args[1].trim(), null);
+                else if (len == 3 && StringUtils.isNumeric(args[2])) Save.save(args[1], Integer.valueOf(args[2]));
+                else showHelp();
+            }else{
+                showHelp();
+            }
+        } else {
+            showHelp();
+        }
+//
 //        Save.save(Constant.RepoPath, null);
-        Cmd.run();
+//        Cmd.run();
     }
 
     public static void showHelp(){

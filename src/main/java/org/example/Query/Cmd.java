@@ -10,8 +10,8 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 public class Cmd {
-    public static void run() throws Exception {run("sonarissue");}
-    public static void run(String table_name) throws Exception {
+    public static void run(boolean mock) throws Exception {run("sonarissue",mock);}
+    public static void run(String table_name,boolean mock) throws Exception {
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.useDataBase(table_name);
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -53,36 +53,36 @@ public class Cmd {
             if(str.startsWith("latest_defect")){
                 String latest = queryMappingById.getCommitLatest(REPO_PATH);
                 System.out.println(latest);
-                queryMappingById.getCountInByCommit_id(latest,false);
+                queryMappingById.getCountInByCommit_id(latest,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingById.getGCountInTypeByCommit_id(latest,false);
+                queryMappingById.getGCountInTypeByCommit_id(latest,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingById.getListInByCommit_id(latest,false);
+                queryMappingById.getListInByCommit_id(latest,mock);
                 System.out.println("\n");
 
 
-                queryMappingById.getCountDoneByCommit_id(latest,false);
+                queryMappingById.getCountDoneByCommit_id(latest,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingById.getCountDoneInTypeByCommit_id(latest,false);
+                queryMappingById.getCountDoneInTypeByCommit_id(latest,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingById.getListDoneByCommit_id(latest,false);
+                queryMappingById.getListDoneByCommit_id(latest,mock);
                 System.out.println("\n");
 
-                queryMappingById.getGCountUnsolvedByCommit_id(latest,false);
+                queryMappingById.getGCountUnsolvedByCommit_id(latest,mock);
             }else if(str.startsWith("defect -c")){
                 String commit_hash = queryMappingById.getCommit_idByCommit_hashAndRepo(str.substring(9).trim(), REPO_PATH);
-                queryMappingById.getCountInByCommit_id(commit_hash,false);
+                queryMappingById.getCountInByCommit_id(commit_hash,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingById.getGCountInTypeByCommit_id(commit_hash,false);
+                queryMappingById.getGCountInTypeByCommit_id(commit_hash,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingById.getListInByCommit_id(commit_hash,false);
+                queryMappingById.getListInByCommit_id(commit_hash,mock);
                 System.out.println("\n");
 
-                queryMappingById.getCountDoneByCommit_id(commit_hash,false);
+                queryMappingById.getCountDoneByCommit_id(commit_hash,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingById.getCountDoneInTypeByCommit_id(commit_hash,false);
+                queryMappingById.getCountDoneInTypeByCommit_id(commit_hash,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingById.getListDoneByCommit_id(commit_hash,false);
+                queryMappingById.getListDoneByCommit_id(commit_hash,mock);
             }else if(str.startsWith("defect -t")){
                 str = str.substring(9).trim();
                 String[] s = str.split("=");
@@ -90,37 +90,37 @@ public class Cmd {
                 String begin_time = s[0];
                 String end_time = getString2(s);
                 System.out.println(begin_time+" "+end_time);
-                queryMappingByTime.getCountInByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getCountInByCommit_time(begin_time,end_time,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingByTime.getGCountInTypeByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getGCountInTypeByCommit_time(begin_time,end_time,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingByTime.getListInByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getListInByCommit_time(begin_time,end_time,REPO_PATH,mock);
                 System.out.println("\n");
-                queryMappingByTime.getCountDoneByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getCountDoneByCommit_time(begin_time,end_time,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingByTime.getCountDoneInTypeByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getCountDoneInTypeByCommit_time(begin_time,end_time,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingByTime.getListDoneByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getListDoneByCommit_time(begin_time,end_time,REPO_PATH,mock);
             }else if(str.startsWith("analysis")){
                 str = str.substring(8).trim();
                 String[] s = str.split("=");
                 if(!checkTimeString(s)) continue;
                 String begin_time = s[0];
                 String end_time = getString2(s);
-                queryMappingByTime.getAnalysisCountByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getAnalysisCountByCommit_time(begin_time,end_time,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingByTime.getAnalysisCountByTypeByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getAnalysisCountByTypeByCommit_time(begin_time,end_time,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingByTime.getAnalysisCountByType_idByCommit_time(begin_time,end_time,REPO_PATH,false);
+                queryMappingByTime.getAnalysisCountByType_idByCommit_time(begin_time,end_time,REPO_PATH,mock);
             }else if(str.startsWith("duration")){
                 str = str.substring(8).trim();
-                queryMappingByTime.getDefectListMoreThanDuration(str,REPO_PATH,false);
+                queryMappingByTime.getDefectListMoreThanDuration(str,REPO_PATH,mock);
             }else if(str.startsWith("devs")){
                 str = str.substring(4).trim();
                 if(str.equals("")) continue;
-                queryMappingByDev.getDevCountByDevs(str,REPO_PATH,false);
+                queryMappingByDev.getDevCountByDevs(str,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingByDev.getDevTypeCountByDevs(str,REPO_PATH,false);
+                queryMappingByDev.getDevTypeCountByDevs(str,REPO_PATH,mock);
             }else if(str.startsWith("commits")){
                 queryMappingById.getCommits(REPO_PATH);
             }else if(str.startsWith("quit")){

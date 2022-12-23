@@ -7,7 +7,7 @@ public class MockUtil {
         time = TimeUtil.begin();
     }
     public static void MockEnd(String msg){
-        System.out.println("查询时间: " + TimeUtil.end(time));
+        System.out.println("使用时间: " + TimeUtil.end(time));
         if(msg!=null) System.out.println(msg);
     }
 }

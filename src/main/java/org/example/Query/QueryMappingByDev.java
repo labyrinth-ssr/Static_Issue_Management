@@ -2,6 +2,7 @@ package org.example.Query;
 
 import org.example.Query.Value.Int4Time4String1Value;
 import org.example.Query.Value.Int4Value;
+import org.example.Query.Value.IntTime;
 import org.example.Utils.MockUtil;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;

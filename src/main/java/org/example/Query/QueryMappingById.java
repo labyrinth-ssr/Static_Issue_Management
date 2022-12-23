@@ -21,10 +21,12 @@ public class QueryMappingById {
         sqlMapping = new SqlMapping(connect);
         sql_add.add("create index commit_time on commit (commit_time);");
         sql_add.add("create index committer on commit (committer);");
+        sql_add.add("create index repo_path on commit (repo_path);");
         sql_add.add("create index case_id on iss_instance (case_id);");
         sql_add.add("create index case_status on iss_case (case_status);");
         sql_drop.add("drop index commit_time on commit; ");
         sql_drop.add("drop index committer on commit;");
+        sql_drop.add("drop index repo_path on commit;");
         sql_drop.add("drop index case_id on iss_instance; ");
         sql_drop.add("drop index case_status on iss_case; ");
     }
@@ -85,8 +87,8 @@ public class QueryMappingById {
     public void getCountInByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
         String sql = "select count(*) intValue from iss_case where commit_id_new = '"+ commit_id +"'";
-        System.out.println("引入缺陷数量: "+ ((List<IntValue>)sqlMapping.select(new IntValue(), sql)).get(0).getIntValue());
         if(mock) MockUtil.MockEnd(null);
+        System.out.println("引入缺陷数量: "+ ((List<IntValue>)sqlMapping.select(new IntValue(), sql)).get(0).getIntValue());
     }
 
     public void getGCountInTypeByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
@@ -144,8 +146,8 @@ public class QueryMappingById {
         if(mock) MockUtil.MockBegin();
         String sql = "select count(*) intValue from iss_case where case_status in ('SOLVED','REOPEN') and commit_id_disappear = '" +commit_id+"'";
         IntValue stringValue = ((List<IntValue>)sqlMapping.select(new IntValue(),sql)).get(0);
-        System.out.println("解决缺陷数量: " + stringValue.getIntValue());
         if(mock) MockUtil.MockEnd(null);
+        System.out.println("解决缺陷数量: " + stringValue.getIntValue());
     }
 
     public void getCountDoneInTypeByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {

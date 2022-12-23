@@ -2,6 +2,7 @@ package org.example.Utils;
 
 import org.example.Constant;
 import org.example.Main;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -94,6 +95,7 @@ public class SqlConnect {
             return 0;
         }
     }
+
     public static List<String> readSqlByFile(String fileName) throws IOException {
         List<String> list = new ArrayList<>();
         StringBuilder sb = new StringBuilder();

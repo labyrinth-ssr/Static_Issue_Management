@@ -3,6 +3,7 @@ package org.example.Update;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.lib.Ref;
+import org.example.Constant;
 import org.example.Entity.*;
 import org.example.SonarConfig.SonarIssues;
 import org.example.SonarConfig.SonarResult;
@@ -24,6 +25,7 @@ public class Save {
         mysqlConnect.execSqlReadFileContent("crebas2.sql");
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
+        sqlMapping.execute(Constant.func);
 
         PrintStream console = System.out;
         System.setOut(null);

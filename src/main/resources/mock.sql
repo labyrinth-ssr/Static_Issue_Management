@@ -3,19 +3,19 @@
 /* Created on:     2022/11/24 20:11:19                          */
 /*==============================================================*/
 
---drop database if EXISTS SonarIssueMock;
+drop database if EXISTS SonarIssueMock;
 
-create database SonarIssueMock;
+create database if not exists SonarIssueMock;
 use sonarIssueMock;
 
---drop table if exists commit;
---drop table if exists iss_file;
---drop table if exists iss_case;
---drop table if exists iss_instance;
---drop table if exists iss_location;
---drop table if exists iss_match;
---drop table if exists repository;
---drop table if exists sonarrules;
+drop table if exists commit;
+drop table if exists iss_file;
+drop table if exists iss_case;
+drop table if exists iss_instance;
+drop table if exists iss_location;
+drop table if exists iss_match;
+drop table if exists repository;
+drop table if exists sonarrules;
 /*==============================================================*/
 /* Table: sonarrules                                            */
 /*==============================================================*/

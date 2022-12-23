@@ -41,8 +41,8 @@ public class QueryMappingByTime {
         if(mock) MockUtil.MockBegin();
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
         String sql = "select count(*) intValue from iss_case ic join commit c on ic.commit_id_new = c.commit_id where " + sql_condition;
-        System.out.println("引入缺陷数量: "+ ((List<IntValue>)sqlMapping.select(new IntValue(), sql)).get(0).getIntValue());
         if(mock) MockUtil.MockEnd(null);
+        System.out.println("引入缺陷数量: "+ ((List<IntValue>)sqlMapping.select(new IntValue(), sql)).get(0).getIntValue());
     }
 
     public void getGCountInTypeByCommit_time(String begin_time, String end_time, String repo, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
@@ -103,8 +103,8 @@ public class QueryMappingByTime {
         if(mock) MockUtil.MockBegin();
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
         String sql = "select count(*) intValue from iss_case join commit c on iss_case.commit_id_disappear = c.commit_id where case_status in ('SOLVED','REOPEN') and " +sql_condition;
-        System.out.println("解决缺陷数量: " + ((List<IntValue>)sqlMapping.select(new IntValue(),sql)).get(0).getIntValue());
         if(mock) MockUtil.MockEnd(null);
+        System.out.println("解决缺陷数量: " + ((List<IntValue>)sqlMapping.select(new IntValue(),sql)).get(0).getIntValue());
     }
 
     public void getCountDoneInTypeByCommit_time(String begin_time, String end_time, String repo, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
@@ -194,13 +194,13 @@ public class QueryMappingByTime {
                 "left join commit c2 on c2.commit_id = iss_case.commit_id_disappear and "+ sql_condition +
                 "order by avg(if(case_status='SOLVED',TIMESTAMPDIFF(SECOND, c1.commit_time, c2.commit_time),null)) desc";
         List<Int2StringTime> int2StringTimes = (List<Int2StringTime>) sqlMapping.select(new Int2StringTime(), sql);
-        if(!mock) for(Int2StringTime int2StringTime : int2StringTimes) {
+        for(Int2StringTime int2StringTime : int2StringTimes) {
             System.out.println("缺陷引入数: " + int2StringTime.getIntValue1() +
                     ", 缺陷解决数: " + int2StringTime.getIntValue2() +
                     ", 缺陷解决率: " + int2StringTime.getStringValue() +
                     ", 平均解决所用时间: " + int2StringTime.getTime());
         }
-        if(mock) MockUtil.MockEnd("数量: " + int2StringTimes.size());
+        if(mock) MockUtil.MockEnd(null);
     }
 
     public void getAnalysisCountByTypeByCommit_time(String begin_time, String end_time, String repo,boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {

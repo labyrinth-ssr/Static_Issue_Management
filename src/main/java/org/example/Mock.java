@@ -6,7 +6,9 @@ import org.eclipse.jgit.api.Git;
 import org.example.Entity.*;
 import org.example.SonarConfig.SonarIssues;
 import org.example.SonarConfig.SonarLocation;
+import org.example.SonarConfig.SonarResult;
 import org.example.Utils.JgitUtil;
+import org.example.Utils.MockUtil;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
 
@@ -15,41 +17,59 @@ import java.io.FileInputStream;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
 public class Mock {
     public static String MOCK_PATH;
-    public static void main(String[] args) throws Exception {
+    public static void mock() throws Exception {
         Properties properties = new Properties();
         File file =new File(System.getProperty("user.dir") + "/conf.properties");
         FileInputStream fileInputStream =new FileInputStream(file);
         properties.load(fileInputStream);
         MOCK_PATH = properties.getProperty("mock_path");
-//
-
+        int repo_num = 4;
+        int commit_total_num=2000;
+        int commit_per_repo=commit_total_num/repo_num;
+        int location_num = 15000;
+        int inst_total_num = 1000000;
+        int inst_per_repo = inst_total_num/repo_num;
+        List<SonarRules> sonarRulesList = get_sonar_rules();
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.execSqlReadFileContent("mock.sql");
         mysqlConnect.useDataBase("sonarissuemock");
-
-        List<SonarRules> sonarRulesList = get_sonar_rules();
-        System.out.println(sonarRulesList.toString());
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
+        sqlMapping.execute(Constant.func);
+
         List<Repos> reposList = new ArrayList<>();
-        List<Commit> commitList = get_commit_list_and_repos(reposList);
+        List<Commit> commitList = get_commit_list_and_repos(reposList,repo_num,commit_total_num);
         List<String> fileList = get_file_list();
         List<Iss_case> issCaseList = new ArrayList<>();
-        List<Iss_location> issLocationList = generate_loaction_list(15000);
-        List<Iss_instance> issInstanceList = generate_iss_instance_and_case_list(issCaseList,100000,sonarRulesList,commitList,fileList);
+        List<Iss_location> issLocationList = generate_loaction_list(location_num);
+        List<Iss_instance> issInstanceList = new ArrayList<>();
+        for (int i = 0; i < repo_num; i++) {
+            List<Iss_instance> issInstanceList0 = generate_iss_instance_and_case_list(inst_per_repo*i,issCaseList,inst_per_repo,sonarRulesList,commitList.subList(i*commit_per_repo,(i+1)*commit_per_repo),fileList,commit_per_repo);
+            issInstanceList.addAll(issInstanceList0);
+        }
         List<Instance_location> instanceLocationList = match_inst_location(issInstanceList,issLocationList);
+        System.out.println("begin_saving");
+        MockUtil.MockBegin();
         sqlMapping.save(reposList);
+        MockUtil.MockEnd("repos");
         sqlMapping.save(commitList);
+        MockUtil.MockEnd("commit");
         sqlMapping.save(sonarRulesList);
+        MockUtil.MockEnd("sonarRules");
         sqlMapping.save(issLocationList);
+        MockUtil.MockEnd("issLocation");
         sqlMapping.save(issInstanceList);
+        MockUtil.MockEnd("issInstance");
         sqlMapping.save(issCaseList);
+        MockUtil.MockEnd("issCase");
         sqlMapping.save(instanceLocationList);
+        MockUtil.MockEnd("instanceLocation");
         System.out.println("done");
     }
 
@@ -71,24 +91,34 @@ public class Mock {
         });
         return instanceLocationList;
     }
-    public static List<Commit> get_commit_list_and_repos(List<Repos> reposList){
+
+    public static List<Commit> get_commit_list_and_repos(List<Repos> reposList,int repo_num,int commit_num){
         String pj_path = MOCK_PATH;
         PrintStream console = System.out;
         System.setOut(null);
         Git git = JgitUtil.openRpo(pj_path);
-        List<Commit> commitList = JgitUtil.gitLog(git);
-        Repos repos = new Repos();
-        repos.setRepo_path("MockRepo");
-        repos.setCommit_num((long)commitList.size());
-        String latest_commit = null;
+        List<Commit> commitList = new ArrayList<>(JgitUtil.gitLog(git).subList(0, commit_num));
+        int commit_per_repo = commit_num/repo_num;
+        commitList.get(commitList.size()-1).setParent_commit_hash(null);
+
+        int commit_cnt = 0;
+        String last_commit_id = null;
         for (Commit commit:commitList) {
             commit.setCommit_id(Commit.getUuidFromCommit(commit));
-            commit.setRepo_path("MockRepo");
-            if (commit.getParent_commit_hash()==null) latest_commit=commit.getCommit_id();
+            if (commit_cnt % commit_per_repo == commit_per_repo-1 ||commit_cnt == commitList.size()-1){
+                commit.setParent_commit_hash(null);
+                Repos repos = new Repos();
+                repos.setRepo_path("MockRepo"+commit_cnt/commit_per_repo);
+                repos.setCommit_num((long)commit_cnt%commit_per_repo + 1);
+                repos.setLatest_commit_id(last_commit_id);
+                reposList.add(repos);
+            }
+            if (commit_cnt % commit_per_repo == 0) {
+                last_commit_id = commit.getCommit_id();
+            }
+            commit.setRepo_path("MockRepo"+commit_cnt/commit_per_repo);
+            commit_cnt++;
         }
-        repos.setLatest_commit_id(latest_commit);
-
-        reposList.add(repos);
         System.setOut(console);
         System.out.println("commitList:"+commitList.toString());
         return commitList;
@@ -103,28 +133,29 @@ public class Mock {
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.useDataBase("sonarissuemock");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
+        sqlMapping.save(SonarResult.getSonartype());
         List<SonarRules> sonarRulesList= (List<SonarRules>) sqlMapping.select(new SonarRules());
         return sonarRulesList == null ? new ArrayList<>():sonarRulesList;
     }
-    public static List<Iss_instance> generate_iss_instance_and_case_list(List<Iss_case>issCaseList,int N,List<SonarRules> sonarRulesList,List<Commit> commitList,List<String> fileList) throws Exception {
+    public static List<Iss_instance> generate_iss_instance_and_case_list(int start,List<Iss_case>issCaseList,int N,List<SonarRules> sonarRulesList,List<Commit> commitList,List<String> fileList,int commit_id_range) throws Exception {
         List<Iss_instance> issInstanceList = new ArrayList<>();
-        int commit_id_range = 10;
+//        int commit_id_range = 100;
         int iss_per_commit = N/commit_id_range;
         for (int i = 0; i < N; i++) {
             Iss_instance iss_instance = new Iss_instance();
-            iss_instance.setInst_id(UUID.nameUUIDFromBytes(String.valueOf(i).getBytes()).toString());
+            iss_instance.setInst_id(UUID.nameUUIDFromBytes(String.valueOf(i+start).getBytes()).toString());
             int rand_rule = (int)(Math.random()*sonarRulesList.size());
             int rand_file = (int)(Math.random()*fileList.size());
             iss_instance.setType_id(sonarRulesList.get(rand_rule).getId());
             iss_instance.setFile_path(fileList.get(rand_file));
-            iss_instance.setCommit_id(commitList.get(i/iss_per_commit).getCommit_id());
+            iss_instance.setCommit_id(commitList.get( commitList.size()-1- (i/iss_per_commit)).getCommit_id());
             issInstanceList.add(iss_instance);
         }
         int case_id = 0;
         for (int j = 0; j < iss_per_commit; j++) {
-            String str = (case_id++)+"c";
+            String str = ((case_id++)+start)+"c";
             String case_hash = UUID.nameUUIDFromBytes(str.getBytes()).toString();
-            String parent_inst_id = UUID.nameUUIDFromBytes(String.valueOf(j).getBytes()).toString();
+            String parent_inst_id = UUID.nameUUIDFromBytes(String.valueOf(j+start).getBytes()).toString();
 
             Iss_case iss_case = new Iss_case();
             iss_case.setCase_id(case_hash);
@@ -134,16 +165,17 @@ public class Mock {
             iss_case.setType_id(issInstanceList.get(j).getType_id());
             issInstanceList.get(j).setCase_id(case_hash);
             for (int i = 1; i < commit_id_range; i++) {
-                    if (Math.random()>0.95){
+                //新引入、解决比例
+                if (Math.random()>0.75){
                     iss_case.setCommit_id_disappear(issInstanceList.get(i*iss_per_commit+j).getCommit_id());
                     iss_case.setCase_status("SOLVED");
                     issCaseList.add(iss_case);
 
                     iss_case = new Iss_case();
-                    str = (case_id++)+"c";
+                    str = ((case_id++)+start)+"c";
                     case_hash = UUID.nameUUIDFromBytes(str.getBytes()).toString();
                     issInstanceList.get(i*iss_per_commit+j).setCase_id(case_hash);
-                    parent_inst_id = UUID.nameUUIDFromBytes(String.valueOf(i*iss_per_commit+j).getBytes()).toString();
+                    parent_inst_id = UUID.nameUUIDFromBytes(String.valueOf((i*iss_per_commit+j)+start).getBytes()).toString();
 
                     iss_case.setCase_id(case_hash);
                     iss_case.setCommit_id_new(issInstanceList.get(i*iss_per_commit+j).getCommit_id());
@@ -161,6 +193,8 @@ public class Mock {
         }
         return issInstanceList;
     }
+
+
 
     public static List<Iss_location> generate_loaction_list(int N){
         List<Iss_location> iss_locationList = new ArrayList<>();
