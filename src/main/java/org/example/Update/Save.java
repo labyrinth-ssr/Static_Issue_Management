@@ -1,7 +1,6 @@
 package org.example.Update;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.lib.Ref;
 import org.example.Constant;
 import org.example.Entity.*;
@@ -22,10 +21,10 @@ public class Save {
 
 
         SqlConnect mysqlConnect = new SqlConnect();
-        mysqlConnect.execSqlReadFileContent("crebas2.sql");
+//        mysqlConnect.execSqlReadFileContent("db.sql");
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
-        sqlMapping.execute(Constant.func);
+//        sqlMapping.execute(Constant.func);
 
         PrintStream console = System.out;
         System.setOut(null);

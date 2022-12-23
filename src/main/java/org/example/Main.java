@@ -1,18 +1,40 @@
 package org.example;
 
 import org.apache.commons.lang.StringUtils;
+import org.example.Entity.Repos;
 import org.example.Query.Cmd;
 import org.example.Update.Save;
+import org.example.Utils.SqlConnect;
+import org.example.Utils.SqlMapping;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) throws Exception {
         System.out.println("welcome");
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        args = br.readLine().split(" ");
+        SqlConnect mysqlConnect = new SqlConnect();
+        mysqlConnect.execSqlReadFileContent("db.sql");
+        mysqlConnect.useDataBase("sonarissue");
+        SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
+        sqlMapping.execute(Constant.func);
+        List<Repos> reposList = (List<Repos>) sqlMapping.select(new Repos());
+        if(reposList==null || reposList.size() == 0){
+            mysqlConnect.execSqlReadFileContent("data/repos.sql");
+            mysqlConnect.execSqlReadFileContent("data/commit.sql");
+            mysqlConnect.execSqlReadFileContent("data/sonarrules.sql");
+            mysqlConnect.execSqlReadFileContent("data/iss_case.sql");
+            mysqlConnect.execSqlReadFileContent("data/iss_instance.sql");
+            mysqlConnect.execSqlReadFileContent("data/iss_location.sql");
+            mysqlConnect.execSqlReadFileContent("data/instance_location.sql");
+        }
+
+//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//        args = br.readLine().split(" ");
         int len = args.length;
         if(len > 0) {
             if (Objects.equals(args[0].trim(), "run")) Cmd.run(false);

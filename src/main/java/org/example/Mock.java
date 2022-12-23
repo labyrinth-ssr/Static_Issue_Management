@@ -30,11 +30,11 @@ public class Mock {
         FileInputStream fileInputStream =new FileInputStream(file);
         properties.load(fileInputStream);
         MOCK_PATH = properties.getProperty("mock_path");
-        int repo_num = 4;
-        int commit_total_num=2000;
-        int commit_per_repo=commit_total_num/repo_num;
-        int location_num = 15000;
-        int inst_total_num = 1000000;
+        int repo_num = Integer.valueOf(properties.getProperty("repo_num"));
+        int commit_total_num=Integer.valueOf(properties.getProperty("commit_total_num"));
+        int commit_per_repo= commit_total_num/repo_num;
+        int location_num = Integer.valueOf(properties.getProperty("location_num"));
+        int inst_total_num = Integer.valueOf(properties.getProperty("inst_total_num"));
         int inst_per_repo = inst_total_num/repo_num;
         List<SonarRules> sonarRulesList = get_sonar_rules();
         SqlConnect mysqlConnect = new SqlConnect();

@@ -200,7 +200,7 @@ public class QueryMappingById {
             }
             if(!mock) System.out.print("\n");
         }
-        MockUtil.MockEnd("数据量: " + getListInLatestInsts.size());
+        if(mock) MockUtil.MockEnd("数据量: " + getListInLatestInsts.size());
     }
 
     public void getGCountUnsolvedByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {

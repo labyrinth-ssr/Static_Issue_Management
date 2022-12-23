@@ -47,10 +47,10 @@ public class QueryMappingByDev {
                 "(select count(if( c1.committer = '" + name +"' and ic.case_status <> 'SOLVED',1,null))) intValue3, " +
                 "(select count(if( c1.committer = '" + name +"' and c2.committer <> '"+name+"',1,null))) intValue4, " +
 
-                "(select avg(if(c1.committer = '"+name+"',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null))) time1, " +
-                "(select avg(if( c2.committer = '" + name +"' and c1.committer <> '"+name+"',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null))) time2, " +
-                "(select avg(if(c1.committer = '" + name +"' and ic.case_status <> 'SOLVED',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null))) time3, " +
-                "(select avg(if( c1.committer = '" + name +"' and c2.committer <> '"+name+"',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null))) time4, " +
+                "(select duration(avg(if(c1.committer = '"+name+"',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null)))) time1, " +
+                "(select duration(avg(if( c2.committer = '" + name +"' and c1.committer <> '"+name+"',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null)))) time2, " +
+                "(select duration(avg(if(c1.committer = '" + name +"' and ic.case_status <> 'SOLVED',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null)))) time3, " +
+                "(select duration(avg(if( c1.committer = '" + name +"' and c2.committer <> '"+name+"',timestampdiff(SECOND,c1.commit_time, case ic.case_status when 'SOLVED' then c2.commit_time else localtime() end),null)))) time4, " +
                 " ic.type_id stringValue " +
                 "from iss_case ic join commit c1 on ic.commit_id_new = c1.commit_id " +
                 "left join commit c2 on ic.commit_id_disappear = c2.commit_id " +
