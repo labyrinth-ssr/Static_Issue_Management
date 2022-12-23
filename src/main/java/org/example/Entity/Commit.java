@@ -1,7 +1,10 @@
 package org.example.Entity;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.UUID;
 
@@ -45,6 +48,11 @@ public class Commit implements Cloneable{
 
     public void setCommitter(String committer) {
         this.committer = committer;
+    }
+
+    public String getTime(){
+        DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        return dateformat.format(commit_time);
     }
 
     public Date getCommit_time() {

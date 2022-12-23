@@ -2,6 +2,7 @@ package org.example.Query;
 
 import org.example.Query.Value.Int4Time4String1Value;
 import org.example.Query.Value.Int4Value;
+import org.example.Utils.MockUtil;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
 
@@ -16,7 +17,8 @@ public class QueryMappingByDev {
         sqlMapping = new SqlMapping(connect);
     }
 
-    public void getDevCountByDevs(String name, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public void getDevCountByDevs(String name, String repo, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        if(mock) MockUtil.MockBegin();
         String sql = "select (select count(if(c1.committer = '"+name+"',1,null))) intValue1, " +
                 "(select count(if(c2.committer = '" + name +"' and c1.committer <> '"+name+"',1,null))) intValue2, " +
                 "(select count(if(c1.committer = '" + name +"' and ic.case_status <> 'SOLVED',1,null))) intValue3, " +
@@ -25,7 +27,9 @@ public class QueryMappingByDev {
                 "left join commit c2 on ic.commit_id_disappear = c2.commit_id " +
                 "where c1.repo_path = '"+repo+"'";
         Int4Value int4Value = ((List<Int4Value>) sqlMapping.select(new Int4Value(), sql)).get(0);
-
+        if(mock){
+            MockUtil.MockEnd(null);
+        }
         System.out.println("开发人员: " + name +
                 ", 引入缺陷数量: " + int4Value.getIntValue1() +
                 ", 解决他人缺陷数量: " + int4Value.getIntValue2() +
@@ -33,9 +37,10 @@ public class QueryMappingByDev {
                 ", 引入被他人解决缺陷数量: " + int4Value.getIntValue4());
     }
 
-    public void getDevTypeCountByDevs(String name, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public void getDevTypeCountByDevs(String name, String repo, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         //如果要计算准确的存活周期，需要再维护一张表，记录reopen的new,last,disappear的历史，或者说使用case_id和case_id_parent表
         //这里先不考虑reopen情况。
+        if(mock) MockUtil.MockBegin();
         String sql = "select (select count(if( c1.committer = '"+name+"',1,null))) intValue1, " +
                 "(select count(if( c2.committer = '" + name +"' and c1.committer <> '"+name+"',1,null))) intValue2, " +
                 "(select count(if( c1.committer = '" + name +"' and ic.case_status <> 'SOLVED',1,null))) intValue3, " +
@@ -50,6 +55,10 @@ public class QueryMappingByDev {
                 "left join commit c2 on ic.commit_id_disappear = c2.commit_id " +
                 "where c1.repo_path = '"+repo+"' group by ic.type_id";
         List<Int4Time4String1Value> int4Float4String1Values = (List<Int4Time4String1Value>) sqlMapping.select(new Int4Time4String1Value(), sql);
+        if(mock){
+            MockUtil.MockEnd("数据量: "+int4Float4String1Values.size()*4);
+            return;
+        }
         System.out.println("\n引入缺陷: ");
         for(Int4Time4String1Value int4Float4String1Value : int4Float4String1Values){
             if(int4Float4String1Value.getIntValue1() > 0) System.out.println("类型: "+ int4Float4String1Value.getStringValue() + ", 数量: "+int4Float4String1Value.getIntValue1() + ", 平均存活周期: " + int4Float4String1Value.getTime1());

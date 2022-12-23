@@ -28,37 +28,16 @@ public class Int1String1Time2 {
     public String getTime1() {
         return time1;
     }
-    public void setTime1(BigDecimal time) {
-        long time_duration = time.longValue();
-        long diffSeconds = time_duration % 60;
-        long diffMinutes = time_duration / (60) % 60;
-        long diffHours = time_duration / (60 * 60) % 24;
-        long diffDays = time_duration / (24 * 60 * 60);
-        StringBuilder s = new StringBuilder();
-        if(diffDays > 0) {
-            s.append(diffDays).append("天");
-            s.append(diffHours).append("时");
-        }else if(diffHours > 0) s.append(diffHours).append("时");
-        s.append(diffMinutes).append("分").append(diffSeconds).append("秒");
-        this.time1 = s.toString();
+
+    public void setTime1(String time1) {
+        this.time1 = time1;
     }
 
     public String getTime2() {
         return time2;
     }
 
-    public void setTime2(BigDecimal time) {
-        long time_duration = time.longValue();
-        long diffSeconds = time_duration % 60;
-        long diffMinutes = time_duration / (60) % 60;
-        long diffHours = time_duration / (60 * 60) % 24;
-        long diffDays = time_duration / (24 * 60 * 60);
-        StringBuilder s = new StringBuilder();
-        if(diffDays > 0) {
-            s.append(diffDays).append("天");
-            s.append(diffHours).append("时");
-        }else if(diffHours > 0) s.append(diffHours).append("时");
-        s.append(diffMinutes).append("分").append(diffSeconds).append("秒");
-        this.time2 = s.toString();
+    public void setTime2(String time2) {
+        this.time2 = time2;
     }
 }

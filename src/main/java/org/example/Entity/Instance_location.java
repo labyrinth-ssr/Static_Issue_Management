@@ -32,10 +32,10 @@ public class Instance_location {
                 Iss_location iss_location = new Iss_location();
                 Instance_location instance_location = new Instance_location();
 
-                iss_location.setStart_line(Integer.parseInt(location.getStartLine()));
-                iss_location.setEnd_line(Integer.parseInt(location.getEndLine()));
-                iss_location.setStart_col(Integer.parseInt(location.getStartOffset()));
-                iss_location.setEnd_col(Integer.parseInt(location.getEndOffset()));
+                iss_location.setStart_line(Long.parseLong(location.getStartLine()));
+                iss_location.setEnd_line(Long.parseLong(location.getEndLine()));
+                iss_location.setStart_col(Long.parseLong(location.getStartOffset()));
+                iss_location.setEnd_col(Long.parseLong(location.getEndOffset()));
 
                 instance_location.setInst_id(sonarIssue.getId());
                 instance_location.setLocation_id(Iss_location.getUuidFromLocation(iss_location));

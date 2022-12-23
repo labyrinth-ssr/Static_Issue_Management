@@ -266,6 +266,9 @@ public class SqlMapping {
     public void execute(String sql) throws SQLException {
         SqlConnect.sqlBatch(Collections.singletonList(sql));
     }
+    public void execute(List<String> sql) throws SQLException {
+        SqlConnect.sqlBatch(sql);
+    }
 
     public void updateRepos(Repos repos) throws SQLException {
         String sql = "update repos set latest_commit_id = '"+repos.getLatest_commit_id()+"', commit_num = commit_num + 1 where repo_path = '" + repos.getRepo_path()+"'";

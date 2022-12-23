@@ -100,7 +100,13 @@ public class JgitUtil {
 
     public static List<Commit> gitLog(Git git){
         try {
-            Iterable<RevCommit> logs = git.log().add(git.getRepository().resolve("refs/heads/master")).all().call();
+            Iterable<RevCommit> logs = git
+                    .log()
+                    .add(git
+                            .getRepository()
+                            .resolve("refs/heads/master"))
+                    .all()
+                    .call();
             List<Commit> commitList = new ArrayList<>();
             for (RevCommit c : logs) {
                 Commit commit = RevCommit2Commit(c);
@@ -173,37 +179,30 @@ public class JgitUtil {
         return null;
     }
 
-//    public static List<Iss_file> gitFileList(Git git,String repo_name){
-//
-//        List<Iss_file> ret=new ArrayList<>();
-//        try {
-//            Repository repo = git.getRepository();
-//            RevWalk revWalk = new RevWalk(repo);
-//            ObjectId objectId = repo.resolve(Constants.HEAD);
-//            RevCommit revCommit = revWalk.parseCommit(objectId);
-//
-//            ObjectId treeId = revCommit.getTree().getId();
-//
-//            try (TreeWalk treeWalk = new TreeWalk(repo)) {
-//                treeWalk.reset(treeId);
-//                treeWalk.setRecursive(true);
-//                while (treeWalk.next()) {
-//                    Iss_file iss_file = new Iss_file();
-//                    iss_file.setFile_path(treeWalk.getPathString());
-//                    iss_file.path_to_name();
-//                    iss_file.setRepo_path(repo_name);
-//                    iss_file.setCreated_time(RevCommit2Commit(revCommit).getCommit_time());
-//                    ret.add(iss_file);
-//                }
-//                return ret;
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//    }
+    public static List<String> gitFileList(Git git,String repo_name){
 
+        List<String> ret=new ArrayList<>();
+        try {
+            Repository repo = git.getRepository();
+            RevWalk revWalk = new RevWalk(repo);
+            ObjectId objectId = repo.resolve(Constants.HEAD);
+            RevCommit revCommit = revWalk.parseCommit(objectId);
 
+            ObjectId treeId = revCommit.getTree().getId();
+
+            try (TreeWalk treeWalk = new TreeWalk(repo)) {
+                treeWalk.reset(treeId);
+                treeWalk.setRecursive(true);
+                while (treeWalk.next()) {
+                    ret.add(treeWalk.getPathString());
+                }
+                return ret;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }

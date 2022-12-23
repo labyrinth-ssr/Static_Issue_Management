@@ -8,18 +8,18 @@ import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        System.out.println("welcome");
-        int len = args.length;
-        if(len == 1 && Objects.equals(args[0], "run")) Cmd.run();
-        else if(len >=2 && Objects.equals(args[0], "save")){
-            if(len == 2) Save.save(args[1], null);
-            else if(len == 3 && StringUtils.isNumeric(args[2])) Save.save(args[1], Integer.valueOf(args[2]));
-            else showHelp();
-        }else{
-            showHelp();
-        }
+//        System.out.println("welcome");
+//        int len = args.length;
+//        if(len == 1 && Objects.equals(args[0], "run")) Cmd.run();
+//        else if(len >=2 && Objects.equals(args[0], "save")){
+//            if(len == 2) Save.save(args[1], null);
+//            else if(len == 3 && StringUtils.isNumeric(args[2])) Save.save(args[1], Integer.valueOf(args[2]));
+//            else showHelp();
+//        }else{
+//            showHelp();
+//        }
 //        Save.save(Constant.RepoPath, null);
-//        Cmd.run();
+        Cmd.run();
     }
 
     public static void showHelp(){

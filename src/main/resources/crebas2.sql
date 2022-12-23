@@ -124,6 +124,26 @@ create table if not exists  repos
    commit_num             INT unsigned not null default 0,
    PRIMARY KEY(repo_path)
 );
+
+DROP FUNCTION IF EXISTS `duration`;
+set global log_bin_trust_function_creators = 1;
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` FUNCTION `duration`(d LONG) RETURNS varchar(30) CHARSET utf8mb4
+begin
+	DECLARE dur varchar(30);
+	DECLARE day int;
+	DECLARE hour int;
+	DECLARE min int;
+	DECLARE sec int;
+	set day = d/ (24 * 60 * 60);
+	set hour = d/ (60 * 60) % 24;
+	set min = d/ (60) % 60;
+	set sec = d% 60;
+	set dur = concat(day,'天',hour,'时',min,'分',sec,'秒');
+	RETURN dur;
+end
+;;
+DELIMITER ;
 --
 --delimiter $
 --create function if not exists get_length(new varchar(50), cur varchar(50)) returns int

@@ -35,7 +35,9 @@ public class RawIssueMatch {
             List<Iss_location> locations = match.getLocation();
             RawIssue preRawIssue = newRawIssue(matchInfo.getInst_id_last(),matchInfo.getType_id(),matchInfo.getMessage(),matchInfo.getCommit_id_last(), matchInfo.getFile_name());
             List<Location> tmplocationList = new ArrayList<>();
-            locations.forEach(location -> tmplocationList.add(newLocation(location.getStart_line(),location.getEnd_line(),location.getStart_col(),location.getEnd_col(),location.getCode(),location.getMethod(),location.getClass_())));
+            if(locations!=null) {
+                locations.forEach(location -> tmplocationList.add(newLocation(Math.toIntExact(location.getStart_line()), Math.toIntExact(location.getEnd_line()), Math.toIntExact(location.getStart_col()), Math.toIntExact(location.getEnd_col()), location.getCode(), location.getMethod(), location.getClass_())));
+            }
             preRawIssue.setLocations(tmplocationList);
             preRawIssueList.add(preRawIssue);
             hashMap.put(matchInfo.getInst_id_last(), match);
@@ -110,10 +112,11 @@ public class RawIssueMatch {
             sqlMapping.save(instanceList);
             sqlMapping.save(locationList);
             sqlMapping.save(instanceLocationList);
-            sqlMapping.execute("commit");
             sqlMapping.getConnection().commit();
+            sqlMapping.getConnection().setAutoCommit(true);
         }catch (Exception e){
             sqlMapping.getConnection().rollback();
+            sqlMapping.getConnection().setAutoCommit(true);
             e.printStackTrace();
         }
     }
