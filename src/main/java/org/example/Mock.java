@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.Git;
 import org.example.Entity.*;
 import org.example.SonarConfig.SonarIssues;
 import org.example.SonarConfig.SonarLocation;
+import org.example.SonarConfig.SonarResult;
 import org.example.Utils.JgitUtil;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
@@ -92,6 +93,7 @@ public class Mock {
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.useDataBase("sonar");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
+        sqlMapping.save(SonarResult.getSonartype());
         List<SonarRules> sonarRulesList= (List<SonarRules>) sqlMapping.select(new SonarRules());
         return sonarRulesList;
     }
