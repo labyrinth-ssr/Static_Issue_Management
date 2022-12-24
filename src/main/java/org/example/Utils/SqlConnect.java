@@ -32,10 +32,6 @@ public class SqlConnect {
             File file =new File(System.getProperty("user.dir") + "/conf.properties");
             FileInputStream fileInputStream =new FileInputStream(file);
             properties.load(fileInputStream);
-            JDBC_URL = Constant.jdbc_url;
-            JDBC_USER = Constant.jdbc_user;
-            JDBC_PASSWORD = Constant.jdbc_password;
-
             JDBC_URL = properties.getProperty("jdbc_url");
             JDBC_USER = properties.getProperty("jdbc_user");
             JDBC_PASSWORD = properties.getProperty("jdbc_password");

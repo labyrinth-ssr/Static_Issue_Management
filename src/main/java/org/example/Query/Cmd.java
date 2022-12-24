@@ -38,15 +38,15 @@ public class Cmd {
         while(true) {
             System.out.println("" +
                     "\n-----------------------------------------------------------------------------------------------------------------------------------------------------\n" +
-                    "| latest_defect 最新版本中，静态缺陷数量的分类统计和详细列表                                                                                                \t|\n" +
-                    "| defect -c [commit_hash] 指定版本代码快照中静态缺陷引入、消除情况的分类统计和详细列表                                                                         \t|\n" +
-                    "| defect -t [begin_time=end_time](如2022-12-21 12:12:12=) 指定时间段内，静态缺陷引入、消除情况的分类统计和详细列表                                             \t|\n" +
-                    "| analysis [begin_time=end_time](如2022-12-21 12:12:12=) 指定时间段内引入静态缺陷的数量，解决情况,包括解决率、解决所用的时间，按总量以及分各个缺陷大类和具体类型统计     \t|\n" +
-                    "| duration [min_duration](如21天12时30分18秒) 现存静态缺陷中，已经存续超过指定时长的分类情况统计                                                               \t|\n" +
-                    "| devs [committer_name] 某个开发人员引入缺陷、解决他人引入缺陷、自己引入且尚未解决缺陷、自己引入且被他人解决缺陷的分类统计，存活周期统计                                 \t|\n" +
-                    "| (辅助命令) commits 查看版本信息                                                                                                                      \t|\n" +
-                    "| (辅助命令) index 删除或添加索引                                                                                                                      \t|\n" +
-                    "| (辅助命令) quit 退出查询                                                                                                                            \t|\n" +
+                    "| latest_defect 最新版本中，静态缺陷数量的分类统计和详细列表，按总量以及分各个缺陷大类和具体类型统计\n" +
+                    "| defect -c [commit_hash] 指定版本缺陷统计\n" +
+                    "| defect -t [begin_time=end_time](如2022-12-21 12:12:12=) 指定时间段内的版本缺陷统计\n" +
+                    "| analysis [begin_time=end_time](如2022-12-21 12:12:12=) 指定时间段内引入静态缺陷的数量，解决情况,包括解决率、解决所用的时间\n" +
+                    "| duration [min_duration](如21天12时30分18秒) 现存静态缺陷中，已经存续超过指定时长的分类情况统计\n" +
+                    "| devs [committer_name] 某个开发人员引入缺陷、解决他人引入缺陷、自己引入且尚未解决缺陷、自己引入且被他人解决缺陷的分类统计，存活周期统计\n" +
+                    "| (辅助命令) commits 查看版本信息\n" +
+                    "| (辅助命令) index 删除或添加索引\n" +
+                    "| (辅助命令) quit 退出查询\n" +
                     "-----------------------------------------------------------------------------------------------------------------------------------------------------\n");
             System.out.print("输入命令# ");
             str = br.readLine();
@@ -121,6 +121,7 @@ public class Cmd {
                 queryMappingByDev.getDevCountByDevs(str,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
                 queryMappingByDev.getDevTypeCountByDevs(str,REPO_PATH,mock);
+                queryMappingByDev.getDevTypeCountByDevsTest(str,REPO_PATH,mock);
             }else if(str.startsWith("commits")){
                 queryMappingById.getCommits(REPO_PATH);
             }else if(str.startsWith("quit")){

@@ -33,8 +33,8 @@ public class Main {
             mysqlConnect.execSqlReadFileContent("data/instance_location.sql");
         }
 
-//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//        args = br.readLine().split(" ");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        args = br.readLine().split(" ");
         int len = args.length;
         if(len > 0) {
             if (Objects.equals(args[0].trim(), "run")) Cmd.run(false);
@@ -58,6 +58,8 @@ public class Main {
     public static void showHelp(){
         System.out.println("" +
                 "run    执行查询\n" +
-                "save (repo_path) [num] 扫描并存储指定路径仓库，如果指定num，则从距最新版本num位置开始扫描");
+                "save (repo_path) [num] 扫描并存储指定路径仓库，如果指定num，则从距最新版本num位置开始扫描\n" +
+                "mock 导入mock数据，mock参数在conf.properties中配置,mock数据存储在sonarrulesmock数据库\n" +
+                "mocktest mock测试");
     }
 }

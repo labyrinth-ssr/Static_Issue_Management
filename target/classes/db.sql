@@ -119,5 +119,4 @@ create table if not exists repos
    PRIMARY KEY(repo_path)
 );
 
-DROP FUNCTION IF EXISTS duration;
--- set global log_bin_trust_function_creators = 1;
+set global log_bin_trust_function_creators = 1;

@@ -21,10 +21,8 @@ public class Save {
 
 
         SqlConnect mysqlConnect = new SqlConnect();
-//        mysqlConnect.execSqlReadFileContent("db.sql");
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
-//        sqlMapping.execute(Constant.func);
 
         PrintStream console = System.out;
         System.setOut(null);
@@ -49,7 +47,7 @@ public class Save {
             System.out.print(i + ":" + commit.getCommit_msg() +", hash: "+commit.getCommit_hash());
 
             List<SonarIssues> sonarIssues = resetAndScanAndFetch(repo_path, commit.getCommit_hash(), git);
-            RawIssueMatch.myMatch(sqlMapping, matches, rulesHashMap, sonarIssues, commit);
+            RawIssueMatch.myMatch(sqlMapping, matches, rulesHashMap, sonarIssues, commit, repo_path);
         }
 
         JgitUtil.gitReset(git, curCommit.getCommit_hash());

@@ -19,9 +19,8 @@ import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
 
 public class RawIssueMatch {
-    private static final String baseRepoPath1 = Constant.RepoPath;
 
-    public static void myMatch(SqlMapping sqlMapping, List<Matches> matches, HashMap<String,SonarRules> rulesHash, List<SonarIssues> issInstanceListCur, Commit curCommit) throws SQLException, IOException {
+    public static void myMatch(SqlMapping sqlMapping, List<Matches> matches, HashMap<String,SonarRules> rulesHash, List<SonarIssues> issInstanceListCur, Commit curCommit, String repo) throws SQLException, IOException {
         List<Iss_case> caseListUpdate = new ArrayList<>();
         List<Iss_location> locationList = new ArrayList<>();
         List<Instance_location> instanceLocationList = new ArrayList<>();
@@ -43,7 +42,7 @@ public class RawIssueMatch {
             hashMap.put(matchInfo.getInst_id_last(), match);
         });
 
-        List<RawIssue> curRawIssueList = getRawIssues(issInstanceListCur, curCommit, rulesHash, sonarRules);
+        List<RawIssue> curRawIssueList = getRawIssues(issInstanceListCur, curCommit, rulesHash, sonarRules,repo);
 
         Map<String, List<RawIssue>> preRawIssueMap = preRawIssueList.stream().collect(Collectors.groupingBy(RawIssue::getFileName));
         Map<String, List<RawIssue>> curRawIssueMap = curRawIssueList.stream().collect(Collectors.groupingBy(RawIssue::getFileName));
@@ -52,7 +51,7 @@ public class RawIssueMatch {
         for(String file_path : keyset) {
             List<RawIssue> rawIssues = preRawIssueMap.get(file_path);
             if(rawIssues!=null && rawIssues.size() != 0) {
-                RawIssueMatcher.match(rawIssues, curRawIssueMap.get(file_path), AstParserUtil.getMethodsAndFieldsInFile(baseRepoPath1 + "/" + file_path));
+                RawIssueMatcher.match(rawIssues, curRawIssueMap.get(file_path), AstParserUtil.getMethodsAndFieldsInFile(repo + "/" + file_path));
             }
         }
         //对于没有childMap的issue，设置case disappear
@@ -121,7 +120,7 @@ public class RawIssueMatch {
         }
     }
 
-    public static List<RawIssue> getRawIssues(List<SonarIssues> sonarIssues, Commit curCommit, HashMap<String, SonarRules> sonarHash, List<SonarRules> sonarRules){
+    public static List<RawIssue> getRawIssues(List<SonarIssues> sonarIssues, Commit curCommit, HashMap<String, SonarRules> sonarHash, List<SonarRules> sonarRules, String repo){
         List<RawIssue> curRawIssueList = new ArrayList<>();
         for (SonarIssues instance : sonarIssues) {
             String type_id = instance.getTypeId();
@@ -139,7 +138,7 @@ public class RawIssueMatch {
             curRawIssue.setLocations(tmplocationList);
             curRawIssueList.add(curRawIssue);
         }
-        AnalyzerUtil.addExtraAttributeInRawIssues(curRawIssueList, baseRepoPath1);
+        AnalyzerUtil.addExtraAttributeInRawIssues(curRawIssueList, repo);
 //        curRawIssueList.forEach(rawIssue -> System.out.println(rawIssue.getLocations().toString()));
         return curRawIssueList;
     }
