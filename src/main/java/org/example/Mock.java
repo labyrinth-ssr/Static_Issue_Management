@@ -8,28 +8,41 @@ import org.example.SonarConfig.SonarIssues;
 import org.example.SonarConfig.SonarLocation;
 import org.example.SonarConfig.SonarResult;
 import org.example.Utils.JgitUtil;
+import org.example.Utils.MockUtil;
 import org.example.Utils.SqlConnect;
 import org.example.Utils.SqlMapping;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
 
 public class Mock {
-    public static void main(String[] args) throws Exception {
-        int repo_num = 4,commit_total_num=2000;
-        int commit_per_repo=commit_total_num/repo_num;
-        int location_num = 1500;
-        int inst_total_num = 10000;
+    public static String MOCK_PATH;
+    public static void mock() throws Exception {
+        Properties properties = new Properties();
+        File file =new File(System.getProperty("user.dir") + "/conf.properties");
+        FileInputStream fileInputStream =new FileInputStream(file);
+        properties.load(fileInputStream);
+        MOCK_PATH = properties.getProperty("mock_path");
+        int repo_num = Integer.valueOf(properties.getProperty("repo_num"));
+        int commit_total_num=Integer.valueOf(properties.getProperty("commit_total_num"));
+        int commit_per_repo= commit_total_num/repo_num;
+        int location_num = Integer.valueOf(properties.getProperty("location_num"));
+        int inst_total_num = Integer.valueOf(properties.getProperty("inst_total_num"));
         int inst_per_repo = inst_total_num/repo_num;
         List<SonarRules> sonarRulesList = get_sonar_rules();
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.execSqlReadFileContent("mock.sql");
         mysqlConnect.useDataBase("sonarissuemock");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
+        sqlMapping.execute(Constant.func);
+
         List<Repos> reposList = new ArrayList<>();
         List<Commit> commitList = get_commit_list_and_repos(reposList,repo_num,commit_total_num);
         List<String> fileList = get_file_list();
@@ -41,13 +54,22 @@ public class Mock {
             issInstanceList.addAll(issInstanceList0);
         }
         List<Instance_location> instanceLocationList = match_inst_location(issInstanceList,issLocationList);
+        System.out.println("begin_saving");
+        MockUtil.MockBegin();
         sqlMapping.save(reposList);
+        MockUtil.MockEnd("repos");
         sqlMapping.save(commitList);
+        MockUtil.MockEnd("commit");
         sqlMapping.save(sonarRulesList);
+        MockUtil.MockEnd("sonarRules");
         sqlMapping.save(issLocationList);
+        MockUtil.MockEnd("issLocation");
         sqlMapping.save(issInstanceList);
+        MockUtil.MockEnd("issInstance");
         sqlMapping.save(issCaseList);
+        MockUtil.MockEnd("issCase");
         sqlMapping.save(instanceLocationList);
+        MockUtil.MockEnd("instanceLocation");
         System.out.println("done");
     }
 
@@ -69,8 +91,9 @@ public class Mock {
         });
         return instanceLocationList;
     }
+
     public static List<Commit> get_commit_list_and_repos(List<Repos> reposList,int repo_num,int commit_num){
-        String pj_path = Constant.MockPath;
+        String pj_path = MOCK_PATH;
         PrintStream console = System.out;
         System.setOut(null);
         Git git = JgitUtil.openRpo(pj_path);
@@ -101,16 +124,18 @@ public class Mock {
         return commitList;
     }
     public static List<String> get_file_list(){
-        String pj_path = Constant.MockPath;
+        String pj_path = MOCK_PATH;
         Git git = JgitUtil.openRpo(pj_path);
-        return JgitUtil.gitFileList(git, pj_path);
+        List<String> iss_files = JgitUtil.gitFileList(git, pj_path);
+        return iss_files;
     }
     public static List<SonarRules> get_sonar_rules() throws Exception {
         SqlConnect mysqlConnect = new SqlConnect();
-        mysqlConnect.useDataBase("sonar");
+        mysqlConnect.useDataBase("sonarissuemock");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
         sqlMapping.save(SonarResult.getSonartype());
-        return (List<SonarRules>) sqlMapping.select(new SonarRules());
+        List<SonarRules> sonarRulesList= (List<SonarRules>) sqlMapping.select(new SonarRules());
+        return sonarRulesList == null ? new ArrayList<>():sonarRulesList;
     }
     public static List<Iss_instance> generate_iss_instance_and_case_list(int start,List<Iss_case>issCaseList,int N,List<SonarRules> sonarRulesList,List<Commit> commitList,List<String> fileList,int commit_id_range) throws Exception {
         List<Iss_instance> issInstanceList = new ArrayList<>();
@@ -140,7 +165,8 @@ public class Mock {
             iss_case.setType_id(issInstanceList.get(j).getType_id());
             issInstanceList.get(j).setCase_id(case_hash);
             for (int i = 1; i < commit_id_range; i++) {
-                    if (Math.random()>0.7){
+                //新引入、解决比例
+                if (Math.random()>0.75){
                     iss_case.setCommit_id_disappear(issInstanceList.get(i*iss_per_commit+j).getCommit_id());
                     iss_case.setCase_status("SOLVED");
                     issCaseList.add(iss_case);
@@ -168,14 +194,16 @@ public class Mock {
         return issInstanceList;
     }
 
+
+
     public static List<Iss_location> generate_loaction_list(int N){
         List<Iss_location> iss_locationList = new ArrayList<>();
         for (int i = 0; i < N; i++) {
             Iss_location issLocation = new Iss_location();
-            issLocation.setStart_line((int)(Math.random()*10));
-            issLocation.setEnd_line((int)(Math.random()*10));
-            issLocation.setStart_col((int)(Math.random()*10));
-            issLocation.setEnd_col((int)(Math.random()*10));
+            issLocation.setStart_line((long) (Math.random()*10));
+            issLocation.setEnd_line((long)(Math.random()*10));
+            issLocation.setStart_col((long)(Math.random()*10));
+            issLocation.setEnd_col((long)(Math.random()*10));
             issLocation.setClass_("null");
             issLocation.setCode("null");
             issLocation.setMethod("null");

@@ -100,12 +100,18 @@ public class JgitUtil {
 
     public static List<Commit> gitLog(Git git){
         try {
-            Iterable<RevCommit> logs = git.log().all().call();
+            Iterable<RevCommit> logs = git
+                    .log()
+                    .add(git
+                            .getRepository()
+                            .resolve("refs/heads/master"))
+                    .all()
+                    .call();
             List<Commit> commitList = new ArrayList<>();
-            logs.forEach(c->{
+            for (RevCommit c : logs) {
                 Commit commit = RevCommit2Commit(c);
                 commitList.add(commit);
-            });
+            }
             return commitList;
         } catch (GitAPIException | IOException e) {
             throw new RuntimeException(e);

@@ -5,7 +5,7 @@
 
 drop database if EXISTS SonarIssueMock;
 
-create database SonarIssueMock;
+create database if not exists SonarIssueMock;
 use sonarIssueMock;
 
 drop table if exists commit;

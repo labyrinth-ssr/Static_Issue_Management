@@ -2,6 +2,7 @@ package org.example.Utils;
 
 import org.example.Constant;
 import org.example.Main;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -31,10 +32,6 @@ public class SqlConnect {
             File file =new File(System.getProperty("user.dir") + "/conf.properties");
             FileInputStream fileInputStream =new FileInputStream(file);
             properties.load(fileInputStream);
-            JDBC_URL = Constant.jdbc_url;
-            JDBC_USER = Constant.jdbc_user;
-            JDBC_PASSWORD = Constant.jdbc_password;
-
             JDBC_URL = properties.getProperty("jdbc_url");
             JDBC_USER = properties.getProperty("jdbc_user");
             JDBC_PASSWORD = properties.getProperty("jdbc_password");
@@ -94,6 +91,7 @@ public class SqlConnect {
             return 0;
         }
     }
+
     public static List<String> readSqlByFile(String fileName) throws IOException {
         List<String> list = new ArrayList<>();
         StringBuilder sb = new StringBuilder();

@@ -11,10 +11,10 @@ public class Iss_location {
     String location_id;
     String class_;
     String method;
-    Integer start_line;
-    Integer end_line;
-    Integer start_col;
-    Integer end_col;
+    Long start_line;
+    Long end_line;
+    Long start_col;
+    Long end_col;
     String code;
 
 
@@ -43,35 +43,35 @@ public class Iss_location {
         this.method = method;
     }
 
-    public Integer getStart_line() {
+    public Long getStart_line() {
         return start_line;
     }
 
-    public void setStart_line(Integer start_line) {
+    public void setStart_line(Long start_line) {
         this.start_line = start_line;
     }
 
-    public Integer getEnd_line() {
+    public Long getEnd_line() {
         return end_line;
     }
 
-    public void setEnd_line(Integer end_line) {
+    public void setEnd_line(Long end_line) {
         this.end_line = end_line;
     }
 
-    public Integer getStart_col() {
+    public Long getStart_col() {
         return start_col;
     }
 
-    public void setStart_col(Integer start_col) {
+    public void setStart_col(Long start_col) {
         this.start_col = start_col;
     }
 
-    public Integer getEnd_col() {
+    public Long getEnd_col() {
         return end_col;
     }
 
-    public void setEnd_col(Integer end_col) {
+    public void setEnd_col(Long end_col) {
         this.end_col = end_col;
     }
 
@@ -99,10 +99,10 @@ public class Iss_location {
         this.location_id = UUID.nameUUIDFromBytes(stringBuilder.getBytes()).toString();
         this.class_ = class_;
         this.method = method;
-        this.start_line = start_line;
-        this.end_line = end_line;
-        this.start_col = start_col;
-        this.end_col = end_col;
+        this.start_line = Long.valueOf(start_line);
+        this.end_line = Long.valueOf(end_line);
+        this.start_col = Long.valueOf(start_col);
+        this.end_col = Long.valueOf(end_col);
         this.code = code;
     }
 

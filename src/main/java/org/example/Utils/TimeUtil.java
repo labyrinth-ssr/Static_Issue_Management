@@ -35,12 +35,28 @@ public class TimeUtil {
         return s.toString();
     }
 
-    public static void begin(){
+
+
+
+
+    public static Long begin(){
         time = System.currentTimeMillis();
+        return time;
     }
 
     public static String end(){
         Long duration = (System.currentTimeMillis() - time)/1000;
         return getTimeDuration(duration);
+    }
+
+    public static String endSecond(){
+        Long duration = (System.currentTimeMillis() - time)/1000;
+        return getTimeDuration(duration);
+    }
+
+
+    public static String end(Long time){
+        Long duration = (System.currentTimeMillis() - time);
+        return duration+"ms";
     }
 }

@@ -3,10 +3,7 @@ package org.example.Utils;
 import org.example.Constant;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -14,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * 实现HTTP操作，主要用于SonarQube数据获取
@@ -163,11 +161,15 @@ public class HTTPUtil {
     /**
      * get方法请求属性设置
      */
-    private static void setGetProperty(URLConnection connection) {
+    private static void setGetProperty(URLConnection connection) throws IOException {
 //        connection.setRequestProperty("accept", "*/*");
 //        connection.setRequestProperty("connection", "Keep-Alive");
 //        connection.setRequestProperty("user-agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-        String authString = Constant.HttpAuthString;
+        Properties properties = new Properties();
+        File file =new File(System.getProperty("user.dir") + "/conf.properties");
+        FileInputStream fileInputStream =new FileInputStream(file);
+        properties.load(fileInputStream);
+        String authString = properties.getProperty("http_auth_string");
         byte[] authEncBytes = Base64.getEncoder().encode(authString.getBytes());
         String authStringEnc = new String(authEncBytes);
         connection.setRequestProperty("Authorization", "Basic " + authStringEnc);

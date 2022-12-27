@@ -2,6 +2,7 @@ package org.example.Update;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Ref;
+import org.example.Constant;
 import org.example.Entity.*;
 import org.example.SonarConfig.SonarIssues;
 import org.example.SonarConfig.SonarResult;
@@ -20,7 +21,6 @@ public class Save {
 
 
         SqlConnect mysqlConnect = new SqlConnect();
-        mysqlConnect.execSqlReadFileContent("crebas2.sql");
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
 
@@ -32,7 +32,7 @@ public class Save {
         System.setOut(console);
         int count = num == null ? commitList.size()-1:num-1;
         if(num!=null && num > commitList.size()){
-            System.err.println("当前仓库分支数: "+ commitList.size() + ", 预扫描数: " + num);
+            System.err.println("当前仓库提交数: "+ commitList.size() + ", 预扫描数: " + num);
             throw new Exception();
         }
         System.out.println("cur: " + curCommit.getCommit_hash());
@@ -47,7 +47,7 @@ public class Save {
             System.out.print(i + ":" + commit.getCommit_msg() +", hash: "+commit.getCommit_hash());
 
             List<SonarIssues> sonarIssues = resetAndScanAndFetch(repo_path, commit.getCommit_hash(), git);
-            RawIssueMatch.myMatch(sqlMapping, matches, rulesHashMap, sonarIssues, commit);
+            RawIssueMatch.myMatch(sqlMapping, matches, rulesHashMap, sonarIssues, commit, repo_path);
         }
 
         JgitUtil.gitReset(git, curCommit.getCommit_hash());

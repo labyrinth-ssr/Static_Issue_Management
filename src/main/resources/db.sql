@@ -3,18 +3,11 @@
 /* Created on:     2022/11/24 20:11:19                          */
 /*==============================================================*/
 
-drop database if EXISTS SonarIssue;
+-- drop database if EXISTS SonarIssue;
 
-create database SonarIssue;
+create database if not exists SonarIssue;
 use sonarIssue;
 
-drop table if exists commit;
-drop table if exists iss_file;
-drop table if exists iss_case;
-drop table if exists iss_instance;
-drop table if exists iss_location;
-drop table if exists iss_match;
-drop table if exists repository;
 
 /*==============================================================*/
 /* Table: sonarrules                                            */
@@ -43,13 +36,14 @@ create table if not exists commit
    parent_commit_hash   varchar(40),
    primary key (commit_id),
    index(commit_time),
-   index(committer)
+   index(committer),
+   index(repo_path)
 );
 
 /*==============================================================*/
 /* Table: iss_case                                              */
 /*==============================================================*/
-create table if not exists  iss_case
+create table if not exists iss_case
 (
    case_id              varchar(50) not null,
    type_id              varchar(20) not null,
@@ -68,7 +62,7 @@ create table if not exists  iss_case
 /*==============================================================*/
 /* Table: iss_instance                                          */
 /*==============================================================*/
-create table if not exists  iss_instance
+create table if not exists iss_instance
 (
    inst_id              varchar(50) not null,
    type_id              varchar(20) not null,
@@ -86,7 +80,7 @@ create table if not exists  iss_instance
 /*==============================================================*/
 /* Table: iss_location                                          */
 /*==============================================================*/
-create table if not exists  iss_location
+create table if not exists iss_location
 (
    location_id          varchar(50) not null,
    class_               varchar(60),
@@ -102,7 +96,7 @@ create table if not exists  iss_location
 /*==============================================================*/
 /* Table: instance_location                                     */
 /*==============================================================*/
-create table if not exists  instance_location
+create table if not exists instance_location
 (
    inst_id              varchar(50) not null,
    location_id          varchar(50) not null,
@@ -117,66 +111,12 @@ create table if not exists  instance_location
 /*==============================================================*/
 /* Table: repos                                     */
 /*==============================================================*/
-create table if not exists  repos
+create table if not exists repos
 (
    repo_path              varchar(50) not null,
    latest_commit_id       varchar(50) not null,
    commit_num             INT unsigned not null default 0,
    PRIMARY KEY(repo_path)
 );
---
---delimiter $
---create function if not exists get_length(new varchar(50), cur varchar(50)) returns int
---begin
---    declare len int;
---    set len = 0;
---    declare tmp varchar(50);
---    set tmp = new;
---    while new <> cur do
---    select parent_inst_id into tmp from iss_instance
---    where inst_id = tmp;
---    len = len + 1;
---    end while;
---    return len;
---end $
---
---delimiter $
---create function if not exists get_length_by_case_id(c_id varchar(50)) returns int
---begin
---    declare new varchar(50);
---    declare `last` varchar(50);
---    select (commit_id_new, commit_id_last) into (new, `last`) from iss_case
---    where case_id = c_id;
---    return get_length(new, `last`);
---end $
---
--- alter table commit add constraint FK_repo_commit foreign key (repo_path)
---      references repository (path) on delete restrict on update restrict;
---
--- alter table iss_file add constraint FK_file_from_repo foreign key (repo_path)
---      references repository (path) on delete restrict on update restrict;
 
--- alter table iss_file add constraint FK_file_in_location foreign key (file_path)
---      references iss_location (file_path) on delete restrict on update restrict;
-
--- alter table iss_instance add constraint FK_commit foreign key (commit_id)
---     references commit (commit_id) on delete restrict on update restrict;
-
--- alter table iss_location add constraint FK_instance_locate foreign key (inst_id)
---       references iss_instance (inst_id) on delete restrict on update restrict;
-
--- alter table instance_location add constraint FK_instance_from foreign key (inst_id)
---       references iss_instance (inst_id) on delete restrict on update restrict;
-
--- alter table instance_location add constraint FK_locate_in foreign key (location_id)
---       references iss_location (location_id) on delete restrict on update restrict;
-
--- alter table iss_location add constraint FK_location_from_file foreign key (file_path)
---      references iss_file (file_path) on delete restrict on update restrict;
-
--- alter table iss_match add constraint FK_instance_match foreign key (inst_id)
---       references iss_instance (inst_id) on delete restrict on update restrict;
-
--- alter table iss_match add constraint FK_instance_match2 foreign key (parent_inst_id)
---      references iss_instance (inst_id) on delete restrict on update restrict;
-
+set global log_bin_trust_function_creators = 1;

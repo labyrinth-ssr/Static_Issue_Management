@@ -19,9 +19,13 @@ public class SqlMapping {
     private Field[] fields;
     private String tableName;
     SqlConnect connection;
+
     public SqlMapping(SqlConnect connection) {
         this.connection = connection;
     }
+
+    public Connection getConnection(){return connection.getConnection();}
+
     private List<List<?>> getFields(List<?> objs) throws InvocationTargetException, IllegalAccessException {
         Class<?> c = objs.get(0).getClass();
         tableName = objs.get(0).getClass().getSimpleName().toLowerCase();
@@ -261,6 +265,9 @@ public class SqlMapping {
 
     public void execute(String sql) throws SQLException {
         SqlConnect.sqlBatch(Collections.singletonList(sql));
+    }
+    public void execute(List<String> sql) throws SQLException {
+        SqlConnect.sqlBatch(sql);
     }
 
     public void updateRepos(Repos repos) throws SQLException {
