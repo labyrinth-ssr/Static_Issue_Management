@@ -81,8 +81,8 @@ public class QueryMappingByTime {
         System.out.println("引入缺陷详情: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
-                    "from iss_instance ii left join instance_location ilo on ii.inst_id = ilo.inst_id and ii.inst_id = '" + getListInLatestInst.getInst_id() +"' " +
-                    "join iss_location il on ilo.location_id = il.location_id order by start_line, start_col";
+                    "from (select * from iss_instance where inst_id = '" + getListInLatestInst.getInst_id() +"') ii " +
+                    "join iss_location order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new Int2String2(), sql1);
             if(!mock) System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     "描述: " + getListInLatestInst.getDescription() +
@@ -134,18 +134,20 @@ public class QueryMappingByTime {
 
     public void getListDoneByCommit_time(String begin_time, String end_time, String repo,boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
-        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
+        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"commit");
         String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
-                "from iss_case ic join iss_instance ii on ic.commit_id_last = ii.commit_id and ic.case_id = ii.case_id " +
-                "join sonarrules sr on ic.type_id = sr.id " +
-                "join commit c on c.commit_id = ic.commit_id_disappear " +
-                "where "+sql_condition+" order by ic.type_id, file_path";
+                "from (select * from commit where "+sql_condition+") c " +
+                "join iss_case ic on ic.commit_id_disappear = c.commit_id and ic.case_status = 'SOLVED' " +
+                "join commit_instance ci on ci.commit_id = ic.commit_id_last " +
+                "join iss_instance using(inst_id, case_id) " +
+                "join sonarrules using(type_id) " +
+                "order by ic.type_id, file_path";
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
         System.out.println("解决缺陷详情: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
-                    "from iss_instance ii left join instance_location ilo on ii.inst_id = ilo.inst_id and ii.inst_id = '" + getListInLatestInst.getInst_id() +"' " +
-                    "join iss_location il on ilo.location_id = il.location_id order by start_line, start_col";
+                    "from (select * from iss_instance where inst_id = '" + getListInLatestInst.getInst_id() +"') ii " +
+                    "join iss_location order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new Int2String2(), sql1);
             if(!mock) System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     ", 描述: " + getListInLatestInst.getDescription() +

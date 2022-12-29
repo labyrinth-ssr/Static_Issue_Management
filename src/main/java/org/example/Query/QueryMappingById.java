@@ -116,16 +116,18 @@ public class QueryMappingById {
 
     public void getListInByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
-        String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
-                "from iss_case ic join iss_instance ii on ic.commit_id_new = ii.commit_id and ic.case_id = ii.case_id " +
-                "join sonarrules sr on ic.type_id = sr.id " +
-                "where ic.commit_id_new = '"+commit_id+"' order by ic.type_id, file_path";
+        String sql = "select inst_id, type_id, description, file_path " +
+                "from (select type_id, commit_id_new as commit_id from iss_case where commit_id_new = '"+ commit_id +"') ic " +
+                "join iss_instance " +
+                "join commit_instance using(inst_id, commit_id) " +
+                "join sonarrules using(type_id) " +
+                "order by ic.type_id, file_path";
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
         System.out.println("引入缺陷详情: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
-                    "from iss_instance ii left join instance_location ilo on ii.inst_id = ilo.inst_id and ii.inst_id = '" + getListInLatestInst.getInst_id() +"' " +
-                    "join iss_location il on ilo.location_id = il.location_id order by start_line, start_col";
+                    "from (select * from iss_instance where inst_id = '" + getListInLatestInst.getInst_id() +"') ii " +
+                    "join iss_location order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new Int2String2(), sql1);
             if(!mock) System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     ", 描述: " + getListInLatestInst.getDescription() +
@@ -178,15 +180,17 @@ public class QueryMappingById {
     public void getListDoneByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
         String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
-                "from iss_case ic join iss_instance ii on ic.commit_id_last = ii.commit_id and ic.case_id = ii.case_id " +
-                "join sonarrules sr on ic.type_id = sr.id " +
-                "where ic.commit_id_disappear = '"+commit_id+"' order by ic.type_id, file_path";
+                "from (select type_id, commit_id_last as commit_id from iss_case where commit_id_last = '"+ commit_id +"') ic " +
+                "join iss_instance " +
+                "join commit_instance using(inst_id, commit_id) " +
+                "join sonarrules using(type_id) " +
+                "order by ic.type_id, file_path";
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
         System.out.println("解决缺陷详情: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
-                    "from iss_instance ii left join instance_location ilo on ii.inst_id = ilo.inst_id and ii.inst_id = '" + getListInLatestInst.getInst_id() +"' " +
-                    "join iss_location il on ilo.location_id = il.location_id order by start_line, start_col";
+                    "from (select * from iss_instance where inst_id = '" + getListInLatestInst.getInst_id() +"') ii" +
+                    "join iss_location order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new Int2String2(), sql1);
             if(!mock) System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     ", 描述: " + getListInLatestInst.getDescription() +
@@ -205,18 +209,23 @@ public class QueryMappingById {
 
     public void getGCountUnsolvedByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
-        String sql = "select count(*) intValue, ii.type_id stringValue, duration(avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime()))) time from " +
-                "iss_instance ii join iss_case ic on ii.case_id = ic.case_id and ii.commit_id = '" + commit_id +"' and ic.case_status <> 'SOLVED' " +
-                "join commit c on ii.commit_id = c.commit_id " +
-                "group by ii.type_id order by avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) desc, ii.type_id";
+        String sql = "select count(*) intValue, type_id stringValue, duration(avg(TIMESTAMPDIFF(SECOND, commit_time, localtime()))) time from " +
+                "(select * from commit_instance where commit_id = '" + commit_id +"') ci " +
+                "join iss_instance " +
+                "join iss_case ic using(case_id) " +
+                "join commit c using(commit_id) " +
+                "where ic.case_status <> 'SOLVED' " +
+                "group by type_id order by avg(TIMESTAMPDIFF(SECOND, commit_time, localtime())) desc, type_id";
         List<IntStringTime> intStringTimes = (List<IntStringTime>) sqlMapping.select(new IntStringTime(), sql);
         System.out.println("现存缺陷类型统计: ");
         for(IntStringTime intStringTime : intStringTimes){
-            String sql_median = "select duration(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) time from " +
-                    "iss_instance ii join iss_case ic on ii.case_id = ic.case_id and ii.commit_id = '" + commit_id +"' " +
-                    "and ic.case_status <> 'RESOLVED' and ii.type_id = '"+intStringTime.getStringValue()+"' " +
-                    "join commit c on ii.commit_id = c.commit_id " +
-                    "order by TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
+            String sql_median = "select duration(TIMESTAMPDIFF(SECOND, commit_time, localtime())) time from " +
+                    "iss_instance " +
+                    "join (select * from commit_instance where commit_id = '"+ commit_id +"') " +
+                    "join iss_case using(case_id) " +
+                    "join commit using(commit_id) " +
+                    "where case_status <> 'RESOLVED' and type_id = '"+intStringTime.getStringValue()+"' " +
+                    "order by TIMESTAMPDIFF(SECOND, commit_time, localtime()) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
             String time = ((List<TimeValue>)sqlMapping.select(new TimeValue(), sql_median)).get(0).getTime();
             if(!mock) System.out.println("类型: "+ intStringTime.getStringValue() +
                     ", 数量: " + intStringTime.getIntValue() +

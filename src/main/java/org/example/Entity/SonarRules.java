@@ -6,18 +6,18 @@ import org.example.SonarConfig.SonarIssues;
 import java.util.List;
 
 public class SonarRules {
-    String id;
+    String type_id;
     String description;
     String severity;
     String lang;
     String type;
 
-    public String getId() {
-        return id;
+    public String getType_id() {
+        return type_id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setType_id(String type_id) {
+        this.type_id = type_id;
     }
 
     public String getDescription() {
@@ -55,7 +55,7 @@ public class SonarRules {
     public static void setSonarRules(List<SonarRules> sonarRules, List<SonarIssues> sonarIssues){
         for (SonarIssues sonarIssue : sonarIssues) {
             SonarRules sonarRule = new SonarRules();
-            sonarRule.setId(sonarIssue.getTypeId());
+            sonarRule.setType_id(sonarIssue.getTypeId());
             sonarRule.setDescription(sonarIssue.getMessage());
             sonarRule.setLang("java");
             sonarRule.setSeverity(sonarIssue.getSeverity());
@@ -67,7 +67,7 @@ public class SonarRules {
     }
 
     public SonarRules(String id, String description, String severity, String lang, String type) {
-        this.id = id;
+        this.type_id= id;
         this.description = description;
         this.severity = severity;
         this.lang = lang;

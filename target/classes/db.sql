@@ -14,12 +14,12 @@ use sonarIssue;
 /*==============================================================*/
 
 create table if not exists `sonarrules`(
-      id varchar(20),
+      type_id varchar(20),
       description varchar(200),
       severity varchar(10),
       lang varchar(10),
       `type` varchar(20),
-      primary key(id)
+      primary key(type_id)
 );
 /*==============================================================*/
 /* Table: commit                                                */
@@ -65,7 +65,6 @@ create table if not exists iss_case
 create table if not exists iss_instance
 (
    inst_id              varchar(50) not null,
-   type_id              varchar(20) not null,
    parent_inst_id       varchar(50),
    case_id              varchar(50) not null,
    file_path            varchar(255) not null,

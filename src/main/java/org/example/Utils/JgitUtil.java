@@ -181,7 +181,7 @@ public class JgitUtil {
         for (DiffEntry diff : diffs) {
             temp = diff.getNewPath().split("/");
             fileList.add(temp[temp.length-1]);
-            System.out.println("change:"+temp[temp.length-1]);
+//            System.out.println("change:"+temp[temp.length-1]);
         }
         return fileList;
     }

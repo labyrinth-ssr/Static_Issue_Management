@@ -24,13 +24,13 @@ public class Main {
         sqlMapping.execute(Constant.func);
         List<Repos> reposList = (List<Repos>) sqlMapping.select(new Repos());
         if(reposList==null || reposList.size() == 0){
-            mysqlConnect.execSqlReadFileContent("data/repos.sql");
-            mysqlConnect.execSqlReadFileContent("data/commit.sql");
-            mysqlConnect.execSqlReadFileContent("data/sonarrules.sql");
-            mysqlConnect.execSqlReadFileContent("data/iss_case.sql");
-            mysqlConnect.execSqlReadFileContent("data/iss_instance.sql");
-            mysqlConnect.execSqlReadFileContent("data/iss_location.sql");
-            mysqlConnect.execSqlReadFileContent("data/instance_location.sql");
+//            mysqlConnect.execSqlReadFileContent("data/repos.sql");
+//            mysqlConnect.execSqlReadFileContent("data/commit.sql");
+//            mysqlConnect.execSqlReadFileContent("data/sonarrules.sql");
+//            mysqlConnect.execSqlReadFileContent("data/iss_case.sql");
+//            mysqlConnect.execSqlReadFileContent("data/iss_instance.sql");
+//            mysqlConnect.execSqlReadFileContent("data/iss_location.sql");
+//            mysqlConnect.execSqlReadFileContent("data/instance_location.sql");
         }
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

@@ -21,6 +21,7 @@ import org.example.Utils.SqlMapping;
 public class RawIssueMatch {
 
     public static void myMatch(SqlMapping sqlMapping, List<Matches> matches, HashMap<String,SonarRules> rulesHash, List<SonarIssues> issInstanceListCur, Commit curCommit, String repo,List<String> changedFileList) throws SQLException, IOException {
+        System.out.println("changedFileList3"+changedFileList.toString());
         List<Iss_case> caseListUpdate = new ArrayList<>();
         List<Iss_location> locationList = new ArrayList<>();
         List<Instance_location> instanceLocationList = new ArrayList<>();
@@ -65,7 +66,7 @@ public class RawIssueMatch {
                 locations.add(issLocation);
             });
             if (curRawIssue.getMappedRawIssue() == null){
-                System.out.println("not match:"+curRawIssue.getStatus());
+//                System.out.println("not match:"+curRawIssue.getStatus());
                 iss_case = new Iss_case(curRawIssue.getType(),curCommit.getCommit_id(),curCommit.getCommit_id(),null,"NEW");
                 caseList.add(iss_case);
                 Matches matches_ = newMatches(iss_case, curRawIssue, locations);
@@ -73,9 +74,7 @@ public class RawIssueMatch {
                 matches.add(matches_);
             }
             else{
-                System.out.println("match:"+curRawIssue.getStatus());
                 String case_status = hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_status();
-                System.out.println("-----------------"+curRawIssue.getStatus());
                 if(case_status.equals("SOLVED")) case_status = "REOPEN";
                 if(case_status.equals("NEW")) {
                     case_status = "UNDONE";
@@ -84,12 +83,17 @@ public class RawIssueMatch {
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(curRawIssue.getMappedRawIssue().getUuid());
                 setMatches(matches_, iss_case, curRawIssue, locations);
+                if(locationEqual(curRawIssue.getLocations(), curRawIssue.getMappedRawIssue().getLocations())){
+                   commitInstList.add(new Commit_Inst(curRawIssue.getUuid(), curCommit.getCommit_id()));
+//                    System.out.println("================================!!!!!!!!!!!!!!!!!!!!!!!!!");
+                   continue;
+                }
             }
 //          instanceLocationList.add(new Instance_location(curRawIssue.getUuid(),issLocation.getLocation_id()))
-            locationList.addAll(locations);
             locations.forEach(issLocation -> issLocation.setInst_id(curRawIssue.getUuid()));
-            commitInstList.add(new Commit_Inst(curRawIssue.getUuid(),curCommit.getCommit_id()));
+            locationList.addAll(locations);
             instanceList.add(new Iss_instance(curRawIssue.getUuid(),curRawIssue.getType(),curRawIssue.getMappedRawIssue() == null ? null:curRawIssue.getMappedRawIssue().getUuid(), iss_case.getCase_id(), curRawIssue.getFileName()));
+            commitInstList.add(new Commit_Inst(curRawIssue.getUuid(),curCommit.getCommit_id()));
         }
 
         for (RawIssue preRawIssue:preRawIssueList) {
@@ -105,7 +109,7 @@ public class RawIssueMatch {
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
                 setMatchesPre(matches_, iss_case, preRawIssue);
-                commitInstList.add(new Commit_Inst(preRawIssue.getUuid(),curCommit.getCommit_id()));
+                commitInstList.add(new Commit_Inst(preRawIssue.getUuid(), curCommit.getCommit_id()));
             }
         }
         Repos repos = new Repos(curCommit);
@@ -220,5 +224,21 @@ public class RawIssueMatch {
     public static void setMatchesPre(Matches match, Iss_case iss_case, RawIssue rawIssue){
         Match_Info matchInfo = new Match_Info(iss_case.getCase_id(), iss_case.getCase_status(), iss_case.getCommit_id_last(),iss_case.getCommit_id_disappear(),rawIssue.getUuid(),rawIssue.getType(),rawIssue.getDetail(),rawIssue.getFileName());
         match.setInfo(matchInfo);
+    }
+
+    public static boolean locationEqual(List<Location> preLocation, List<Location> lastLocation){
+        if(preLocation == null || lastLocation == null) return false;
+        if(preLocation.size()!=lastLocation.size()) return false;
+        for(int i = 0; i< preLocation.size(); i++){
+            Location p = preLocation.get(i);
+            Location l = lastLocation.get(i);
+            if(p.getStartLine()!=l.getStartLine() ||
+                p.getEndLine() != l.getEndLine() ||
+                p.getStartToken() != l.getStartToken() ||
+                p.getEndToken() != l.getEndToken() ||
+                !Objects.equals(p.getAnchorName(), l.getAnchorName()) ||
+                !Objects.equals(p.getClassName(), l.getClassName())) return false;
+        }
+        return true;
     }
 }

@@ -144,9 +144,7 @@ public class Mock {
         for (int i = 0; i < N; i++) {
             Iss_instance iss_instance = new Iss_instance();
             iss_instance.setInst_id(UUID.nameUUIDFromBytes(String.valueOf(i+start).getBytes()).toString());
-            int rand_rule = (int)(Math.random()*sonarRulesList.size());
             int rand_file = (int)(Math.random()*fileList.size());
-            iss_instance.setType_id(sonarRulesList.get(rand_rule).getId());
             iss_instance.setFile_path(fileList.get(rand_file));
 //            iss_instance.setCommit_id(commitList.get( commitList.size()-1- (i/iss_per_commit)).getCommit_id());
             issInstanceList.add(iss_instance);
@@ -162,7 +160,7 @@ public class Mock {
             iss_case.setCommit_id_new(commitList.get( commitList.size()-1- (j/iss_per_commit)).getCommit_id());
             iss_case.setCommit_id_last(commitList.get( commitList.size()-1- (j/iss_per_commit)).getCommit_id());
             iss_case.setCase_status("NEW");
-            iss_case.setType_id(issInstanceList.get(j).getType_id());
+            iss_case.setType_id(sonarRulesList.get((int)(Math.random()*sonarRulesList.size())).getType_id());
             issInstanceList.get(j).setCase_id(case_hash);
             for (int i = 1; i < commit_id_range; i++) {
                 //新引入、解决比例 i*iss_per_commit+j
@@ -181,7 +179,7 @@ public class Mock {
                     iss_case.setCommit_id_new(commitList.get( commitList.size()-1- ((i*iss_per_commit+j)/iss_per_commit)).getCommit_id());
                     iss_case.setCommit_id_last(commitList.get( commitList.size()-1- ((i*iss_per_commit+j)/iss_per_commit)).getCommit_id());
                     iss_case.setCase_status("NEW");
-                    iss_case.setType_id(issInstanceList.get(i*iss_per_commit+j).getType_id());
+                    iss_case.setType_id(sonarRulesList.get((int)(Math.random()*sonarRulesList.size())).getType_id());
                 } else {
                     iss_case.setCase_status("UNDONE");
                     iss_case.setCommit_id_last(commitList.get( commitList.size()-1- ((i*iss_per_commit+j)/iss_per_commit)).getCommit_id());
