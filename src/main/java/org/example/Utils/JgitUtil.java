@@ -5,18 +5,22 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.example.Entity.Commit;
 import org.sonar.api.issue.internal.FieldDiffs;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -159,6 +163,30 @@ public class JgitUtil {
         for(DiffEntry diffEntry : diffs) if(diffEntry.getNewPath().endsWith(".java")) str.add(diffEntry.getNewPath());
         return str;
     }
+
+    public static List<String> getChangedFiles(Git git) throws IOException {
+        List<String> fileList = new ArrayList<>();
+        Repository repository = git.getRepository();
+        RevWalk rw = new RevWalk(repository);
+
+        ObjectId head = repository.resolve(Constants.HEAD);
+        RevCommit commit = rw.parseCommit(head);
+        RevCommit parent = rw.parseCommit(commit.getParent(0).getId());
+        DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
+        df.setRepository(repository);
+        df.setDiffComparator(RawTextComparator.DEFAULT);
+        df.setDetectRenames(true);
+        List<DiffEntry> diffs = df.scan(parent.getTree(), commit.getTree());
+        String[] temp;
+        for (DiffEntry diff : diffs) {
+            temp = diff.getNewPath().split("/");
+            fileList.add(temp[temp.length-1]);
+            System.out.println("change:"+temp[temp.length-1]);
+        }
+        return fileList;
+    }
+
+
 
     public static RevCommit getPrevHash(RevCommit commit, Repository repo)  throws  IOException {
 

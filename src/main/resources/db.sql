@@ -3,7 +3,7 @@
 /* Created on:     2022/11/24 20:11:19                          */
 /*==============================================================*/
 
--- drop database if EXISTS SonarIssue;
+ drop database if EXISTS SonarIssue;
 
 create database if not exists SonarIssue;
 use sonarIssue;
@@ -55,7 +55,7 @@ create table if not exists iss_case
    foreign key (commit_id_new) references commit(commit_id),
    foreign key (commit_id_disappear) references commit(commit_id),
    foreign key (commit_id_last) references commit(commit_id),
-   CHECK (case_status in ('NEW', 'UNDONE', 'SOLVED','REOPEN')),
+   CHECK (case_status in ('NEW', 'UNDONE', 'SOLVED','REOPEN','NONCHG')),
    index(case_status)
 );
 
@@ -66,14 +66,10 @@ create table if not exists iss_instance
 (
    inst_id              varchar(50) not null,
    type_id              varchar(20) not null,
-   commit_id            varchar(50) not null,
    parent_inst_id       varchar(50),
    case_id              varchar(50) not null,
    file_path            varchar(255) not null,
    primary key (inst_id),
-   foreign key (commit_id) references commit (commit_id)
-        on delete restrict
-        on update restrict,
    index(case_id)
 );
 
@@ -83,6 +79,7 @@ create table if not exists iss_instance
 create table if not exists iss_location
 (
    location_id          varchar(50) not null,
+   inst_id              varchar(50) not null,
    class_               varchar(60),
    method               varchar(60),
    start_line           int unsigned not null,
@@ -90,26 +87,44 @@ create table if not exists iss_location
    start_col            int unsigned not null,
    end_col              int unsigned not null,
    code                 varchar(255),
-   primary key (location_id)
+   primary key (location_id),
+   foreign key (inst_id) references iss_instance (inst_id)
+        on delete restrict
+        on update restrict
 );
+
+ create table if not exists commit_inst
+ (
+   inst_id            varchar(50) not null,
+   commit_id          varchar(50) not null,
+   PRIMARY KEY(inst_id, commit_id),
+   foreign key (inst_id) references iss_instance (inst_id)
+        on delete restrict
+        on update restrict,
+   foreign key (commit_id) references commit (commit_id)
+        on delete restrict
+        on update restrict
+ );
 
 /*==============================================================*/
 /* Table: instance_location                                     */
 /*==============================================================*/
-create table if not exists instance_location
-(
-   inst_id              varchar(50) not null,
-   location_id          varchar(50) not null,
-   PRIMARY KEY(inst_id, location_id),
-   foreign key (inst_id) references iss_instance (inst_id)
-        on delete restrict
-        on update restrict,
-   foreign key (location_id) references iss_location (location_id)
-        on delete restrict
-        on update restrict
-);
+-- create table if not exists instance_location
+-- (
+--   inst_id              varchar(50) not null,
+--   location_id          varchar(50) not null,
+--   PRIMARY KEY(inst_id, location_id),
+--   foreign key (inst_id) references iss_instance (inst_id)
+--        on delete restrict
+--        on update restrict,
+--   foreign key (location_id) references iss_location (location_id)
+--        on delete restrict
+--        on update restrict
+-- );
+
+
 /*==============================================================*/
-/* Table: repos                                     */
+/* Table: repos                                                 */
 /*==============================================================*/
 create table if not exists repos
 (

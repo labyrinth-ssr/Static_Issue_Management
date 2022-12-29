@@ -34,22 +34,25 @@ public class Main {
         }
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        args = br.readLine().split(" ");
-        int len = args.length;
-        if(len > 0) {
-            if (Objects.equals(args[0].trim(), "run")) Cmd.run(false);
-            else if (Objects.equals(args[0].trim(),"mock")) Mock.mock();
-            else if(Objects.equals(args[0].trim(),"mocktest")) Cmd.run("sonarissuemock",true);
-            else if (len >= 2 && Objects.equals(args[0].trim(), "save")) {
-                if (len == 2) Save.save(args[1].trim(), null);
-                else if (len == 3 && StringUtils.isNumeric(args[2])) Save.save(args[1], Integer.valueOf(args[2]));
-                else showHelp();
-            }else{
+        while (true){
+            args = br.readLine().split(" ");
+            int len = args.length;
+            if(len > 0) {
+                if (Objects.equals(args[0].trim(), "run")) Cmd.run(false);
+                else if (Objects.equals(args[0].trim(),"mock")) Mock.mock();
+                else if(Objects.equals(args[0].trim(),"mocktest")) Cmd.run("sonarissuemock",true);
+                else if (len >= 2 && Objects.equals(args[0].trim(), "save")) {
+                    if (len == 2) Save.save(args[1].trim(), null);
+                    else if (len == 3 && StringUtils.isNumeric(args[2])) Save.save(args[1], Integer.valueOf(args[2]));
+                    else showHelp();
+                }else{
+                    showHelp();
+                }
+            } else {
                 showHelp();
             }
-        } else {
-            showHelp();
         }
+
 //
 //        Save.save(Constant.RepoPath, null);
 //        Cmd.run();
