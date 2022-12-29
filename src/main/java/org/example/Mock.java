@@ -148,7 +148,7 @@ public class Mock {
             int rand_file = (int)(Math.random()*fileList.size());
             iss_instance.setType_id(sonarRulesList.get(rand_rule).getId());
             iss_instance.setFile_path(fileList.get(rand_file));
-            iss_instance.setCommit_id(commitList.get( commitList.size()-1- (i/iss_per_commit)).getCommit_id());
+//            iss_instance.setCommit_id(commitList.get( commitList.size()-1- (i/iss_per_commit)).getCommit_id());
             issInstanceList.add(iss_instance);
         }
         int case_id = 0;
@@ -159,15 +159,15 @@ public class Mock {
 
             Iss_case iss_case = new Iss_case();
             iss_case.setCase_id(case_hash);
-            iss_case.setCommit_id_new(issInstanceList.get(j).getCommit_id());
-            iss_case.setCommit_id_last(issInstanceList.get(j).getCommit_id());
+            iss_case.setCommit_id_new(commitList.get( commitList.size()-1- (j/iss_per_commit)).getCommit_id());
+            iss_case.setCommit_id_last(commitList.get( commitList.size()-1- (j/iss_per_commit)).getCommit_id());
             iss_case.setCase_status("NEW");
             iss_case.setType_id(issInstanceList.get(j).getType_id());
             issInstanceList.get(j).setCase_id(case_hash);
             for (int i = 1; i < commit_id_range; i++) {
-                //新引入、解决比例
+                //新引入、解决比例 i*iss_per_commit+j
                 if (Math.random()>0.75){
-                    iss_case.setCommit_id_disappear(issInstanceList.get(i*iss_per_commit+j).getCommit_id());
+                    iss_case.setCommit_id_disappear(commitList.get( commitList.size()-1- ((i*iss_per_commit+j)/iss_per_commit)).getCommit_id());
                     iss_case.setCase_status("SOLVED");
                     issCaseList.add(iss_case);
 
@@ -178,13 +178,13 @@ public class Mock {
                     parent_inst_id = UUID.nameUUIDFromBytes(String.valueOf((i*iss_per_commit+j)+start).getBytes()).toString();
 
                     iss_case.setCase_id(case_hash);
-                    iss_case.setCommit_id_new(issInstanceList.get(i*iss_per_commit+j).getCommit_id());
-                    iss_case.setCommit_id_last(issInstanceList.get(i*iss_per_commit+j).getCommit_id());
+                    iss_case.setCommit_id_new(commitList.get( commitList.size()-1- ((i*iss_per_commit+j)/iss_per_commit)).getCommit_id());
+                    iss_case.setCommit_id_last(commitList.get( commitList.size()-1- ((i*iss_per_commit+j)/iss_per_commit)).getCommit_id());
                     iss_case.setCase_status("NEW");
                     iss_case.setType_id(issInstanceList.get(i*iss_per_commit+j).getType_id());
                 } else {
                     iss_case.setCase_status("UNDONE");
-                    iss_case.setCommit_id_last(issInstanceList.get(i*iss_per_commit+j).getCommit_id());
+                    iss_case.setCommit_id_last(commitList.get( commitList.size()-1- ((i*iss_per_commit+j)/iss_per_commit)).getCommit_id());
                     issInstanceList.get(i*iss_per_commit+j).setCase_id(case_hash);
                     issInstanceList.get(i*iss_per_commit+j).setParent_inst_id(parent_inst_id);
                 }

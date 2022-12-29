@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public class Iss_location {
     String location_id;
+    String inst_id;
     String class_;
     String method;
     Long start_line;
@@ -16,7 +17,6 @@ public class Iss_location {
     Long start_col;
     Long end_col;
     String code;
-
 
     public String getLocation_id() {
         return location_id;
@@ -26,6 +26,13 @@ public class Iss_location {
         this.location_id = location_id;
     }
 
+    public String getInst_id() {
+        return inst_id;
+    }
+
+    public void setInst_id(String inst_id) {
+        this.inst_id = inst_id;
+    }
 
     public String getClass_() {
         return class_;

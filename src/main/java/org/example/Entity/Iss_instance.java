@@ -10,7 +10,7 @@ import java.util.List;
 public class Iss_instance {
     String inst_id;
     String type_id;
-    String commit_id;
+//    String commit_id;
     String parent_inst_id;
     String case_id;
     String file_path;
@@ -34,14 +34,14 @@ public class Iss_instance {
     public void setType_id(String type_id) {
         this.type_id = type_id;
     }
-
-    public String getCommit_id() {
-        return commit_id;
-    }
-
-    public void setCommit_id(String commit_id) {
-        this.commit_id = commit_id;
-    }
+//
+//    public String getCommit_id() {
+//        return commit_id;
+//    }
+//
+//    public void setCommit_id(String commit_id) {
+//        this.commit_id = commit_id;
+//    }
     public String getParent_inst_id() {
         return parent_inst_id;
     }
@@ -71,16 +71,16 @@ public class Iss_instance {
             for (SonarIssues sonarIssues1:sonarIssues) {
                 Iss_instance iss_instance=new Iss_instance();
                 iss_instance.inst_id = sonarIssues1.getId();
-                iss_instance.commit_id=commit.getCommit_id();
+//                iss_instance.commit_id=commit.getCommit_id();
                 iss_instance.type_id=sonarIssues1.getTypeId() ;
                 res.add(iss_instance);
             }
     }
 
-    public Iss_instance(String inst_id, String type_id, String commit_id, String parent_inst_id, String case_id, String file_path) {
+    public Iss_instance(String inst_id, String type_id,String parent_inst_id, String case_id, String file_path) {
         this.inst_id = inst_id;
         this.type_id = type_id;
-        this.commit_id = commit_id;
+//        this.commit_id = commit_id;
         this.parent_inst_id = parent_inst_id;
         this.case_id = case_id;
         this.file_path = file_path;
@@ -94,7 +94,7 @@ public class Iss_instance {
         return "Iss_instance{" +
                 "inst_id='" + inst_id + '\'' +
                 ", type_id='" + type_id + '\'' +
-                ", commit_id='" + commit_id + '\'' +
+//                ", commit_id='" + commit_id + '\'' +
                 ", parent_inst_id='" + parent_inst_id + '\'' +
                 ", case_id='" + case_id + '\'' +
                 ", file_path='" + file_path + '\'' +

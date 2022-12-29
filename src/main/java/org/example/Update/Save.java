@@ -19,7 +19,6 @@ import java.util.List;
 public class Save {
     public static void save(String repo_path, Integer num) throws Exception {
 
-
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
@@ -30,6 +29,7 @@ public class Save {
         List<Commit> commitList = JgitUtil.gitLog(git);
         Commit curCommit = JgitUtil.gitCurLog(git);
         System.setOut(console);
+
         int count = num == null ? commitList.size()-1:num-1;
         if(num!=null && num > commitList.size()){
             System.err.println("当前仓库提交数: "+ commitList.size() + ", 预扫描数: " + num);
@@ -41,24 +41,41 @@ public class Save {
         repoCheck(repo_path, sqlMapping);
         HashMap<String, SonarRules> rulesHashMap = getRules(sqlMapping);
         List<Matches> matches = getMatches(sqlMapping, repo_path);
+        boolean first_flag = true;
+        List<String> changedFileList = new ArrayList<>();
         for (int i = count; i >=0; i--) {
             Commit commit = new Commit();
             commit.setCommit(commitList.get(i), repo_path);
             System.out.print(i + ":" + commit.getCommit_msg() +", hash: "+commit.getCommit_hash());
-
-            List<SonarIssues> sonarIssues = resetAndScanAndFetch(repo_path, commit.getCommit_hash(), git);
-            RawIssueMatch.myMatch(sqlMapping, matches, rulesHashMap, sonarIssues, commit, repo_path);
+            List<SonarIssues> sonarIssues = resetAndScanAndFetch(repo_path, commit.getCommit_hash(), git,first_flag,changedFileList);
+            RawIssueMatch.myMatch(sqlMapping, matches, rulesHashMap, sonarIssues, commit, repo_path,changedFileList);
+            first_flag = false;
         }
-
         JgitUtil.gitReset(git, curCommit.getCommit_hash());
     }
 
-    public static List<SonarIssues> resetAndScanAndFetch(String repo_path, String commit_hash, Git git) throws Exception {
+    public static List<SonarIssues> resetAndScanAndFetch(String repo_path, String commit_hash, Git git,boolean first,List<String> changedFileList) throws Exception {
         Ref ref = JgitUtil.gitReset(git, commit_hash);
         String key = repo_path.split("/")[repo_path.split("/").length-1]+commit_hash;
-        CmdUtil.runProcess(repo_path,"sonar-scanner -D sonar.projectKey="+key);
+        changedFileList = JgitUtil.getChangedFiles(git);
+        StringBuilder inclusions = new StringBuilder();
+        int cnt = 0;
+        for (String file: changedFileList) {
+            if (cnt!= changedFileList.size()-1){
+                inclusions.append("**/").append(file).append(",");
+            } else {
+                inclusions.append("**/").append(file);
+            }
+        }
+        if (first){
+            CmdUtil.runProcess(repo_path,"sonar-scanner -D sonar.projectKey="+key);
+        } else {
+            CmdUtil.runProcess(repo_path,"sonar-scanner -D sonar.projectKey="+key+" -D sonar.inclusions="+inclusions);
+        }
+
         return SonarResult.getSonarIssues(key);
     }
+//    "**/CourseSelectedController.java,**/PermitResponse.java"
 
     public static  boolean list_not_empty(List<?> l){
         return l!=null && l.size()!=0;
@@ -76,8 +93,9 @@ public class Save {
     public static  List<Matches> getMatches(SqlMapping sqlMapping, String repo_path) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         List<Matches> matches = new ArrayList<>();
         String sql_str = "select ic.case_id, ic.case_status, ic.commit_id_last, ic.commit_id_disappear, ii.inst_id inst_id_last, ii.type_id, sr.description message, ii.file_path file_name " +
-                "from iss_case ic join iss_instance ii on ic.commit_id_last = ii.commit_id " +
-                "join commit c on c.commit_id = ii.commit_id and c.repo_path = '" + repo_path +"' " +
+                "from iss_case ic join commit_inst ci on ic.commit_id_last = ci.commit_id " +
+                "join commit c on c.commit_id = ci.commit_id and c.repo_path = '" + repo_path +"' " +
+                "join iss_instance ii on ii.inst_id = ci.inst_id " +
                 "join sonarrules sr on ii.type_id = sr.id";
         List<Match_Info> matchInfoList =  (List<Match_Info>) sqlMapping.select(new Match_Info(),sql_str);
         matchInfoList.forEach(matchInfo -> {
