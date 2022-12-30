@@ -22,6 +22,7 @@ public class Main {
         mysqlConnect.useDataBase("sonarissue");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
         sqlMapping.execute(Constant.func);
+        System.out.println("func");
         List<Repos> reposList = (List<Repos>) sqlMapping.select(new Repos());
         if(reposList==null || reposList.size() == 0){
 //            mysqlConnect.execSqlReadFileContent("data.sql");
