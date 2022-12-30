@@ -1,7 +1,7 @@
 package org.example;
 public class Constant {
     public static String func =
-        "CREATE FUNCTION if not exists `duration`(d LONG) RETURNS varchar(30) CHARSET utf8mb4 " +
+        "CREATE DEFINER=`root`@`%` FUNCTION if not exists `duration`(d LONG) RETURNS varchar(30) CHARSET utf8mb4 " +
         "begin " +
         "DECLARE dur varchar(30); " +
         "DECLARE day int; " +
