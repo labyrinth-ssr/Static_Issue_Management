@@ -63,14 +63,29 @@ public class RawIssueMatch {
                 locations.add(issLocation);
             });
             if (curRawIssue.getMappedRawIssue() == null){
+                /**
+                 *  在静态文件中但未匹配
+                 *  修改
+                 *  case_status为new
+                 *  commit_new_id和commit_last_id为当前版本id
+                 *  添加当前commit到instance的映射
+                 *  加入matches
+                 *  */
 //                System.out.println("not match:"+curRawIssue.getStatus());
                 iss_case = new Iss_case(curRawIssue.getType(),curCommit.getCommit_id(),curCommit.getCommit_id(),null,"NEW");
                 caseList.add(iss_case);
                 Matches matches_ = newMatches(iss_case, curRawIssue, locations);
 //              hashMap.put(iss_case.getCase_id(), matches_);
                 matches.add(matches_);
-            }
-            else{
+            } else{
+                /**
+                 *  在静态文件中但并匹配
+                 *  修改
+                 *  case_status为reopen或undone
+                 *  commit_last_id为当前版本id
+                 *  添加当前commit到instance的映射
+                 *  更新matches
+                 *  */
                 String case_status = hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_status();
                 if(case_status.equals("SOLVED")) {
                     case_status = "REOPEN";
@@ -80,7 +95,7 @@ public class RawIssueMatch {
                     System.out.println("undone");
                     case_status = "UNDONE";
                 }
-                iss_case = new Iss_case(hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_id(), curRawIssue.getType(), curCommit.getCommit_id(), curCommit.getCommit_id(), hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().commit_id_disappear, case_status);
+                iss_case = new Iss_case(hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_id(), curRawIssue.getType(), null, curCommit.getCommit_id(), hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().commit_id_disappear, case_status);
                 caseListUpdate.add(iss_case);
                 if(locationEqual(curRawIssue.getLocations(), curRawIssue.getMappedRawIssue().getLocations())){
 //                    System.out.println("================================!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -102,18 +117,32 @@ public class RawIssueMatch {
         for (RawIssue preRawIssue:preRawIssueList) {
             String[] temp = preRawIssue.getFileName().split("/");
             String fileName = temp[temp.length-1];
-            if (preRawIssue.getMappedRawIssue() == null && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED") && changedFileList.contains(fileName)){
+            if (changedFileList.contains(fileName) && preRawIssue.getMappedRawIssue() == null && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED") && changedFileList.contains(fileName)){
+                /**
+                 *  在文件中且未匹配到的实例
+                 *  修改
+                 *  case_status为solved
+                 *  commit_disappear_id为当前版本id
+                 *  更新matches
+                 *  */
                 Iss_case iss_case = new Iss_case(hashMap.get(preRawIssue.getUuid()).getInfo().getCase_id(),preRawIssue.getType(), null, hashMap.get(preRawIssue.getUuid()).getInfo().commit_id_last, curCommit.getCommit_id(), "SOLVED");
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
                 setMatchesPre(matches_, iss_case, preRawIssue);
             } else if (!changedFileList.contains(fileName) && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED") && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("REOPEN")) {
+                /**
+                 *  不包含在静态扫描中的缺陷
+                 *  修改
+                 *  case_status为remain
+                 *  commit_last_id为当前版本id
+                 *  添加当前commit到instance的映射
+                 *  更新matches
+                 *  */
                 Iss_case iss_case = new Iss_case(hashMap.get(preRawIssue.getUuid()).getInfo().getCase_id(),preRawIssue.getType(), null, curCommit.getCommit_id(), null, "NONCHG");
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
                 setMatchesPre(matches_, iss_case, preRawIssue);
                 commitInstList.add(new Commit_Inst(preRawIssue.getUuid(), curCommit.getCommit_id()));
-
             }
 
         }
