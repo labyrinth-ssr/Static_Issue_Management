@@ -73,8 +73,12 @@ public class RawIssueMatch {
             }
             else{
                 String case_status = hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_status();
-                if(case_status.equals("SOLVED")) case_status = "REOPEN";
+                if(case_status.equals("SOLVED")) {
+                    case_status = "REOPEN";
+                    System.out.println("reopen");
+                }
                 if(case_status.equals("NEW")) {
+                    System.out.println("undone");
                     case_status = "UNDONE";
                 }
                 iss_case = new Iss_case(hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_id(), curRawIssue.getType(), curCommit.getCommit_id(), curCommit.getCommit_id(), hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().commit_id_disappear, case_status);
@@ -105,7 +109,7 @@ public class RawIssueMatch {
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
                 setMatchesPre(matches_, iss_case, preRawIssue);
-            } else if (!changedFileList.contains(fileName) && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED")) {
+            } else if (!changedFileList.contains(fileName) && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED") && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("REOPEN")) {
                 Iss_case iss_case = new Iss_case(hashMap.get(preRawIssue.getUuid()).getInfo().getCase_id(),preRawIssue.getType(), null, curCommit.getCommit_id(), null, "NONCHG");
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
