@@ -35,8 +35,7 @@ public class RawIssueMatch {
             RawIssue preRawIssue = newRawIssue(matchInfo.getInst_id_last(),matchInfo.getType_id(),matchInfo.getMessage(),matchInfo.getCommit_id_last(), matchInfo.getFile_name());
             List<Location> tmplocationList = new ArrayList<>();
             if(locations!=null) {
-                locations.forEach(location -> tmplocationList.add(newLocation(Math.toIntExact(location.getStart_line()), Math.toIntExact(location.getEnd_line()), Math.toIntExact(location.getStart_col()), Math.toIntExact(location.getEnd_col()), location.getCode(), location.getMethod(), location.getClass_()))
-                );
+                locations.forEach(location -> tmplocationList.add(newLocation(Math.toIntExact(location.getStart_line()), Math.toIntExact(location.getEnd_line()), Math.toIntExact(location.getStart_col()), Math.toIntExact(location.getEnd_col()), location.getCode(), location.getMethod(), location.getClass_())));
             }
             preRawIssue.setLocations(tmplocationList);
             preRawIssueList.add(preRawIssue);
@@ -104,7 +103,6 @@ public class RawIssueMatch {
             String[] temp = preRawIssue.getFileName().split("/");
             String fileName = temp[temp.length-1];
             if (preRawIssue.getMappedRawIssue() == null && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED") && changedFileList.contains(fileName)){
-                System.out.println("solved in file"+fileName);
                 Iss_case iss_case = new Iss_case(hashMap.get(preRawIssue.getUuid()).getInfo().getCase_id(),preRawIssue.getType(), null, hashMap.get(preRawIssue.getUuid()).getInfo().commit_id_last, curCommit.getCommit_id(), "SOLVED");
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());

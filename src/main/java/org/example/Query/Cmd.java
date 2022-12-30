@@ -120,7 +120,7 @@ public class Cmd {
                 if(str.equals("")) continue;
                 queryMappingByDev.getDevCountByDevs(str,REPO_PATH,mock);
                 System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------");
-                queryMappingByDev.getDevTypeCountByDevs(str,REPO_PATH,mock);
+//                queryMappingByDev.getDevTypeCountByDevs(str,REPO_PATH,mock);
                 queryMappingByDev.getDevTypeCountByDevsTest(str,REPO_PATH,mock);
             }else if(str.startsWith("commits")){
                 queryMappingById.getCommits(REPO_PATH);
