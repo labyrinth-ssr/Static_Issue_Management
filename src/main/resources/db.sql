@@ -133,3 +133,13 @@ create table if not exists repos
 );
 
 set global log_bin_trust_function_creators = 1;
+
+create function dept_count (dept_name varchar(20))
+returns integer
+begin
+declare d_count integer;
+select count (* ) into d_count
+from instructor
+where instructor.dept_name = dept_name
+return d_count;
+end
