@@ -33,8 +33,8 @@ public class Mock {
         int repo_num = Integer.valueOf(properties.getProperty("repo_num"));
         int commit_total_num=Integer.valueOf(properties.getProperty("commit_total_num"));
         int commit_per_repo= commit_total_num/repo_num;
-        int location_num = Integer.valueOf(properties.getProperty("location_num"));
         int inst_total_num = Integer.valueOf(properties.getProperty("inst_total_num"));
+        int location_num = inst_total_num;
         int inst_per_repo = inst_total_num/repo_num;
         List<SonarRules> sonarRulesList = get_sonar_rules();
         SqlConnect mysqlConnect = new SqlConnect();
@@ -49,11 +49,11 @@ public class Mock {
         List<Iss_case> issCaseList = new ArrayList<>();
         List<Iss_location> issLocationList = generate_loaction_list(location_num);
         List<Iss_instance> issInstanceList = new ArrayList<>();
+        List<Commit_Inst> commitInstList = new ArrayList<>();
         for (int i = 0; i < repo_num; i++) {
-            List<Iss_instance> issInstanceList0 = generate_iss_instance_and_case_list(inst_per_repo*i,issCaseList,inst_per_repo,sonarRulesList,commitList.subList(i*commit_per_repo,(i+1)*commit_per_repo),fileList,commit_per_repo);
+            List<Iss_instance> issInstanceList0 = generate_iss_instance_and_case_list(inst_per_repo*i,issCaseList,inst_per_repo, issLocationList, commitInstList, sonarRulesList, commitList.subList(i*commit_per_repo,(i+1)*commit_per_repo), fileList, commit_per_repo);
             issInstanceList.addAll(issInstanceList0);
         }
-        List<Instance_location> instanceLocationList = match_inst_location(issInstanceList,issLocationList);
         System.out.println("begin_saving");
         MockUtil.MockBegin();
         sqlMapping.save(reposList);
@@ -62,35 +62,17 @@ public class Mock {
         MockUtil.MockEnd("commit");
         sqlMapping.save(sonarRulesList);
         MockUtil.MockEnd("sonarRules");
-        sqlMapping.save(issLocationList);
-        MockUtil.MockEnd("issLocation");
         sqlMapping.save(issInstanceList);
         MockUtil.MockEnd("issInstance");
+        sqlMapping.save(issLocationList);
+        MockUtil.MockEnd("issLocation");
+        sqlMapping.save(commitInstList);
+        MockUtil.MockEnd("commitInstList");
         sqlMapping.save(issCaseList);
         MockUtil.MockEnd("issCase");
-        sqlMapping.save(instanceLocationList);
-        MockUtil.MockEnd("instanceLocation");
         System.out.println("done");
     }
 
-    public static List<Instance_location> match_inst_location(List<Iss_instance> issInstanceList,List<Iss_location> issLocationList){
-        List<Instance_location> instanceLocationList = new ArrayList<>();
-        issInstanceList.forEach(iss_instance -> {
-            if (Math.random()<0.95){
-                Instance_location instanceLocation = new Instance_location();
-                instanceLocation.setInst_id(iss_instance.getInst_id());
-                instanceLocation.setLocation_id(issLocationList.get((int)(Math.random()*issLocationList.size())).getLocation_id());
-                instanceLocationList.add(instanceLocation);
-                if (Math.random()<0.3){
-                    Instance_location instanceLocation2 = new Instance_location();
-                    instanceLocation2.setInst_id(iss_instance.getInst_id());
-                    instanceLocation2.setLocation_id(issLocationList.get((int)(Math.random()*issLocationList.size())).getLocation_id());
-                    instanceLocationList.add(instanceLocation2);
-                }
-            }
-        });
-        return instanceLocationList;
-    }
 
     public static List<Commit> get_commit_list_and_repos(List<Repos> reposList,int repo_num,int commit_num){
         String pj_path = MOCK_PATH;
@@ -133,11 +115,11 @@ public class Mock {
         SqlConnect mysqlConnect = new SqlConnect();
         mysqlConnect.useDataBase("sonarissuemock");
         SqlMapping sqlMapping = new SqlMapping(mysqlConnect);
-        sqlMapping.save(SonarResult.getSonartype());
+        sqlMapping.save(change(SonarResult.getSonartype()));
         List<SonarRules> sonarRulesList= (List<SonarRules>) sqlMapping.select(new SonarRules());
         return sonarRulesList == null ? new ArrayList<>():sonarRulesList;
     }
-    public static List<Iss_instance> generate_iss_instance_and_case_list(int start,List<Iss_case>issCaseList,int N,List<SonarRules> sonarRulesList,List<Commit> commitList,List<String> fileList,int commit_id_range) throws Exception {
+    public static List<Iss_instance> generate_iss_instance_and_case_list(int start,List<Iss_case>issCaseList,int N,List<Iss_location> issLocationList, List<Commit_Inst> commitInstList, List<SonarRules> sonarRulesList,List<Commit> commitList,List<String> fileList,int commit_id_range) throws Exception {
         List<Iss_instance> issInstanceList = new ArrayList<>();
 //        int commit_id_range = 100;
         int iss_per_commit = N/commit_id_range;
@@ -148,6 +130,11 @@ public class Mock {
             iss_instance.setFile_path(fileList.get(rand_file));
 //            iss_instance.setCommit_id(commitList.get( commitList.size()-1- (i/iss_per_commit)).getCommit_id());
             issInstanceList.add(iss_instance);
+            Commit_Inst commitInst = new Commit_Inst();
+            commitInst.setCommit_id(commitList.get( commitList.size()-1- (i/iss_per_commit)).getCommit_id());
+            commitInst.setInst_id(iss_instance.getInst_id());
+            commitInstList.add(commitInst);
+            issLocationList.get(i).setInst_id(iss_instance.getInst_id());
         }
         int case_id = 0;
         for (int j = 0; j < iss_per_commit; j++) {
@@ -209,6 +196,12 @@ public class Mock {
             iss_locationList.add(issLocation);
         }
         return iss_locationList;
+    }
+
+    public static List<SonarRules> change(List<org.example.SonarConfig.SonarRules> sonarRules){
+        List<SonarRules> sonarRulesList = new ArrayList<>();
+        sonarRules.forEach(sonarRules1 -> sonarRulesList.add(new SonarRules(sonarRules1.getId(),sonarRules1.getDescription(),sonarRules1.getSeverity(),sonarRules1.getLang(),sonarRules1.getType())));
+        return  sonarRulesList;
     }
 
 //    public static List<SonarIssues> generate_sonar_issue_list(int N) throws Exception {

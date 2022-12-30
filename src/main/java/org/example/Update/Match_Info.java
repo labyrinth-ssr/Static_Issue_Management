@@ -4,7 +4,6 @@ public class Match_Info {
     String case_id;
     String case_status;
     String commit_id_last;
-
     String commit_id_disappear;
     String inst_id_last;
     String type_id;

@@ -166,6 +166,8 @@ public class JgitUtil {
 
     public static List<String> getChangedFiles(Git git) throws IOException {
         List<String> fileList = new ArrayList<>();
+        PrintStream console = System.out;
+        System.setOut(null);
         Repository repository = git.getRepository();
         RevWalk rw = new RevWalk(repository);
 
@@ -183,6 +185,7 @@ public class JgitUtil {
             fileList.add(temp[temp.length-1]);
 //            System.out.println("change:"+temp[temp.length-1]);
         }
+        System.setOut(console);
         return fileList;
     }
 

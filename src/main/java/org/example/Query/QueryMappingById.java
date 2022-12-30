@@ -87,6 +87,7 @@ public class QueryMappingById {
     public void getCountInByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
         String sql = "select count(*) intValue from iss_case where commit_id_new = '"+ commit_id +"'";
+        System.out.println(sql);
         if(mock) MockUtil.MockEnd(null);
         System.out.println("引入缺陷数量: "+ ((List<IntValue>)sqlMapping.select(new IntValue(), sql)).get(0).getIntValue());
     }
@@ -117,17 +118,20 @@ public class QueryMappingById {
     public void getListInByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
         String sql = "select inst_id, type_id, description, file_path " +
-                "from (select type_id, commit_id_new as commit_id from iss_case where commit_id_new = '"+ commit_id +"') ic " +
-                "join iss_instance " +
-                "join commit_instance using(inst_id, commit_id) " +
+                "from (select case_id, type_id, commit_id_new as commit_id from iss_case where commit_id_new = '"+ commit_id +"') ic " +
+                "join commit_inst using(commit_id) " +
+                "join iss_instance using(inst_id, case_id) " +
                 "join sonarrules using(type_id) " +
                 "order by ic.type_id, file_path";
+        System.out.println(sql);
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
         System.out.println("引入缺陷详情: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
                     "from (select * from iss_instance where inst_id = '" + getListInLatestInst.getInst_id() +"') ii " +
-                    "join iss_location order by start_line, start_col";
+                    "join iss_location using(inst_id) " +
+                    "order by start_line, start_col";
+            System.out.println(sql1);
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new Int2String2(), sql1);
             if(!mock) System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     ", 描述: " + getListInLatestInst.getDescription() +
@@ -179,10 +183,10 @@ public class QueryMappingById {
 
     public void getListDoneByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
-        String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
-                "from (select type_id, commit_id_last as commit_id from iss_case where commit_id_last = '"+ commit_id +"') ic " +
-                "join iss_instance " +
-                "join commit_instance using(inst_id, commit_id) " +
+        String sql = "select inst_id, type_id, description, file_path " +
+                "from (select case_id, type_id, commit_id_last as commit_id from iss_case where commit_id_disappear = '"+ commit_id +"' and case_status = 'SOLVED') ic " +
+                "join commit_inst using(commit_id) " +
+                "join iss_instance using(case_id, inst_id) " +
                 "join sonarrules using(type_id) " +
                 "order by ic.type_id, file_path";
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
@@ -190,7 +194,8 @@ public class QueryMappingById {
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
                     "from (select * from iss_instance where inst_id = '" + getListInLatestInst.getInst_id() +"') ii" +
-                    "join iss_location order by start_line, start_col";
+                    "join iss_location using(inst_id) " +
+                    "order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new Int2String2(), sql1);
             if(!mock) System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     ", 描述: " + getListInLatestInst.getDescription() +
@@ -210,7 +215,7 @@ public class QueryMappingById {
     public void getGCountUnsolvedByCommit_id(String commit_id, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
         String sql = "select count(*) intValue, type_id stringValue, duration(avg(TIMESTAMPDIFF(SECOND, commit_time, localtime()))) time from " +
-                "(select * from commit_instance where commit_id = '" + commit_id +"') ci " +
+                "(select * from commit_inst where commit_id = '" + commit_id +"') ci " +
                 "join iss_instance " +
                 "join iss_case ic using(case_id) " +
                 "join commit c using(commit_id) " +
@@ -221,7 +226,7 @@ public class QueryMappingById {
         for(IntStringTime intStringTime : intStringTimes){
             String sql_median = "select duration(TIMESTAMPDIFF(SECOND, commit_time, localtime())) time from " +
                     "iss_instance " +
-                    "join (select * from commit_instance where commit_id = '"+ commit_id +"') " +
+                    "join (select * from commit_inst where commit_id = '"+ commit_id +"') ci " +
                     "join iss_case using(case_id) " +
                     "join commit using(commit_id) " +
                     "where case_status <> 'RESOLVED' and type_id = '"+intStringTime.getStringValue()+"' " +

@@ -71,18 +71,22 @@ public class QueryMappingByTime {
 
     public void getListInByCommit_time(String begin_time, String end_time, String repo,boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
-        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
-        String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
-                "from iss_case ic join iss_instance ii on ic.commit_id_new = ii.commit_id and ic.case_id = ii.case_id " +
-                "join sonarrules sr on ic.type_id = sr.id " +
-                "join commit c on c.commit_id = ic.commit_id_new " +
-                "where "+ sql_condition +" order by ic.type_id, file_path";
+        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"commit");
+        String sql = "select inst_id, type_id, description, file_path " +
+                "from (select * from commit where "+sql_condition+") c " +
+                "join iss_case ic on ic.commit_id_new = c.commit_id " +
+                "join commit_inst using(commit_id) " +
+                "join iss_instance using(inst_id, case_id) " +
+                "join sonarrules using(type_id) " +
+                "order by ic.type_id, file_path";
+        System.out.println(sql);
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
         System.out.println("引入缺陷详情: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
                     "from (select * from iss_instance where inst_id = '" + getListInLatestInst.getInst_id() +"') ii " +
-                    "join iss_location order by start_line, start_col";
+                    "join iss_location  using(inst_id) " +
+                    "order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new Int2String2(), sql1);
             if(!mock) System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     "描述: " + getListInLatestInst.getDescription() +
@@ -102,7 +106,7 @@ public class QueryMappingByTime {
     public void getCountDoneByCommit_time(String begin_time, String end_time, String repo, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
-        String sql = "select count(*) intValue from iss_case join commit c on iss_case.commit_id_disappear = c.commit_id where case_status in ('SOLVED','REOPEN') and " +sql_condition;
+        String sql = "select count(*) intValue from iss_case join commit c on iss_case.commit_id_disappear = c.commit_id where case_status = 'SOLVED' and " +sql_condition;
         if(mock) MockUtil.MockEnd(null);
         System.out.println("解决缺陷数量: " + ((List<IntValue>)sqlMapping.select(new IntValue(),sql)).get(0).getIntValue());
     }
@@ -135,19 +139,21 @@ public class QueryMappingByTime {
     public void getListDoneByCommit_time(String begin_time, String end_time, String repo,boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
         String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"commit");
-        String sql = "select ii.inst_id, ic.type_id, sr.description, file_path " +
+        String sql = "select inst_id, type_id, description, file_path " +
                 "from (select * from commit where "+sql_condition+") c " +
                 "join iss_case ic on ic.commit_id_disappear = c.commit_id and ic.case_status = 'SOLVED' " +
-                "join commit_instance ci on ci.commit_id = ic.commit_id_last " +
+                "join commit_inst ci on ci.commit_id = ic.commit_id_last " +
                 "join iss_instance using(inst_id, case_id) " +
                 "join sonarrules using(type_id) " +
                 "order by ic.type_id, file_path";
+        System.out.println(sql);
         List<GetListInLatestInst> getListInLatestInsts = (List<GetListInLatestInst>) sqlMapping.select(new GetListInLatestInst(), sql);
         System.out.println("解决缺陷详情: ");
         for(GetListInLatestInst getListInLatestInst : getListInLatestInsts) {
             String sql1 = "select start_line intValue1, start_col intValue2, class_ stringValue1, method stringValue2 " +
                     "from (select * from iss_instance where inst_id = '" + getListInLatestInst.getInst_id() +"') ii " +
-                    "join iss_location order by start_line, start_col";
+                    "join iss_location using(inst_id) " +
+                    "order by start_line, start_col";
             List<Int2String2> int2String2s = (List<Int2String2>) sqlMapping.select(new Int2String2(), sql1);
             if(!mock) System.out.print("缺陷类型: "+ getListInLatestInst.getType_id() +
                     ", 描述: " + getListInLatestInst.getDescription() +
@@ -164,27 +170,6 @@ public class QueryMappingByTime {
         if(mock) MockUtil.MockEnd("数据量: " + getListInLatestInsts.size());
     }
 
-    public void getGCountUnsolvedByCommit_time(String begin_time, String end_time, String repo) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        String sql_condition = getUniversalSqlCondition(begin_time,end_time,repo,"c");
-        String sql = "select count(*) intValue, ii.type_id stringValue, avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) time from " +
-                "iss_instance ii join iss_case ic on ii.case_id = ic.case_id and ic.case_status <> 'SOLVED' " +
-                "join commit c on ii.commit_id = c.commit_id and " + sql_condition +
-                "group by ii.type_id order by avg(TIMESTAMPDIFF(SECOND, c.commit_time, localtime())) desc, ii.type_id";
-        List<IntStringTime> intStringTimes = (List<IntStringTime>) sqlMapping.select(new IntStringTime(), sql);
-        System.out.println("现存缺陷类型统计: ");
-        for(IntStringTime intStringTime : intStringTimes){
-            String sql_median = "select TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) time from " +
-                    "iss_instance ii join iss_case ic on ii.case_id = ic.case_id " +
-                    "and ic.case_status <> 'RESOLVED' and ic.type_id = '"+intStringTime.getStringValue()+"' " +
-                    "join commit c on ii.commit_id = c.commit_id and " + sql_condition +
-                    "order by TIMESTAMPDIFF(SECOND, c.commit_time, localtime()) limit " + ((intStringTime.getIntValue()+1)/2 - 1) + ",1";
-            String time = ((List<TimeValue>)sqlMapping.select(new TimeValue(), sql_median)).get(0).getTime();
-            System.out.println("类型: "+ intStringTime.getStringValue() +
-                    ", 数量: " + intStringTime.getIntValue() +
-                    ", 平均存续时长: " + intStringTime.getTime() +
-                    ", 存续时长中位数: " + time);
-        }
-    }
 
     public void getAnalysisCountByCommit_time(String begin_time, String end_time, String repo, boolean mock) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         if(mock) MockUtil.MockBegin();
@@ -214,7 +199,7 @@ public class QueryMappingByTime {
                 "duration(avg(if(case_status='SOLVED',TIMESTAMPDIFF(SECOND, c1.commit_time, c2.commit_time),null))) time from " +
                 "iss_case join commit c1 on c1.commit_id = iss_case.commit_id_new and " + sql_condition +
                 "left join commit c2 on c2.commit_id = iss_case.commit_id_disappear " +
-                "join sonarrules sr on iss_case.type_id = sr.id group by sr.type " +
+                "join sonarrules sr using(type_id) group by sr.type " +
                 "order by avg(if(case_status='SOLVED',TIMESTAMPDIFF(SECOND, c1.commit_time, c2.commit_time),null)) desc";
         System.out.println(sql);
         List<Int2String2Time> int2String2Times = (List<Int2String2Time>) sqlMapping.select(new Int2String2Time(), sql);

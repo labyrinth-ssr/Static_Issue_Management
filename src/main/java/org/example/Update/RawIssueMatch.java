@@ -21,10 +21,8 @@ import org.example.Utils.SqlMapping;
 public class RawIssueMatch {
 
     public static void myMatch(SqlMapping sqlMapping, List<Matches> matches, HashMap<String,SonarRules> rulesHash, List<SonarIssues> issInstanceListCur, Commit curCommit, String repo,List<String> changedFileList) throws SQLException, IOException {
-        System.out.println("changedFileList3"+changedFileList.toString());
         List<Iss_case> caseListUpdate = new ArrayList<>();
         List<Iss_location> locationList = new ArrayList<>();
-        List<Instance_location> instanceLocationList = new ArrayList<>();
         List<Iss_case> caseList = new ArrayList<>();
         List<Iss_instance> instanceList = new ArrayList<>();
         List<SonarRules> sonarRules = new ArrayList<>();
@@ -81,13 +79,15 @@ public class RawIssueMatch {
                 }
                 iss_case = new Iss_case(hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().getCase_id(), curRawIssue.getType(), curCommit.getCommit_id(), curCommit.getCommit_id(), hashMap.get(curRawIssue.getMappedRawIssue().getUuid()).getInfo().commit_id_disappear, case_status);
                 caseListUpdate.add(iss_case);
+                if(locationEqual(curRawIssue.getLocations(), curRawIssue.getMappedRawIssue().getLocations())){
+//                    System.out.println("================================!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    commitInstList.add(new Commit_Inst(curRawIssue.getMappedRawIssue().getUuid(), curCommit.getCommit_id()));
+                    Matches matches_ = hashMap.get(curRawIssue.getMappedRawIssue().getUuid());
+                    setMatches(matches_, iss_case, curRawIssue.getMappedRawIssue(), locations);
+                    continue;
+                }
                 Matches matches_ = hashMap.get(curRawIssue.getMappedRawIssue().getUuid());
                 setMatches(matches_, iss_case, curRawIssue, locations);
-                if(locationEqual(curRawIssue.getLocations(), curRawIssue.getMappedRawIssue().getLocations())){
-                   commitInstList.add(new Commit_Inst(curRawIssue.getUuid(), curCommit.getCommit_id()));
-//                    System.out.println("================================!!!!!!!!!!!!!!!!!!!!!!!!!");
-                   continue;
-                }
             }
 //          instanceLocationList.add(new Instance_location(curRawIssue.getUuid(),issLocation.getLocation_id()))
             locations.forEach(issLocation -> issLocation.setInst_id(curRawIssue.getUuid()));
@@ -130,7 +130,6 @@ public class RawIssueMatch {
             sqlMapping.save(caseList);
             sqlMapping.save(instanceList);
             sqlMapping.save(locationList);
-            sqlMapping.save(instanceLocationList);
             sqlMapping.save(commitInstList);
             sqlMapping.getConnection().commit();
             sqlMapping.getConnection().setAutoCommit(true);
@@ -190,10 +189,7 @@ public class RawIssueMatch {
         return new Iss_location(l.getClassName(), l.getAnchorName(), l.getStartLine(), l.getEndLine(), l.getStartToken(), l.getEndToken(), l.getCode(), l.getFilePath());
     }
 
-    public static void setMatch(Iss_match iss_match, String parent_inst_id, String case_id){
-        iss_match.setParent_inst_id(parent_inst_id);
-        iss_match.setCase_id(case_id);
-    }
+
 
     public static void setCase(Iss_case iss_case, String status, String commit_id_last, String commit_id_disappear){
         iss_case.setCase_status(status);

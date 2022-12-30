@@ -43,14 +43,15 @@ public class Save {
         List<Matches> matches = getMatches(sqlMapping, repo_path);
         boolean first_flag = true;
         System.setOut(null);
-        List<String> changedFileList = changedFileList = JgitUtil.getChangedFiles(git);
         System.setOut(console);
         for (int i = count; i >=0; i--) {
             Commit commit = new Commit();
             commit.setCommit(commitList.get(i), repo_path);
             System.out.print(i + ":" + commit.getCommit_msg() +", hash: "+commit.getCommit_hash());
-            List<SonarIssues> sonarIssues = resetAndScanAndFetch(repo_path, commit.getCommit_hash(), git, first_flag, changedFileList);
-            System.out.println("changedFileList2"+changedFileList.toString());
+            Ref ref = JgitUtil.gitReset(git, commit.getCommit_hash());
+            List<String> changedFileList = JgitUtil.getChangedFiles(git);
+            List<SonarIssues> sonarIssues = resetAndScanAndFetch(repo_path, commit.getCommit_hash(), first_flag, changedFileList);
+            System.out.println("changedFileList: "+changedFileList.toString());
             RawIssueMatch.myMatch(sqlMapping, matches, rulesHashMap, sonarIssues, commit, repo_path, changedFileList);
             first_flag = false;
         }
@@ -58,8 +59,7 @@ public class Save {
     }
 
 
-    public static List<SonarIssues> resetAndScanAndFetch(String repo_path, String commit_hash, Git git,boolean first,List<String> changedFileList) throws Exception {
-        Ref ref = JgitUtil.gitReset(git, commit_hash);
+    public static List<SonarIssues> resetAndScanAndFetch(String repo_path, String commit_hash, boolean first,List<String> changedFileList) throws Exception {
         String key = repo_path.split("/")[repo_path.split("/").length-1]+commit_hash;
         StringBuilder inclusions = new StringBuilder();
         int cnt = 0;
@@ -99,10 +99,10 @@ public class Save {
                 "from iss_case ic join commit_inst ci on ic.commit_id_last = ci.commit_id " +
                 "join commit c on c.commit_id = ci.commit_id and c.repo_path = '" + repo_path +"' " +
                 "join iss_instance ii on ii.inst_id = ci.inst_id " +
-                "join sonarrules sr";
+                "join sonarrules sr using(type_id) ";
         List<Match_Info> matchInfoList =  (List<Match_Info>) sqlMapping.select(new Match_Info(),sql_str);
         matchInfoList.forEach(matchInfo -> {
-            String sql = "select il.* from iss_location il join instance_location inl on il.location_id = inl.location_id where inl.inst_id = '" + matchInfo.getInst_id_last()+"'";
+            String sql = "select il.* from iss_location il where il.inst_id = '" + matchInfo.getInst_id_last()+"'";
             List<Iss_location> locations = null;
             try {
                 locations = (List<Iss_location>) sqlMapping.select(new Iss_location(),sql);

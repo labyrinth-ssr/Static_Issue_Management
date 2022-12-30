@@ -3,9 +3,8 @@
 /* Created on:     2022/11/24 20:11:19                          */
 /*==============================================================*/
 
- drop database if EXISTS SonarIssue;
 
-create database if not exists SonarIssue;
+create database if not exists sonarissue;
 use sonarIssue;
 
 
