@@ -95,16 +95,17 @@ public class RawIssueMatch {
             instanceList.add(new Iss_instance(curRawIssue.getUuid(),curRawIssue.getType(),curRawIssue.getMappedRawIssue() == null ? null:curRawIssue.getMappedRawIssue().getUuid(), iss_case.getCase_id(), curRawIssue.getFileName()));
             commitInstList.add(new Commit_Inst(curRawIssue.getUuid(),curCommit.getCommit_id()));
         }
-
+//        System.out.println("file list length:"+changedFileList.size());
         for (RawIssue preRawIssue:preRawIssueList) {
             String[] temp = preRawIssue.getFileName().split("/");
             String fileName = temp[temp.length-1];
             if (preRawIssue.getMappedRawIssue() == null && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED") && changedFileList.contains(fileName)){
+                System.out.println("solved in file"+fileName);
                 Iss_case iss_case = new Iss_case(hashMap.get(preRawIssue.getUuid()).getInfo().getCase_id(),preRawIssue.getType(), null, hashMap.get(preRawIssue.getUuid()).getInfo().commit_id_last, curCommit.getCommit_id(), "SOLVED");
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
                 setMatchesPre(matches_, iss_case, preRawIssue);
-            } else if (!changedFileList.contains(fileName)) {
+            } else if (!changedFileList.contains(fileName) && !hashMap.get(preRawIssue.getUuid()).getInfo().case_status.equals("SOLVED")) {
                 Iss_case iss_case = new Iss_case(hashMap.get(preRawIssue.getUuid()).getInfo().getCase_id(),preRawIssue.getType(), null, curCommit.getCommit_id(), null, "NONCHG");
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
