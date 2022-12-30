@@ -114,6 +114,8 @@ public class RawIssueMatch {
                 caseListUpdate.add(iss_case);
                 Matches matches_ = hashMap.get(preRawIssue.getUuid());
                 setMatchesPre(matches_, iss_case, preRawIssue);
+            }
+            if (!changedFileList.contains(fileName)){
                 commitInstList.add(new Commit_Inst(preRawIssue.getUuid(), curCommit.getCommit_id()));
             }
         }
